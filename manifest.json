@@ -1,0 +1,23 @@
+{
+    "name": "YouTube Speed Time Calculator",
+    "version": "1.0.0",
+    "description": "Simple Calculator to find time with YouTube video speed",
+    "manifest_version": 3,
+    "author": "Liying Chen",
+    "permissions": [
+        "webNavigation"
+    ],
+    "background": {
+        "service_worker": "js/background.js"
+    },
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "Calculation for YouTube Time and Speed"
+    },
+    "content_scripts": [
+        {
+          "matches": ["*://www.youtube.com/watch?v=*"],
+          "js": ["js/content.js"]
+        }
+    ]
+}

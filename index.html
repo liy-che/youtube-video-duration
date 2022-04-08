@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+  	<meta charset="utf-8">
+  	<meta name="description" content="Simple Calculator to find time with YouTube video speed">
+  	<meta name="keywords" content="YouTube, video, speed, calculator">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<title>YouTube Speed Time Calculator</title>
+
+		<!-- external CSS link -->
+		<link rel="stylesheet" href="css/normalize.css">
+		<link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+        <main class="container">
+            <form>
+                <label>
+                    <input type="radio" name="speed" value="1.0" checked> x1
+                </label>
+                <label>
+                    <input type="radio" name="speed" value="1.25"> x1.25
+                </label>
+                <label>
+                    <input type="radio" name="speed" value="1.75"> x1.75
+                </label>
+                <label>
+                    <input type="radio" name="speed" value="2.0"> x2
+                </label>
+            </form>
+
+            <p>Time: <span id="time"></span></p>
+            <p id="result"></p>
+        </main>
+		<script type="text/javascript" src="js/main.js"></script>
+	</body>
+</html>
