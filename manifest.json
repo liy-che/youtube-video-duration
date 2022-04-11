@@ -5,19 +5,22 @@
     "manifest_version": 3,
     "author": "Liying Chen",
     "permissions": [
-        "webNavigation"
+        "activeTab", "scripting", "storage"
     ],
-    "background": {
-        "service_worker": "js/background.js"
-    },
     "action":{
         "default_popup": "index.html",
-        "default_title": "Calculation for YouTube Time and Speed"
-    },
-    "content_scripts": [
-        {
-          "matches": ["*://www.youtube.com/watch?v=*"],
-          "js": ["js/content.js"]
+        "default_title": "Calculation for YouTube Time and Speed",
+        "default_icon": {
+            "16": "/images/speedCalc16.png",
+            "32": "/images/speedCalc32.png",
+            "48": "/images/speedCalc48.png",
+            "128": "/images/speedCalc128.png"
         }
-    ]
+    },
+    "icons": {
+        "16": "/images/speedCalc16.png",
+        "32": "/images/speedCalc32.png",
+        "48": "/images/speedCalc48.png",
+        "128": "/images/speedCalc128.png"
+    }
 }
