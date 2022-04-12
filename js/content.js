@@ -7,9 +7,9 @@ if(document.readyState === 'loading') {
 
 function afterDOMLoaded(){
     //Everything that needs to happen after the DOM has initially loaded.
+    let duration = document.querySelector('video').duration;
 
-    alert(document.querySelector('video').duration);
-    // chrome.runtime.sendMessage({videoTime: 1}, function(response) {
-    //     console.log(response.farewell);
-    // });
+    chrome.runtime.sendMessage({msgType: 1, durationInSec: duration}, function(response) {
+        console.log(response.farewell);
+    });
 }
