@@ -9,7 +9,7 @@
     ],
     "action":{
         "default_popup": "index.html",
-        "default_title": "Calculation for YouTube Time and Speed",
+        "default_title": "YouTube Speed Calculator",
         "default_icon": {
             "16": "/images/speedCalc16.png",
             "32": "/images/speedCalc32.png",

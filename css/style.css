@@ -36,7 +36,6 @@
   /* LAYOUT
   /*******************************************/
   form {
-    border: 1px solid red;
     display: flex;
     flex-direction: column;
   }
@@ -52,4 +51,6 @@
   /******************************************
   /* ADDITIONAL STYLES
   /*******************************************/
-  
+  h1 {
+    font-size: 1.6rem;
+  }

@@ -45,6 +45,7 @@ chrome.runtime.onMessage.addListener(
                   "from a content script:" + sender.tab.url :
                   "from the extension");
       if (request.msgType === 1) {
+          document.querySelector('h1').innerText = request.vidTitle;
           vidDuration = request.durationInSec;
           updateCalcResult(vidDuration);
           sendResponse({farewell: "goodbye"});
