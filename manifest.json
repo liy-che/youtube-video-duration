@@ -5,8 +5,11 @@
     "manifest_version": 3,
     "author": "Liying Chen",
     "permissions": [
-        "activeTab", "scripting", "storage"
+        "activeTab", "scripting", "storage", "declarativeContent"
     ],
+    "background": {
+        "service_worker": "js/background.js"
+    },
     "action":{
         "default_popup": "index.html",
         "default_title": "YouTube Speed Calculator",
