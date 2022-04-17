@@ -18,7 +18,16 @@
             <h1></h1>
             <form>
                 <label>
-                    <input type="radio" name="speed" value="1.0" checked> x1
+                    <input type="radio" name="speed" value="0.25"> x0.25
+                </label>
+                <label>
+                    <input type="radio" name="speed" value="0.5"> x0.5
+                </label>
+                <label>
+                    <input type="radio" name="speed" value="0.75"> x0.75
+                </label>
+                <label>
+                    <input type="radio" name="speed" value="1.0" checked autofocus> x1
                 </label>
                 <label>
                     <input type="radio" name="speed" value="1.25"> x1.25
@@ -35,7 +44,7 @@
             </form>
 
             <p>Time: <span id="time"></span></p>
-            <p>Saved: <span id="saved"></span></p>
+            <p><span id="diff-word">Saved: </span><span id="diff"></span></p>
         </main>
 		<script type="text/javascript" src="js/main.js"></script>
 	</body>

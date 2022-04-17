@@ -5,7 +5,7 @@
     "manifest_version": 3,
     "author": "Liying Chen",
     "permissions": [
-        "activeTab", "scripting", "storage", "declarativeContent"
+        "activeTab", "scripting", "storage", "declarativeContent", "commands"
     ],
     "background": {
         "service_worker": "js/background.js"
@@ -25,5 +25,12 @@
         "32": "/images/speedCalc32.png",
         "48": "/images/speedCalc48.png",
         "128": "/images/speedCalc128.png"
+    },
+    "commands": {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+S"
+            }
+        }
     }
 }
