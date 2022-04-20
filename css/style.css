@@ -27,6 +27,7 @@
     width: 200px;
     font-size: 1.6rem;
     padding: 10px;
+    font-family: "Roboto", Arial, Helvetica, sans-serif;
   }
   
   html {
@@ -98,4 +99,11 @@
 
   .pressed-incre {
     border-color: transparent transparent transparent #005792;
+  }
+
+  small {
+    font-size: .9rem;
+    color: #808080;
+    float: right;
+    margin: 5px 0;
   }
