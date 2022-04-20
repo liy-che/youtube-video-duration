@@ -2,7 +2,10 @@
 
 
 let vidDuration;
-let speedChosen = 1.0;
+let playSpeed = 1;
+let showSpeed = playSpeed;
+const decreButton = document.querySelector('#decre');
+const increButton = document.querySelector('#incre');
 
 
 /******************************* event listeners ******************************/
@@ -14,35 +17,75 @@ chrome.runtime.onMessage.addListener(
       if (request.msgType === 1) {
           document.querySelector('h1').innerText = request.vidTitle;
           vidDuration = request.durationInSec;
-          updateCalcResult(vidDuration/request.speed);
-          updateChecked(request.speed);
-          sendResponse({farewell: "goodbye"});
+          updateCalcResult(calcDuration(request.speed));
+          updatePlaySpeed(request.speed);
       }
     }
 );
 
-// calculate time for selected speed
-const buttons = document.querySelectorAll('input[name="speed"]');
-Array.from(buttons).forEach(button => button.addEventListener('change', calcTime));
+// change speed with arrow
+decreButton.addEventListener('click', decreSpeed);
 
-function calcTime(evt) {
-    speedChosen = evt.target.value; 
-    const newTime = vidDuration / speedChosen;
-    updateCalcResult(newTime);
+function decreSpeed() {
+    if (showSpeed > 0.25) {
+        updateShowSpeed(showSpeed-0.25);
+        updateCalcResult(calcDuration(showSpeed));
+    }
 }
 
-// listening for enter key up on radio buttons
-const radioButtons = document.querySelectorAll('input[name="speed"]');
-Array.from(radioButtons).forEach(button => button.addEventListener("keyup", keyPressHandler));
+increButton.addEventListener('click', increSpeed);
 
-function keyPressHandler(evt) {
-    if (evt.keyCode === 13) {
-        evt.preventDefault();
-        sendMessage({msgType: 1, speed: speedChosen});
-    } 
-    else if (evt.keyCode === 32) window.close();
+function increSpeed() {
+    if (showSpeed < 2) {
+        updateShowSpeed(showSpeed+0.25);
+        updateCalcResult(calcDuration(showSpeed));
+    }
 }
 
+// listen for key press
+document.onkeydown = event => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        decreSpeed();
+        decreButton.classList.add('pressed-decre');
+    }
+    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        increSpeed();
+        increButton.classList.add('pressed-incre');
+    }
+    else if (event.key === 'Enter') {
+        if (showSpeed === playSpeed) {
+            window.close();
+            return;
+        }
+        playSpeed = showSpeed;
+        sendMessage({msgType: 1, speed: showSpeed});
+    }
+    else if (event.key === ' ') window.close();
+}
+
+document.onkeyup = event => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        decreButton.classList.remove('pressed-decre');
+    }
+    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        increButton.classList.remove('pressed-incre');
+    }
+}
+
+decreButton.addEventListener('mousedown', toggleColor);
+decreButton.addEventListener('mouseup', toggleColor);
+increButton.addEventListener('mousedown', toggleColor);
+increButton.addEventListener('mouseup', toggleColor);
+
+function toggleColor(event) {
+    const classList = event.target.classList;
+    if (classList.contains('left-arrow')) {
+        classList.toggle('pressed-decre');
+    }
+    else if (classList.contains('right-arrow')) {
+        classList.toggle('pressed-incre');
+    }
+}
 
 /******************************* helper functions *****************************/
 
@@ -64,46 +107,45 @@ function convertSecondToTimestamp(totalSeconds) {
     return timeStr;
 }
 
+function calcDuration(speed) {
+    return vidDuration/speed;
+}
+
 
 /********************************* functions **********************************/
 
 
 function sendMessage(msg) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, msg, function(response) {
-          console.log(response.farewell);
-        });
+        chrome.tabs.sendMessage(tabs[0].id, msg);
     });
 }
 
 function updateCalcResult(newTime) {
-    const diffWord = document.querySelector('#diff-word');
-    const diff = newTime - vidDuration
+    const sign = document.querySelector('#sign');
     const timeDiff = newTime - vidDuration;
 
     document.querySelector('#time').innerText = convertSecondToTimestamp(newTime);
     document.querySelector('#diff').innerText = convertSecondToTimestamp(Math.abs(timeDiff));
 
-    if (timeDiff < 0) diffWord.innerText = 'Saved: ';
-    else if (timeDiff > 0) diffWord.innerText = 'Added: ';
+    if (timeDiff < 0) sign.innerText = '-';
+    else if (timeDiff > 0) sign.innerText = '+';
     else {
-        diffWord.innerText = '';
-        document.querySelector('#diff').innerText = '';
+        sign.innerText = '=';
+        document.querySelector('#diff').innerText = '00:00';
     }
 }
 
-function updateChecked(curSpeed) {
-    if (curSpeed != speedChosen) {
-        speedChosen = curSpeed;
-        const curSelected = document.querySelector('input[checked]');
-        curSelected.removeAttribute('checked');
-        curSelected.removeAttribute('autofocus');
-
-        // update selection
-        const newSelected = document.querySelector(`input[value="${curSpeed}"]`);
-        newSelected.setAttribute('checked', '');
-        newSelected.focus();
+function updatePlaySpeed(curSpeed) {
+    if (curSpeed != playSpeed) {
+        playSpeed = curSpeed;
+        updateShowSpeed(playSpeed);
     }
+}
+
+function updateShowSpeed(newSpeed) {
+    showSpeed = newSpeed;
+    document.querySelector('#speed').innerText = showSpeed.toFixed(2);
 }
 
 async function injectScript() {

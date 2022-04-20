@@ -16,35 +16,17 @@
 	<body>
         <main class="container">
             <h1></h1>
-            <form>
-                <label>
-                    <input type="radio" name="speed" value="0.25"> x0.25
-                </label>
-                <label>
-                    <input type="radio" name="speed" value="0.5"> x0.5
-                </label>
-                <label>
-                    <input type="radio" name="speed" value="0.75"> x0.75
-                </label>
-                <label>
-                    <input type="radio" name="speed" value="1.0" checked autofocus> x1
-                </label>
-                <label>
-                    <input type="radio" name="speed" value="1.25"> x1.25
-                </label>
-                <label>
-                    <input type="radio" name="speed" value="1.5"> x1.5
-                </label>
-                <label>
-                    <input type="radio" name="speed" value="1.75"> x1.75
-                </label>
-                <label>
-                    <input type="radio" name="speed" value="2.0"> x2
-                </label>
-            </form>
+
+            <section id="speed-display">
+                <span id="speed">1.00</span>
+                <section id="controls">
+                    <div class="triangle left-arrow" id="decre"></div>
+                    <div class="triangle right-arrow" id="incre"></div>
+                </section>
+            </section>
 
             <p>Time: <span id="time"></span></p>
-            <p><span id="diff-word">Saved: </span><span id="diff"></span></p>
+            <p>Change(<span id="sign"></span>): <span id="diff"></span></p>
         </main>
 		<script type="text/javascript" src="js/main.js"></script>
 	</body>

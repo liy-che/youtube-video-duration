@@ -10,9 +10,7 @@ function afterDOMLoaded(){
     let video = document.querySelector('video')
     let duration = video.duration;
     let title = document.querySelector('h1 yt-formatted-string.style-scope.ytd-video-primary-info-renderer').innerText;
-    chrome.runtime.sendMessage({msgType: 1, vidTitle: title, durationInSec: duration, speed: video.playbackRate}, function(response) {
-        console.log(response.farewell);
-    });
+    chrome.runtime.sendMessage({msgType: 1, vidTitle: title, durationInSec: duration, speed: video.playbackRate});
 }
 
 
@@ -21,6 +19,5 @@ chrome.runtime.onMessage.addListener(
         if (request.msgType === 1) {
             document.querySelector('video').playbackRate = request.speed;
         }
-        sendResponse({farewell: "goodbye"});
     }
 );

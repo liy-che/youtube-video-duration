@@ -1,5 +1,3 @@
-console.log('hi it\'s background');
-
 chrome.runtime.onInstalled.addListener(() => {
   // Page actions are disabled by default and enabled on select tabs
   chrome.action.disable();
