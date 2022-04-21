@@ -33,6 +33,13 @@
   html {
       font-size: 62.5%;
   }
+
+  body:hover {
+      background-color: #FAFDD6;
+      -webkit-transition: background-color 1000ms linear;
+      -ms-transition: background-color 1000ms linear;
+      transition: background-color 1000ms linear;
+  }
   
   /******************************************
   /* LAYOUT
@@ -75,12 +82,27 @@
   }
 
   .triangle {
+    cursor: pointer;
     display: inline-block;
     border-style: solid;
 
     /* Size */
     height: 0px;
     width: 0px;
+  }
+
+  .gray-out {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .on-hover {
+    opacity: 0.7;
+    transition: 0.2s;
+  }
+
+  .on-hover:hover {
+    opacity: 1;
   }
 
   .left-arrow {

@@ -1,11 +1,17 @@
 /******************************* program states *******************************/
 
+const minSpeed = 0.25;
+const interval = 0.25;
+const maxSpeed = 2;
 
 let vidDuration;
 let playSpeed = 1;
 let showSpeed = playSpeed;
 const decreButton = document.querySelector('#decre');
 const increButton = document.querySelector('#incre');
+const timeDisplay = document.querySelector('#time');
+const diffDisplay = document.querySelector('#diff');
+const sign = document.querySelector('#sign');
 
 
 /******************************* event listeners ******************************/
@@ -17,10 +23,17 @@ chrome.runtime.onMessage.addListener(
       if (request.msgType === 1) {
           document.querySelector('h1').innerText = request.vidTitle;
           vidDuration = request.durationInSec;
-          updateCalcResult(calcDuration(request.speed));
           updatePlaySpeed(request.speed);
-          sendResponse({farewell: "goodbye"});
+        
+          if (request.speed !== 0) updateCalcResult(calcDuration(request.speed));
+          else {
+            timeDisplay.innerHTML = '&infin;';
+            diffDisplay.innerHTML = '&infin;';
+            sign.innerText = '+';
+          }
+          checkSpeed();
       }
+      sendResponse({farewell: "goodbye"});
     }
 );
 
@@ -28,29 +41,35 @@ chrome.runtime.onMessage.addListener(
 decreButton.addEventListener('click', decreSpeed);
 
 function decreSpeed() {
-    if (showSpeed > 0.25) {
-        updateShowSpeed(showSpeed-0.25);
+    if (increButton.classList.contains('gray-out')) enableClick(increButton);
+    if (showSpeed > minSpeed) {
+        updateShowSpeed(showSpeed-interval);
         updateCalcResult(calcDuration(showSpeed));
     }
+    checkSpeed();
 }
 
 increButton.addEventListener('click', increSpeed);
 
 function increSpeed() {
-    if (showSpeed < 2) {
-        updateShowSpeed(showSpeed+0.25);
+    if (decreButton.classList.contains('gray-out')) enableClick(decreButton);
+    if (showSpeed < maxSpeed) {
+        updateShowSpeed(showSpeed+interval);
         updateCalcResult(calcDuration(showSpeed));
     }
+    checkSpeed();
 }
 
 // listen for key press
 document.onkeydown = event => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
         decreSpeed();
+        if (decreButton.classList.contains('gray-out')) return;
         decreButton.classList.add('pressed-decre');
     }
     else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         increSpeed();
+        if (increButton.classList.contains('gray-out')) return;
         increButton.classList.add('pressed-incre');
     }
     else if (event.key === 'Enter') {
@@ -80,6 +99,7 @@ increButton.addEventListener('mouseup', toggleColor);
 
 function toggleColor(event) {
     const classList = event.target.classList;
+    if (classList.contains('gray-out')) return;
     if (classList.contains('left-arrow')) {
         classList.toggle('pressed-decre');
     }
@@ -112,6 +132,21 @@ function calcDuration(speed) {
     return vidDuration/speed;
 }
 
+function disableClick(elt) {
+    elt.classList.remove('on-hover');
+    elt.classList.add('gray-out');
+}
+
+function enableClick(elt) {
+    elt.classList.add('on-hover');
+    elt.classList.remove('gray-out');
+}
+
+function checkSpeed() {
+    if (showSpeed === maxSpeed) disableClick(increButton);
+    else if (showSpeed === minSpeed) disableClick(decreButton);
+    else if (showSpeed === 0) disableClick(decreButton);
+}
 
 /********************************* functions **********************************/
 
@@ -125,17 +160,16 @@ function sendMessage(msg) {
 }
 
 function updateCalcResult(newTime) {
-    const sign = document.querySelector('#sign');
     const timeDiff = newTime - vidDuration;
 
-    document.querySelector('#time').innerText = convertSecondToTimestamp(newTime);
-    document.querySelector('#diff').innerText = convertSecondToTimestamp(Math.abs(timeDiff));
+    timeDisplay.innerText = convertSecondToTimestamp(newTime);
+    diffDisplay.innerText = convertSecondToTimestamp(Math.abs(timeDiff));
 
     if (timeDiff < 0) sign.innerText = '-';
     else if (timeDiff > 0) sign.innerText = '+';
     else {
         sign.innerText = '=';
-        document.querySelector('#diff').innerText = '00:00';
+        diffDisplay.innerText = '00:00';
     }
 }
 
