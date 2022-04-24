@@ -1,6 +1,6 @@
 /******************************* program states *******************************/
 
-const minSpeed = 0.25;
+const minSpeed = 0;
 const interval = 0.25;
 const maxSpeed = 2;
 
@@ -9,9 +9,18 @@ let playSpeed = 1;
 let showSpeed = playSpeed;
 const decreButton = document.querySelector('#decre');
 const increButton = document.querySelector('#incre');
+const setButton = document.querySelector('#set-speed');
 const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
 const sign = document.querySelector('#sign');
+
+function showIcon() {
+    document.getElementById('loading').style.display ='block';
+  } 
+ 
+function hideIcon() {
+    document.getElementById('loading').style.display ='none';
+}
 
 
 /******************************* event listeners ******************************/
@@ -21,16 +30,11 @@ const sign = document.querySelector('#sign');
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
       if (request.msgType === 1) {
+          hideIcon();
           document.querySelector('h1').innerText = request.vidTitle;
           vidDuration = request.durationInSec;
           updatePlaySpeed(request.speed);
-        
-          if (request.speed !== 0) updateCalcResult(calcDuration(request.speed));
-          else {
-            timeDisplay.innerHTML = '&infin;';
-            diffDisplay.innerHTML = '&infin;';
-            sign.innerText = '+';
-          }
+          updateCalcResult(calcDuration(request.speed));
           checkSpeed();
       }
       sendResponse({farewell: "goodbye"});
@@ -60,6 +64,8 @@ function increSpeed() {
     checkSpeed();
 }
 
+setButton.addEventListener('click', setSpeed);
+
 // listen for key press
 document.onkeydown = event => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
@@ -77,8 +83,7 @@ document.onkeydown = event => {
             window.close();
             return;
         }
-        playSpeed = showSpeed;
-        sendMessage({msgType: 1, speed: showSpeed});
+        setSpeed();
     }
     else if (event.key === ' ') window.close();
 }
@@ -143,6 +148,11 @@ function enableClick(elt) {
 }
 
 function checkSpeed() {
+    if (showSpeed == playSpeed) {
+        setButton.classList.add('selected');
+    }
+    else setButton.classList.remove('selected');
+
     if (showSpeed === maxSpeed) disableClick(increButton);
     else if (showSpeed === minSpeed) disableClick(decreButton);
     else if (showSpeed === 0) disableClick(decreButton);
@@ -160,6 +170,13 @@ function sendMessage(msg) {
 }
 
 function updateCalcResult(newTime) {
+    if (!isFinite(newTime)) {
+        timeDisplay.innerHTML = '&infin;';
+        diffDisplay.innerHTML = '&infin;';
+        sign.innerText = '+';
+        return;
+    }
+
     const timeDiff = newTime - vidDuration;
 
     timeDisplay.innerText = convertSecondToTimestamp(newTime);
@@ -183,6 +200,12 @@ function updatePlaySpeed(curSpeed) {
 function updateShowSpeed(newSpeed) {
     showSpeed = newSpeed;
     document.querySelector('#speed').innerText = showSpeed.toFixed(2);
+}
+
+function setSpeed() {
+    setButton.classList.add('selected');
+    playSpeed = showSpeed;
+    sendMessage({msgType: 1, speed: showSpeed});
 }
 
 async function injectScript() {
