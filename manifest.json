@@ -7,6 +7,10 @@
     "permissions": [
         "activeTab", "scripting", "declarativeContent", "commands"
     ],
+    "content_scripts": [{
+        "matches": ["*://*.youtube.com/*"],
+        "js":["js/content.js"]
+    }],
     "background": {
         "service_worker": "js/background.js"
     },

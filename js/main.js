@@ -29,6 +29,7 @@ function hideIcon() {
 // listen to message from content script
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+      alert('main receives msg');
       if (request.msgType === 1) {
           hideIcon();
           document.querySelector('h1').innerText = request.vidTitle;
@@ -221,4 +222,3 @@ async function injectScript() {
 /******************************* main program *********************************/
 
 // when pop up is opened, get video duration
-injectScript();
