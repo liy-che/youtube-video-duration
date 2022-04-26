@@ -25,20 +25,12 @@ function hideIcon() {
 
 /******************************* event listeners ******************************/
 
-
-// listen to message from content script
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
-      alert('main receives msg');
       if (request.msgType === 1) {
-          hideIcon();
-          document.querySelector('h1').innerText = request.vidTitle;
-          vidDuration = request.durationInSec;
-          updatePlaySpeed(request.speed);
-          updateCalcResult(calcDuration(request.speed));
-          checkSpeed();
+          processInfo(request);
       }
-      sendResponse({farewell: "goodbye"});
+      sendResponse({success: true});
     }
 );
 
@@ -162,11 +154,18 @@ function checkSpeed() {
 /********************************* functions **********************************/
 
 
+function processInfo(info) {
+    hideIcon();
+    document.querySelector('h1').innerText = info.vidTitle;
+    vidDuration = info.durationInSec;
+    updatePlaySpeed(info.speed);
+    updateCalcResult(calcDuration(info.speed));
+    checkSpeed();
+}
+
 function sendMessage(msg) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, msg, function(response) {
-          console.log(response.farewell);
-        });
+        chrome.tabs.sendMessage(tabs[0].id, msg);
     });
 }
 
@@ -206,19 +205,10 @@ function updateShowSpeed(newSpeed) {
 function setSpeed() {
     setButton.classList.add('selected');
     playSpeed = showSpeed;
-    sendMessage({msgType: 1, speed: showSpeed});
+    sendMessage({msgType: 2, speed: showSpeed});
 }
-
-async function injectScript() {
-    let [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['js/content.js']
-    });
-}
-
 
 /******************************* main program *********************************/
 
 // when pop up is opened, get video duration
+sendMessage({msgType: 1});
