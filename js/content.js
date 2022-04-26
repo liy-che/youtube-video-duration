@@ -55,7 +55,7 @@ async function afterDOMLoaded(msgType){
     let title = elt.innerText;
 
     // return video info for extension
-    sendMessage({msgType: msgType, vidTitle: title, durationInSec: duration, speed: video.playbackRate});
+    return {msgType: msgType, vidTitle: title, durationInSec: duration, speed: video.playbackRate};
 }
 
 // afterDOMLoaded();
@@ -70,7 +70,8 @@ function sendMessage(msg) {
 // receive incoming message
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (request.msgType === 1) { // sender wants us to collect and send info
-            afterDOMLoaded(request.msgType);
+            afterDOMLoaded(request.msgType).then(sendResponse);
+            return true;
         }
         else if (request.msgType === 2) { // sender wants set speed to given
             document.querySelector('video').playbackRate = request.speed;
