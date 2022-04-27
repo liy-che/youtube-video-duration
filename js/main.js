@@ -25,23 +25,6 @@ function hideIcon() {
 
 /******************************* event listeners ******************************/
 
-
-// listen to message from content script
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-    //if (request.msgType === 'requestLoading') showIcon();
-    //   else if (request.msgType === 'videoInfo') {
-    //       hideIcon();
-    //       document.querySelector('h1').innerText = request.vidTitle;
-    //       vidDuration = request.durationInSec;
-    //       updatePlaySpeed(request.speed);
-    //       updateCalcResult(calcDuration(request.speed));
-    //       checkSpeed();
-    //   }
-    //   sendResponse({farewell: "goodbye"});
-    }
-);
-
 // change speed with arrow
 decreButton.addEventListener('click', decreSpeed);
 
@@ -175,9 +158,12 @@ function sendMessage(type, msg={}) {
     msg['msgType'] = type;
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, msg, function(response) {
-          if (response.msgType === 'status') {
-              alert(response.navigateEnd);
-          }
+            if (response.msgType === 'videoInfo') {
+                process(response);
+            }
+            else if (response.msgType === 'setSpeed') {
+                console.log(response.success);
+            }
         });
     });
 }
@@ -224,5 +210,4 @@ function setSpeed() {
 /******************************* main program *********************************/
 
 // when pop up is opened, get video duration
-// sendMessage('requestInfo');
-sendMessage('requestStatus');
+sendMessage('videoInfo');

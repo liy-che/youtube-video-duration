@@ -5,7 +5,7 @@
     "manifest_version": 3,
     "author": "Liying Chen",
     "permissions": [
-        "activeTab", "scripting", "declarativeContent", "commands"
+        "activeTab", "scripting", "declarativeContent", "commands", "storage"
     ],
     "background": {
         "service_worker": "js/background.js"
