@@ -8,30 +8,33 @@ document.addEventListener('yt-navigate-finish', () => navigateEnd = true);
 // wait for element to exist
 function waitForElm(selector) {
     return new Promise(resolve => {
-        if (document.querySelector(selector) && navigateEnd) {
+        if (navigateEnd && document.querySelector(selector)) {
             return resolve(document.querySelector(selector));
         }
 
         const observer = new MutationObserver((mutations, obs) => {
-            if (document.querySelector(selector) && navigateEnd) {
+            if (navigateEnd && document.querySelector(selector)) {
                 obs.disconnect();
                 resolve(document.querySelector(selector));
             }
         });
 
-        observer.observe(document.body, {
+        observer.observe(document.documentElement, {
             childList: true,
             subtree: true
         });
     });
 }
 
+// document.querySelector('h1 yt-formatted-string.style-scope.ytd-video-primary-info-renderer').innerText
+// document.querySelector('a.ytp-title-link').textContent
+
 async function afterDOMLoaded(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
-    let elt = await waitForElm('h1 yt-formatted-string.style-scope.ytd-video-primary-info-renderer');
-    let video = document.querySelector('video')
+    let elt = await waitForElm('a.ytp-title-link');
+    let video = document.querySelector('video');
     let duration = video.duration;
-    let title = elt.innerText;
+    let title = elt.textContent;
     let info = {msgType: msgType, vidTitle: title, durationInSec: duration, speed: video.playbackRate};
     return info;
 }
