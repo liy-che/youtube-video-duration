@@ -1,11 +1,11 @@
 {
-    "name": "YouTube Speed Time Calculator",
+    "name": "YouTube Duration Calculator for Speed",
     "version": "1.0.0",
     "description": "Calculate time to watch YouTube video with various speed",
     "manifest_version": 3,
     "author": "Liying Chen",
     "permissions": [
-        "activeTab", "scripting", "declarativeContent", "commands", "storage"
+        "activeTab", "scripting", "declarativeContent", "commands"
     ],
     "background": {
         "service_worker": "js/background.js"
@@ -18,7 +18,7 @@
     }],
     "action":{
         "default_popup": "index.html",
-        "default_title": "YouTube Speed Calculator",
+        "default_title": "YouTube Duration Calculator",
         "default_icon": {
             "16": "/images/speedCalc16.png",
             "32": "/images/speedCalc32.png",
