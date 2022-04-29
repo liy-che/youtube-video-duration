@@ -1,7 +1,7 @@
 {
-    "name": "YouTube Duration Calculator for Speed",
+    "name": "Duration Calculator for YouTube™",
     "version": "1.0.0",
-    "description": "Calculate time to watch YouTube video with various speed",
+    "description": "Calculate the time it will take to watch a YouTube video with various speed settings",
     "manifest_version": 3,
     "author": "Liying Chen",
     "permissions": [
