@@ -29,7 +29,7 @@ function hideIcon() {
 decreButton.addEventListener('click', decreSpeed);
 
 function decreSpeed() {
-    if (increButton.classList.contains('gray-out')) enableClick(increButton);
+    if (increButton.classList.contains('gray-out')) disablePersistentState(increButton, 'gray-out');
     if (showSpeed > minSpeed) {
         updateShowSpeed(showSpeed-interval);
         updateCalcResult(calcDuration(showSpeed));
@@ -40,7 +40,7 @@ function decreSpeed() {
 increButton.addEventListener('click', increSpeed);
 
 function increSpeed() {
-    if (decreButton.classList.contains('gray-out')) enableClick(decreButton);
+    if (decreButton.classList.contains('gray-out')) disablePersistentState(decreButton, 'gray-out');
     if (showSpeed < maxSpeed) {
         updateShowSpeed(showSpeed+interval);
         updateCalcResult(calcDuration(showSpeed));
@@ -121,25 +121,27 @@ function calcDuration(speed) {
     return vidDuration/speed;
 }
 
-function disableClick(elt) {
+function enablePersistentState(elt, persistentState) {
     elt.classList.remove('on-hover');
-    elt.classList.add('gray-out');
+    elt.classList.add(persistentState);
 }
 
-function enableClick(elt) {
+function disablePersistentState(elt, persistentState) {
     elt.classList.add('on-hover');
-    elt.classList.remove('gray-out');
+    elt.classList.remove(persistentState);
 }
 
 function checkSpeed() {
     if (showSpeed == playSpeed) {
-        setButton.classList.add('selected');
+        enablePersistentState(setButton, 'selected');
     }
-    else setButton.classList.remove('selected');
+    else {
+        disablePersistentState(setButton, 'selected');
+    }
 
-    if (showSpeed === maxSpeed) disableClick(increButton);
-    else if (showSpeed === minSpeed) disableClick(decreButton);
-    else if (showSpeed === 0) disableClick(decreButton);
+    if (showSpeed === maxSpeed) enablePersistentState(increButton, 'gray-out');
+    else if (showSpeed === minSpeed) enablePersistentState(decreButton, 'gray-out');
+    else if (showSpeed === 0) enablePersistentState(decreButton, 'gray-out');
 }
 
 /********************************* functions **********************************/
@@ -202,7 +204,7 @@ function updateShowSpeed(newSpeed) {
 }
 
 function setSpeed() {
-    setButton.classList.add('selected');
+    enablePersistentState(setButton, 'selected');
     playSpeed = showSpeed;
     sendMessage('setSpeed', {speed: showSpeed});
 }
