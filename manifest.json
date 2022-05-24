@@ -1,7 +1,7 @@
 {
-    "name": "Duration Calculator for YouTube™",
-    "version": "1.0.0",
-    "description": "Get YouTube video watch time with various speed settings",
+    "name": "Video Duration for YouTube™",
+    "version": "1.0.1",
+    "description": "Get remaining YouTube video watch time with various speed settings",
     "manifest_version": 3,
     "author": "Liying Chen",
     "permissions": [
@@ -18,19 +18,19 @@
     }],
     "action":{
         "default_popup": "index.html",
-        "default_title": "YouTube Duration Calculator",
+        "default_title": "YouTube Video Duration",
         "default_icon": {
-            "16": "/images/speedCalc16.png",
-            "32": "/images/speedCalc32.png",
-            "48": "/images/speedCalc48.png",
-            "128": "/images/speedCalc128.png"
+            "16": "/icons/speedCalc16.png",
+            "32": "/icons/speedCalc32.png",
+            "48": "/icons/speedCalc48.png",
+            "128": "/icons/speedCalc128.png"
         }
     },
     "icons": {
-        "16": "/images/speedCalc16.png",
-        "32": "/images/speedCalc32.png",
-        "48": "/images/speedCalc48.png",
-        "128": "/images/speedCalc128.png"
+        "16": "/icons/speedCalc16.png",
+        "32": "/icons/speedCalc32.png",
+        "48": "/icons/speedCalc48.png",
+        "128": "/icons/speedCalc128.png"
     },
     "commands": {
         "_execute_action": {
