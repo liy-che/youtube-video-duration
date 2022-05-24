@@ -1,26 +1,26 @@
-#Video Duration for YouTube™#
+# Video Duration for YouTube™
 
 A Google Chrome extension that helps you decide which speed to watch YouTube video.
 
 Find it here:
 [Chrome Web Store](https://chrome.google.com/webstore/detail/duration-calculator-for-y/djphelnkeombgogeophphofmjkbooofh)
 
-##Features##
-:white_check_mark: Show video length for various speed settings
-:white_check_mark: Show time difference compared to normal speed
-:white_check_mark: Set video speed
+## Features
+:white_check_mark: Show video length for various speed settings  
+:white_check_mark: Show time difference compared to normal speed  
+:white_check_mark: Set video speed  
 
-##Keyboard shortcuts##
+## Keyboard shortcuts
 - Open: CMD+SHIFT+S (Mac), CTRL+SHIFT+S (Windows)
 - Change speed: Arrow keys
 - Set speed: ENTER key
 - Set speed and close: Press ENTER twice
 - Close without setting speed: SPACE key
 
-##Future Release##
-- [] Unlimited max speed
-- [] Real time update based on time remaining
-- [] Option: custom speed interval
-- [] Option: persistent speed change
+## Future Release
+- [ ] Unlimited max speed
+- [ ] Real time update based on time remaining
+- [ ] Option: custom speed interval
+- [ ] Option: persistent speed change
 
 I welcome feedback and suggestions.
