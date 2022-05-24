@@ -2,6 +2,8 @@
 
 A Google Chrome extension that helps you decide which speed to watch YouTube video.
 
+![Extension intro](images/banners/marquee-promo.jpg)
+
 Find it here:
 [Chrome Web Store](https://chrome.google.com/webstore/detail/duration-calculator-for-y/djphelnkeombgogeophphofmjkbooofh)
 
