@@ -36,9 +36,16 @@
   }
 
   #time-display {
-    border: 1px solid #262626;
-    border-radius: 5px;
     padding: 10px;
+    text-align: center;
+  }
+
+  #time {
+    font-size: 3rem;
+  }
+
+  #sign {
+    font-size: 1em;
   }
   
   /******************************************

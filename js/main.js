@@ -2,7 +2,7 @@
 
 const minSpeed = 0;
 const interval = 0.25;
-const maxSpeed = 2;
+const maxSpeed = 16;
 
 let vidDuration;
 let playSpeed = 1;
@@ -174,7 +174,7 @@ function updateCalcResult(newTime) {
     if (!isFinite(newTime)) {
         timeDisplay.innerHTML = '&infin;';
         diffDisplay.innerHTML = '&infin;';
-        sign.innerText = '+';
+        sign.innerHTML = '&uarr;';
         return;
     }
 
@@ -183,10 +183,10 @@ function updateCalcResult(newTime) {
     timeDisplay.innerText = convertSecondToTimestamp(newTime);
     diffDisplay.innerText = convertSecondToTimestamp(Math.abs(timeDiff));
 
-    if (timeDiff < 0) sign.innerText = '-';
-    else if (timeDiff > 0) sign.innerText = '+';
+    if (timeDiff < 0) sign.innerHTML = '&darr;';
+    else if (timeDiff > 0) sign.innerHTML = '&uarr;';
     else {
-        sign.innerText = '=';
+        sign.innerHTML = '=';
         diffDisplay.innerText = '00:00';
     }
 }

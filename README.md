@@ -10,7 +10,7 @@ Find it here:
 ## Features
 :white_check_mark: Show video length for various speed settings  
 :white_check_mark: Show time difference compared to normal speed  
-:white_check_mark: Set video speed  
+:white_check_mark: Set video speed beyond x2.0  
 
 ## Keyboard shortcuts
 - Open: CMD+SHIFT+S (Mac), CTRL+SHIFT+S (Windows)
@@ -20,9 +20,8 @@ Find it here:
 - Close without setting speed: SPACE key
 
 ## Future Release
-- [ ] Unlimited max speed
 - [ ] Real time update based on time remaining
 - [ ] Option: custom speed interval
 - [ ] Option: persistent speed change
 
-I welcome feedback and suggestions.
+Feedback and suggestions are welcomed.

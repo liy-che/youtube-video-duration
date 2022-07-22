@@ -21,6 +21,11 @@
             <!-- <img href="images/" alt="help icon"></img> -->
             <h1></h1>
 
+            <section id="time-display">
+                Video length
+                <p><span id="time"></span> (<span id="sign"></span><span id="diff"></span>)</p>
+            </section>
+
             <div id="speed-display">
                 <span id="speed">1.00</span>
                 <div id="buttons">
@@ -28,14 +33,9 @@
                         <div class="on-hover triangle left-arrow" id="decre"></div>
                         <div class="on-hover triangle right-arrow" id="incre"></div>
                     </div>
-                    <button id="set-speed" class="inactive">set</button>
+                    <button id="set-speed" class="inactive">&check;</button>
                 </div>
             </div>
-
-            <section id="time-display">
-                <p>Time: <span id="time"></span></p>
-                <p>Change(<span id="sign"></span>): <span id="diff"></span></p>
-            </section>
         </main>
         <!-- <small>Version 1.0.0</small> -->
 		<script type="text/javascript" src="js/main.js"></script>
