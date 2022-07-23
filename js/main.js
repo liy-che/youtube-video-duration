@@ -170,11 +170,23 @@ function sendMessage(type, msg={}) {
     });
 }
 
+function showTimeUp() {
+    sign.style.display = 'inline';
+    sign.setAttribute('src', '../images/arrow-154-24.png');
+    sign.setAttribute('alt', 'Up');
+}
+
+function showTimeDown() {
+    sign.style.display = 'inline';
+    sign.setAttribute('src', '../images/arrow-216-24.png')
+    sign.setAttribute('alt', 'Down');
+}
+
 function updateCalcResult(newTime) {
     if (!isFinite(newTime)) {
         timeDisplay.innerHTML = '&infin;';
         diffDisplay.innerHTML = '&infin;';
-        sign.innerHTML = '&uarr;';
+        showTimeUp();
         return;
     }
 
@@ -183,10 +195,10 @@ function updateCalcResult(newTime) {
     timeDisplay.innerText = convertSecondToTimestamp(newTime);
     diffDisplay.innerText = convertSecondToTimestamp(Math.abs(timeDiff));
 
-    if (timeDiff < 0) sign.innerHTML = '&darr;';
-    else if (timeDiff > 0) sign.innerHTML = '&uarr;';
+    if (timeDiff < 0) showTimeDown();
+    else if (timeDiff > 0) showTimeUp();
     else {
-        sign.innerHTML = '=';
+        sign.style.display = 'none';
         diffDisplay.innerText = '00:00';
     }
 }
