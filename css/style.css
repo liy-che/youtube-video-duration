@@ -86,6 +86,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 40%;
   }
 
   #buttons {
@@ -96,33 +97,11 @@
     gap: .5rem;
   }
 
-  #set-speed {
-    border: none;
-    color: #fff;
-    border-radius: 5px;
-    padding: 1px 2px;
-  }
-
-  .inactive {
-    background-color: #808080;
-    opacity: .4;
-    cursor: pointer;
-  }
-
-  .inactive:hover {
-    opacity: 0.6;
-  }
-
   .selected,
   .selected:hover {
     background-color: #59b538;
     opacity: 1;
     cursor: default;
-  }
-
-  #controls,
-  #set-speed {
-    width: 40%;
   }
 
   .triangle {

@@ -9,7 +9,6 @@ let playSpeed = 1;
 let showSpeed = playSpeed;
 const decreButton = document.querySelector('#decre');
 const increButton = document.querySelector('#incre');
-const setButton = document.querySelector('#set-speed');
 const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
 const sign = document.querySelector('#sign');
@@ -47,8 +46,6 @@ function increSpeed() {
     }
     checkSpeed();
 }
-
-setButton.addEventListener('click', setSpeed);
 
 // listen for key press
 document.onkeydown = event => {
@@ -132,13 +129,6 @@ function disablePersistentState(elt, persistentState) {
 }
 
 function checkSpeed() {
-    if (showSpeed == playSpeed) {
-        enablePersistentState(setButton, 'selected');
-    }
-    else {
-        disablePersistentState(setButton, 'selected');
-    }
-
     if (showSpeed === maxSpeed) enablePersistentState(increButton, 'gray-out');
     else if (showSpeed === minSpeed) enablePersistentState(decreButton, 'gray-out');
     else if (showSpeed === 0) enablePersistentState(decreButton, 'gray-out');
