@@ -24,7 +24,7 @@
   /*******************************************/
   
   body {
-    width: 200px;
+    width: 230px;
     font-size: 1.6rem;
     padding: 10px;
     font-family: "Roboto", Arial, Helvetica, sans-serif;
@@ -36,7 +36,6 @@
   }
 
   #time-display {
-    padding: 10px;
     text-align: center;
   }
 
@@ -66,9 +65,29 @@
     display: inherit;
   }
 
+  h2 {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.5rem;
+    margin: .7em 0;
+    background-color: lightblue;
+    padding: .2em 0;
+    border-radius: 3px;
+  }
+
+  .noneditable {
+    background-color: black;
+    color: lightgray;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    color: gray;
+    font-weight: normal;
+  }
+
   #speed-display {
     display: flex;
-    margin: 10px 0;
   }
 
   #speed {
@@ -95,13 +114,6 @@
     display: flex;
     flex-direction: column;
     gap: .5rem;
-  }
-
-  .selected,
-  .selected:hover {
-    background-color: #59b538;
-    opacity: 1;
-    cursor: default;
   }
 
   .triangle {

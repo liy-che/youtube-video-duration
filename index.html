@@ -16,18 +16,22 @@
         <link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-        <div id="loading">Loading</div>
-        <main class="container">
+        <div id="loading">
+            <h4>Loading...</h4>
+        </div>
+        <main id="main" class="container">
             <!-- <img href="images/" alt="help icon"></img> -->
+            <h3>Playing</3>
             <h1></h1>
 
+            <h2 class="noneditable">Remaining time</h2>
+            <img id="refresh" src="../images/synchronize-24.png"/>
             <section id="time-display">
-                Video length
-                <p><span id="time"></span>  <img id="sign" src="" alt=""></img><span id="diff"></span></p>
+                <p><span id="time"></span>  <img id="sign" src="" alt=""/><span id="diff"></span></p>
             </section>
 
+            <h2>Change speed</h2>
             <div id="speed-display">
-                Playback speed
                 <span id="speed">1.00</span>
                 <div id="buttons">
                     <div id="controls">

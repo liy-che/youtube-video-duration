@@ -6,19 +6,18 @@ const maxSpeed = 16;
 
 let vidDuration;
 let playSpeed = 1;
-let showSpeed = playSpeed;
 const decreButton = document.querySelector('#decre');
 const increButton = document.querySelector('#incre');
 const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
 const sign = document.querySelector('#sign');
 
-function showIcon() {
-    document.getElementById('loading').style.display ='block';
+function showBlock(elt) {
+    document.getElementById(elt).style.display ='block';
   } 
  
-function hideIcon() {
-    document.getElementById('loading').style.display ='none';
+function hideBlock(elt) {
+    document.getElementById(elt).style.display ='none';
 }
 
 
@@ -29,9 +28,9 @@ decreButton.addEventListener('click', decreSpeed);
 
 function decreSpeed() {
     if (increButton.classList.contains('gray-out')) disablePersistentState(increButton, 'gray-out');
-    if (showSpeed > minSpeed) {
-        updateShowSpeed(showSpeed-interval);
-        updateCalcResult(calcDuration(showSpeed));
+    if (playSpeed > minSpeed) {
+        updatePlaySpeed(playSpeed-interval);
+        updateCalcResult(calcDuration(playSpeed));
     }
     checkSpeed();
 }
@@ -40,9 +39,9 @@ increButton.addEventListener('click', increSpeed);
 
 function increSpeed() {
     if (decreButton.classList.contains('gray-out')) disablePersistentState(decreButton, 'gray-out');
-    if (showSpeed < maxSpeed) {
-        updateShowSpeed(showSpeed+interval);
-        updateCalcResult(calcDuration(showSpeed));
+    if (playSpeed < maxSpeed) {
+        updatePlaySpeed(playSpeed+interval);
+        updateCalcResult(calcDuration(playSpeed));
     }
     checkSpeed();
 }
@@ -58,13 +57,6 @@ document.onkeydown = event => {
         increSpeed();
         if (increButton.classList.contains('gray-out')) return;
         increButton.classList.add('pressed-incre');
-    }
-    else if (event.key === 'Enter') {
-        if (showSpeed === playSpeed) {
-            window.close();
-            return;
-        }
-        setSpeed();
     }
     else if (event.key === ' ') window.close();
 }
@@ -129,20 +121,21 @@ function disablePersistentState(elt, persistentState) {
 }
 
 function checkSpeed() {
-    if (showSpeed === maxSpeed) enablePersistentState(increButton, 'gray-out');
-    else if (showSpeed === minSpeed) enablePersistentState(decreButton, 'gray-out');
-    else if (showSpeed === 0) enablePersistentState(decreButton, 'gray-out');
+    if (playSpeed === maxSpeed) enablePersistentState(increButton, 'gray-out');
+    else if (playSpeed === minSpeed) enablePersistentState(decreButton, 'gray-out');
+    else if (playSpeed === 0) enablePersistentState(decreButton, 'gray-out');
 }
 
 /********************************* functions **********************************/
 
 function process(info) {
-    hideIcon();
+    hideBlock('loading');
     document.querySelector('h1').innerText = info.vidTitle;
     vidDuration = info.durationInSec;
-    updatePlaySpeed(info.speed);
+    updatePlaySpeed(info.speed, false);
     updateCalcResult(calcDuration(info.speed));
     checkSpeed();
+    showBlock('main');
 }
 
 
@@ -193,25 +186,14 @@ function updateCalcResult(newTime) {
     }
 }
 
-function updatePlaySpeed(curSpeed) {
-    if (curSpeed != playSpeed) {
-        playSpeed = curSpeed;
-        updateShowSpeed(playSpeed);
-    }
-}
-
-function updateShowSpeed(newSpeed) {
-    showSpeed = newSpeed;
-    document.querySelector('#speed').innerText = showSpeed.toFixed(2);
-}
-
-function setSpeed() {
-    enablePersistentState(setButton, 'selected');
-    playSpeed = showSpeed;
-    sendMessage('setSpeed', {speed: showSpeed});
+function updatePlaySpeed(newSpeed, sendMsg=true) {
+    playSpeed = newSpeed;
+    if (sendMsg) sendMessage('setSpeed', {speed: playSpeed});
+    document.querySelector('#speed').innerText = playSpeed.toFixed(2);
 }
 
 /******************************* main program *********************************/
 
 // when pop up is opened, get video duration
+hideBlock('main');
 sendMessage('videoInfo');

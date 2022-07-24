@@ -33,7 +33,7 @@ async function afterDOMLoaded(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
     let elt = await waitForElm('a.ytp-title-link');
     let video = document.querySelector('video');
-    let duration = video.duration;
+    let duration = video.duration - video.currentTime;
     let title = elt.textContent;
     let info = {msgType: msgType, vidTitle: title, durationInSec: duration, speed: video.playbackRate};
     return info;
