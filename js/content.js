@@ -56,7 +56,20 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.msgType === 'setSpeed') {
             document.querySelector('video').playbackRate = request.speed;
-            sendResponse({success: true});
+            sendResponse({msgType: request.msgType, success: true});
+        }
+        else if (request.msgType === 'getRemaining') {
+            let video = document.querySelector('video');
+            let remainingTime = video.duration - video.currentTime;
+            sendResponse({msgType: request.msgType, durationInSec: remainingTime});
+        }
+        else if (request.msgType === 'pauseVideo') {
+            document.querySelector('video').pause();
+            sendResponse({msgType: request.msgType, success: true});
+        }
+        else if (request.msgType === 'playVideo') {
+            document.querySelector('video').play();
+            sendResponse({msgType: request.msgType, success: true});
         }
     }
 );

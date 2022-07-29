@@ -46,6 +46,25 @@
   #sign {
     height: 1em;
   }
+
+  button {
+    height: 2em;
+    width: 2em;
+    border: none;
+    cursor: pointer;
+  }
+
+  #refresh {
+    background: url('../images/refresh-2-48.png') 50% 50% / 1.3em no-repeat;
+  }
+
+  #pause {
+    background: url('../images/pause-48.png') 50% 50% / 1.3em no-repeat;
+  }
+
+  #play {
+    background: url('../images/play-48.png') 50% 50% / 1.3em no-repeat;
+  }
   
   /******************************************
   /* LAYOUT

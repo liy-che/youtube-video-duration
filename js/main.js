@@ -1,6 +1,6 @@
 /******************************* program states *******************************/
 
-const minSpeed = 0;
+const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
 
@@ -11,6 +11,8 @@ const increButton = document.querySelector('#incre');
 const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
 const sign = document.querySelector('#sign');
+const refreshButton = document.querySelector('#refresh');
+const playControlButton = document.querySelector('#play-control');
 
 function showBlock(elt) {
     document.getElementById(elt).style.display ='block';
@@ -23,6 +25,25 @@ function hideBlock(elt) {
 
 /******************************* event listeners ******************************/
 
+refreshButton.addEventListener('click', function() {
+    sendMessage('getRemaining');
+})
+
+// playControlButton.addEventListener('click', function(event) {
+//     if (event.target.classList.contains('pause'))
+// })
+
+let counted = 0;
+let target = 100;
+let i = setInterval(function () {
+    if (counted <= target) {
+        counted++;
+        document.write("Counted : " + counted);
+    } else {
+        clearInterval(i);
+    }
+}, 1000);
+
 // change speed with arrow
 decreButton.addEventListener('click', decreSpeed);
 
@@ -30,7 +51,7 @@ function decreSpeed() {
     if (increButton.classList.contains('gray-out')) disablePersistentState(increButton, 'gray-out');
     if (playSpeed > minSpeed) {
         updatePlaySpeed(playSpeed-interval);
-        updateCalcResult(calcDuration(playSpeed));
+        sendMessage('getRemaining');
     }
     checkSpeed();
 }
@@ -41,7 +62,7 @@ function increSpeed() {
     if (decreButton.classList.contains('gray-out')) disablePersistentState(decreButton, 'gray-out');
     if (playSpeed < maxSpeed) {
         updatePlaySpeed(playSpeed+interval);
-        updateCalcResult(calcDuration(playSpeed));
+        sendMessage('getRemaining');
     }
     checkSpeed();
 }
@@ -146,9 +167,19 @@ function sendMessage(type, msg={}) {
             if (response.msgType === 'videoInfo') {
                 process(response);
             }
-            else if (response.msgType === 'setSpeed') {
+            else if (response.msgType === 'setSpeed' ||
+                     response.msgType === 'pauseVideo' ||
+                     response.msgType === 'playVideo') {
                 console.log(response.success);
             }
+            else if (response.msgType === 'getRemaining') {
+                vidDuration = response.durationInSec;
+                updateCalcResult(calcDuration(playSpeed));
+                // let newRow = document.createElement("p");
+                // const remain = document.createTextNode(response.durationInSec);
+                // newRow.appendChild(remain);
+                // document.getElementById("main").appendChild(newRow);
+            } 
         });
     });
 }
