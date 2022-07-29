@@ -8,20 +8,21 @@ Find it here:
 [Chrome Web Store](https://chrome.google.com/webstore/detail/duration-calculator-for-y/djphelnkeombgogeophphofmjkbooofh)
 
 ## Features
-:white_check_mark: Show video length for various speed settings  
-:white_check_mark: Show time difference compared to normal speed  
-:white_check_mark: Set video speed beyond x2.0  
+:white_check_mark: Show remaining video length for various speed settings  
+:white_check_mark: Show time difference compared to normal x1 speed  
+:white_check_mark: Set video speed beyond 2x 
+:white_check_mark: Jump to normal 1x speed  
 
 ## Keyboard shortcuts
 - Open: CMD+SHIFT+S (Mac), CTRL+SHIFT+S (Windows)
-- Change speed: Arrow keys
-- Set speed: ENTER key
-- Set speed and close: Press ENTER twice
-- Close without setting speed: SPACE key
+- Change speed: Left/right arrow keys
+- Refresh remaining time: Up arrow key
+- Jump to normal 1x speed: Down arrow key
+- Close popup: SPACE
 
 ## Future Release
-- [ ] Real time update based on time remaining
 - [ ] Option: custom speed interval
 - [ ] Option: persistent speed change
+- [ ] Change from popup to embedded
 
 Feedback and suggestions are welcomed.

@@ -12,7 +12,8 @@ const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
 const sign = document.querySelector('#sign');
 const refreshButton = document.querySelector('#refresh');
-const playControlButton = document.querySelector('#play-control');
+const setNormalButton = document.querySelector('#set-normal');
+// const playControlButton = document.querySelector('#play-control');
 
 function showBlock(elt) {
     document.getElementById(elt).style.display ='block';
@@ -26,23 +27,17 @@ function hideBlock(elt) {
 /******************************* event listeners ******************************/
 
 refreshButton.addEventListener('click', function() {
+    sendMessage('videoInfo');
+})
+
+setNormalButton.addEventListener('click', function() {
+    updatePlaySpeed(1);
     sendMessage('getRemaining');
 })
 
 // playControlButton.addEventListener('click', function(event) {
 //     if (event.target.classList.contains('pause'))
 // })
-
-let counted = 0;
-let target = 100;
-let i = setInterval(function () {
-    if (counted <= target) {
-        counted++;
-        document.write("Counted : " + counted);
-    } else {
-        clearInterval(i);
-    }
-}, 1000);
 
 // change speed with arrow
 decreButton.addEventListener('click', decreSpeed);
@@ -69,25 +64,40 @@ function increSpeed() {
 
 // listen for key press
 document.onkeydown = event => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    if (event.key === 'ArrowLeft') {
         decreSpeed();
         if (decreButton.classList.contains('gray-out')) return;
         decreButton.classList.add('pressed-decre');
     }
-    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    else if (event.key === 'ArrowRight') {
         increSpeed();
         if (increButton.classList.contains('gray-out')) return;
         increButton.classList.add('pressed-incre');
+    }
+    else if (event.key === 'ArrowUp') {
+        sendMessage('videoInfo');
+        refreshButton.classList.add('pressed');
+    }
+    else if (event.key === 'ArrowDown') {
+        updatePlaySpeed(1);
+        sendMessage('getRemaining');
+        setNormalButton.classList.add('pressed');
     }
     else if (event.key === ' ') window.close();
 }
 
 document.onkeyup = event => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    if (event.key === 'ArrowLeft') {
         decreButton.classList.remove('pressed-decre');
     }
-    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    else if (event.key === 'ArrowRight') {
         increButton.classList.remove('pressed-incre');
+    }
+    else if (event.key === 'ArrowUp') {
+        refreshButton.classList.remove('pressed');
+    }
+    else if (event.key === 'ArrowDown') {
+        setNormalButton.classList.remove('pressed');
     }
 }
 
@@ -227,4 +237,5 @@ function updatePlaySpeed(newSpeed, sendMsg=true) {
 
 // when pop up is opened, get video duration
 hideBlock('main');
-sendMessage('videoInfo');
+
+sendMessage('videoInfo')

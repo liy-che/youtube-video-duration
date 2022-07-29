@@ -25,20 +25,19 @@
             <h1></h1>
 
             <h2 class="noneditable">Remaining time</h2>
-            <button id="refresh"></button>
-            <button id="play-control"></button>
+            <!-- <button id="play-control"></button> -->
             <section id="time-display">
                 <p><span id="time"></span>  <img id="sign" src="" alt=""/><span id="diff"></span></p>
+                <button class="on-hover" id="refresh" title="update time"></button>
             </section>
 
             <h2>Change speed</h2>
             <div id="speed-display">
                 <span id="speed">1.00</span>
-                <div id="buttons">
-                    <div id="controls">
-                        <div class="on-hover triangle left-arrow" id="decre"></div>
-                        <div class="on-hover triangle right-arrow" id="incre"></div>
-                    </div>
+                <div id="controls">
+                    <div class="on-hover triangle left-arrow" id="decre" title="decrease"></div>
+                    <div class="on-hover triangle right-arrow" id="incre" title="increase"></div>
+                    <button class="on-hover" id="set-normal">1x</button>
                 </div>
             </div>
         </main>
