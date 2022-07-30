@@ -7,7 +7,7 @@ Find it here:
 
 ## Features
 :white_check_mark: Show remaining video length for various speed settings  
-:white_check_mark: Show time difference compared to normal x1 speed  
+:white_check_mark: Show time difference compared to the normal 1x speed  
 :white_check_mark: Set video speed beyond 2x  
 :white_check_mark: Jump to normal 1x speed  
 
