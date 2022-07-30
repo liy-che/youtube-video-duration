@@ -1,6 +1,6 @@
 # Video Duration for YouTube™
 
-A Google Chrome extension that helps you decide which speed to choose to watch YouTube video.
+The Google Chrome extension that helps you decide which speed to watch YouTube video.
 
 Find it here:
 [Chrome Web Store](https://chrome.google.com/webstore/detail/duration-calculator-for-y/djphelnkeombgogeophphofmjkbooofh)
@@ -8,7 +8,7 @@ Find it here:
 ## Features
 :white_check_mark: Show remaining video length for various speed settings  
 :white_check_mark: Show time difference compared to normal x1 speed  
-:white_check_mark: Set video speed beyond 2x 
+:white_check_mark: Set video speed beyond 2x  
 :white_check_mark: Jump to normal 1x speed  
 
 ## Keyboard shortcuts
