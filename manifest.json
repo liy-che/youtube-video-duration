@@ -14,9 +14,8 @@
         "matches": ["*://*.youtube.com/*"],
         "js":["js/content.js"],
         "run_at": "document_start"
-
     }],
-    "action":{
+    "action": {
         "default_popup": "index.html",
         "default_title": "YouTube Video Duration",
         "default_icon": {
