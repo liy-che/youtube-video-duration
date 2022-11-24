@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener(() => {
     let exampleRule = {
       conditions: [
         new chrome.declarativeContent.PageStateMatcher({
-          pageUrl: {urlMatches: "youtube\.com/watch?v="},
+          pageUrl: {urlContains: 'www.youtube.com/watch?v='},
         })
       ],
       actions: [new chrome.declarativeContent.ShowAction()],
