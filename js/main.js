@@ -11,7 +11,7 @@ const increButton = document.querySelector('#incre');
 const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
 const sign = document.querySelector('#sign');
-const refreshButton = document.querySelector('#refresh');
+// const refreshButton = document.querySelector('#refresh');
 const setNormalButton = document.querySelector('#set-normal');
 // const playControlButton = document.querySelector('#play-control');
 
@@ -26,9 +26,9 @@ function hideBlock(elt) {
 
 /******************************* event listeners ******************************/
 
-refreshButton.addEventListener('click', function() {
-    sendMessage('videoInfo');
-})
+// refreshButton.addEventListener('click', function() {
+//     sendMessage('videoInfo');
+// })
 
 setNormalButton.addEventListener('click', function() {
     updatePlaySpeed(1);
@@ -74,10 +74,10 @@ document.onkeydown = event => {
         if (increButton.classList.contains('gray-out')) return;
         increButton.classList.add('pressed-incre');
     }
-    else if (event.key === 'ArrowUp') {
-        sendMessage('videoInfo');
-        refreshButton.classList.add('pressed');
-    }
+    // else if (event.key === 'ArrowUp') {
+    //     sendMessage('videoInfo');
+    //     refreshButton.classList.add('pressed');
+    // }
     else if (event.key === 'ArrowDown') {
         updatePlaySpeed(1);
         sendMessage('getRemaining');
@@ -93,9 +93,9 @@ document.onkeyup = event => {
     else if (event.key === 'ArrowRight') {
         increButton.classList.remove('pressed-incre');
     }
-    else if (event.key === 'ArrowUp') {
-        refreshButton.classList.remove('pressed');
-    }
+    // else if (event.key === 'ArrowUp') {
+    //     refreshButton.classList.remove('pressed');
+    // }
     else if (event.key === 'ArrowDown') {
         setNormalButton.classList.remove('pressed');
     }
@@ -157,14 +157,18 @@ function checkSpeed() {
     else if (playSpeed === 0) enablePersistentState(decreButton, 'gray-out');
 }
 
+function updateShowTime(time, speed) {
+    vidDuration = time;
+    updateCalcResult(calcDuration(speed))
+}
+
 /********************************* functions **********************************/
 
 function process(info) {
     hideBlock('loading');
     document.querySelector('h1').innerText = info.vidTitle;
-    vidDuration = info.durationInSec;
     updatePlaySpeed(info.speed, false);
-    updateCalcResult(calcDuration(info.speed));
+    updateShowTime(info.durationInSec, info.speed);
     checkSpeed();
     showBlock('main');
 }
@@ -182,13 +186,8 @@ function sendMessage(type, msg={}) {
                      response.msgType === 'playVideo') {
                 console.log(response.success);
             }
-            else if (response.msgType === 'getRemaining') {
-                vidDuration = response.durationInSec;
-                updateCalcResult(calcDuration(playSpeed));
-                // let newRow = document.createElement("p");
-                // const remain = document.createTextNode(response.durationInSec);
-                // newRow.appendChild(remain);
-                // document.getElementById("main").appendChild(newRow);
+            else if (response.msgType === 'getRemaining') { // only for instaneous response to user input
+                updateShowTime(response.durationInSec, playSpeed);
             } 
         });
     });
@@ -239,3 +238,10 @@ function updatePlaySpeed(newSpeed, sendMsg=true) {
 hideBlock('main');
 
 sendMessage('videoInfo')
+
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    const port = chrome.tabs.connect(tabs[0].id, {name: "video-progress"});
+    port.onMessage.addListener(function(msg) {
+        updateShowTime(msg.remainingTime, playSpeed);
+    });
+});

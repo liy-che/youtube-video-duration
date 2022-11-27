@@ -1,3 +1,4 @@
+let video;
 let navigateEnd = true;
 
 document.addEventListener('yt-navigate-start', () => navigateEnd = false);
@@ -32,7 +33,7 @@ function waitForElm(selector) {
 async function afterDOMLoaded(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
     let elt = await waitForElm('a.ytp-title-link');
-    let video = document.querySelector('video');
+    video = document.querySelector('video');
     let duration = video.duration - video.currentTime;
     let title = elt.textContent;
     let info = {msgType: msgType, vidTitle: title, durationInSec: duration, speed: video.playbackRate};
@@ -47,6 +48,10 @@ function sendMessage(type, msg={}) {
     });
 }
 
+function getRemainingTime() {
+    return video.duration - video.currentTime;
+}
+
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
@@ -55,21 +60,30 @@ chrome.runtime.onMessage.addListener(
             return true;
         }
         else if (request.msgType === 'setSpeed') {
-            document.querySelector('video').playbackRate = request.speed;
+            video.playbackRate = request.speed;
             sendResponse({msgType: request.msgType, success: true});
         }
         else if (request.msgType === 'getRemaining') {
-            let video = document.querySelector('video');
-            let remainingTime = video.duration - video.currentTime;
-            sendResponse({msgType: request.msgType, durationInSec: remainingTime});
+            sendResponse({msgType: request.msgType, durationInSec: getRemainingTime()});
         }
         else if (request.msgType === 'pauseVideo') {
-            document.querySelector('video').pause();
+            video.pause();
             sendResponse({msgType: request.msgType, success: true});
         }
         else if (request.msgType === 'playVideo') {
-            document.querySelector('video').play();
+            video.play();
             sendResponse({msgType: request.msgType, success: true});
         }
     }
 );
+
+// handle incoming connections from popup
+chrome.runtime.onConnect.addListener(function(port) {
+    let heartBeatId = setInterval(function() {
+        port.postMessage({"remainingTime": getRemainingTime()});
+    }, 1000);
+
+    port.onDisconnect.addListener(function(port) {
+        clearInterval(heartBeatId);
+    });
+});

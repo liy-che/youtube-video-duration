@@ -24,7 +24,8 @@
   /*******************************************/
   
   body {
-    width: 250px;
+    max-width: 300px;
+    min-width: 250px;
     font-size: 1.6rem;
     padding: 10px;
     font-family: "Roboto", Arial, Helvetica, sans-serif;
@@ -55,12 +56,12 @@
     cursor: pointer;
   }
 
-  #refresh {
+  /* #refresh {
     background: url('../images/refresh-2-48.png') 50% 50% / 1.3em no-repeat;
     position: absolute;
     top: 0;
     right: 10px;
-  }
+  } */
 
   /* #pause {
     background: url('../images/pause-48.png') 50% 50% / 1.3em no-repeat;
@@ -128,7 +129,7 @@
     display: flex;
     align-items: center;
     column-gap: 10px;
-    width: 40%;
+    width: 50%;
   }
 
   .triangle {

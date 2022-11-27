@@ -1,6 +1,6 @@
 {
     "name": "Video Duration for YouTube™",
-    "version": "1.0.2.1",
+    "version": "1.0.3",
     "description": "Get remaining YouTube video watch time with various speed settings",
     "manifest_version": 3,
     "author": "liyche",
