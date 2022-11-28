@@ -14,6 +14,8 @@ const sign = document.querySelector('#sign');
 // const refreshButton = document.querySelector('#refresh');
 const setNormalButton = document.querySelector('#set-normal');
 // const playControlButton = document.querySelector('#play-control');
+const tab1 = document.getElementById('tab1');
+const tab2 = document.getElementById('tab2');
 
 function showBlock(elt) {
     document.getElementById(elt).style.display ='block';
@@ -62,23 +64,36 @@ function increSpeed() {
     checkSpeed();
 }
 
+
+function isUpKey(event) {
+    return event.key === 'ArrowUp' || event.key.toLowerCase() === 'w';
+}
+
+function isDownKey(event) {
+    return event.key === 'ArrowDown' || event.key.toLowerCase() === 's';
+}
+
+function isLeftKey(event) {
+    return event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a';
+}
+
+function isRightKey(event) {
+    return event.key === 'ArrowRight' || event.key.toLowerCase() === 'd';
+}
+
 // listen for key press
 document.onkeydown = event => {
-    if (event.key === 'ArrowLeft') {
+    if (isLeftKey(event)) {
         decreSpeed();
         if (decreButton.classList.contains('gray-out')) return;
         decreButton.classList.add('pressed-decre');
     }
-    else if (event.key === 'ArrowRight') {
+    else if (isRightKey(event)) {
         increSpeed();
         if (increButton.classList.contains('gray-out')) return;
         increButton.classList.add('pressed-incre');
     }
-    // else if (event.key === 'ArrowUp') {
-    //     sendMessage('videoInfo');
-    //     refreshButton.classList.add('pressed');
-    // }
-    else if (event.key === 'ArrowDown') {
+    else if (isDownKey(event)) {
         updatePlaySpeed(1);
         sendMessage('getRemaining');
         setNormalButton.classList.add('pressed');
@@ -87,16 +102,17 @@ document.onkeydown = event => {
 }
 
 document.onkeyup = event => {
-    if (event.key === 'ArrowLeft') {
+    if (isLeftKey(event)) {
         decreButton.classList.remove('pressed-decre');
     }
-    else if (event.key === 'ArrowRight') {
+    else if (isRightKey(event)) {
         increButton.classList.remove('pressed-incre');
     }
-    // else if (event.key === 'ArrowUp') {
-    //     refreshButton.classList.remove('pressed');
-    // }
-    else if (event.key === 'ArrowDown') {
+    else if (isUpKey(event)) {
+        if (tab1.checked) tab2.checked = true;
+        else tab1.checked = true;
+    }
+    else if (isDownKey(event)) {
         setNormalButton.classList.remove('pressed');
     }
 }
@@ -166,7 +182,7 @@ function updateShowTime(time, speed) {
 
 function process(info) {
     hideBlock('loading');
-    document.querySelector('h1').innerText = info.vidTitle;
+    document.querySelector('h3').innerText = info.vidTitle;
     updatePlaySpeed(info.speed, false);
     updateShowTime(info.durationInSec, info.speed);
     checkSpeed();

@@ -11,38 +11,76 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 		<!-- external CSS link -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 		<link rel="stylesheet" href="css/normalize.css">
 		<link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-        <div id="loading">
-            <h4>Loading...</h4>
-            <p>Refresh webpage if stuck</p>
-        </div>
-        <main id="main" class="container">
-            <!-- <img href="images/" alt="help icon"></img> -->
-            <h3>Playing</3>
-            <h1></h1>
-
-            <h2 class="noneditable">Remaining time</h2>
-            <!-- <button id="play-control"></button> -->
-            <section id="time-display">
-                <p><span id="time"></span>  <img id="sign" src="" alt=""/><span id="diff"></span></p>
-                <!-- <button class="on-hover" id="refresh" title="update time"></button> -->
-            </section>
-
-            <h2>Change speed</h2>
-            <div id="speed-display">
-                <span id="speed">1.00</span>
-                <div id="controls">
-                    <div class="on-hover triangle left-arrow" id="decre" title="decrease"></div>
-                    <div class="on-hover triangle right-arrow" id="incre" title="increase"></div>
-                    <button class="on-hover" id="set-normal" title="1x speed">1x</button>
+        <main class="container">
+            <input type="radio" id="tab1" name="tab" checked>
+            <label for="tab1"><i class="fa-regular fa-circle-play"></i> Playing</label>
+            <input type="radio" id="tab2" name="tab">
+            <label for="tab2"><i class="fa-regular fa-keyboard"></i> Shortcuts</label>
+            
+            <div class="line"></div>
+            
+            <div class="content-container">
+                <div class="content" id="c1">
+                    <div id="loading">
+                        <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+                        <span class="sr-only">Loading...</span>
+                        <p>This shouldn't take long. <br>Refresh YouTube video page if stuck.</p>
+                    </div>
+                    <div id="main">
+                        <h3></h3>
+    
+                        <h2 class="noneditable">Remaining time</h2>
+                        <section id="time-display">
+                            <p><span id="time"></span>  <img id="sign" src="" alt=""/><span id="diff"></span></p>
+                        </section>
+    
+                        <h2>Change speed</h2>
+                        <div id="speed-display">
+                            <span id="speed">1.00</span>
+                            <div id="controls">
+                                <div class="on-hover triangle left-arrow" id="decre" title="decrease"></div>
+                                <div class="on-hover triangle right-arrow" id="incre" title="increase"></div>
+                                <button class="on-hover" id="set-normal" title="1x speed">1x</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content" id="c2">
+                    <h3>Shortcuts</h3>
+                    <ul>
+                        <li>
+                            <div>Open Extension</div>
+                            <div>
+                                CMD+SHIFT+S (Mac)<br>
+                                CTRL+SHIFT+S (Win)
+                            </div>
+                        </li>
+                        <li>
+                            <div>Switch Tabs</div>
+                            <div>Up arrow, W</div>
+                        </li>
+                        <li>
+                            <div>Change Speed</div>
+                            <div>Left / right arrow, A / D</div>
+                        </li>
+                        <li>
+                            <div>Jump to 1x speed</div>
+                            <div>Down arrow, S</div>
+                        </li>
+                        <li>
+                            <div>Close popup</div>
+                            <div>SPACE</div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </main>
-        <!-- <small>Version 1.0.0</small> -->
+
 		<script type="text/javascript" src="js/main.js"></script>
 	</body>
 </html>
