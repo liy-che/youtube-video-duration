@@ -1,7 +1,7 @@
 {
     "name": "Video Duration for YouTube™",
     "version": "1.0.4",
-    "description": "Get remaining YouTube video watch time with various speed settings",
+    "description": "Adjust YouTube video playback speed, save time, and navigate with ease.",
     "manifest_version": 3,
     "author": "liyche",
     "permissions": [
