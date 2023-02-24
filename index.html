@@ -38,19 +38,27 @@
                         <section id="time-display">
                             <p><span id="time"></span>  <img id="sign" src="" alt=""/><span id="diff"></span></p>
                         </section>
+
+                        <section id="video-controls">
+                            <button id="restart" title="restart (r)"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+                            <button id="rewind" title="rewind (j)"><i class="fa-solid fa-backward"></i></button>
+                            <button id="play-pause" title="play (k)"><i class="fa-solid fa-play"></i></button>
+                            <button id="advance" title="advance (l)"><i class="fa-solid fa-forward"></i></button>
+                            <button id="volume" title="mute (m)"><i class="fa-solid fa-volume-xmark"></i></button>
+                        </section>
     
                         <h2>Change speed</h2>
                         <div id="speed-display">
                             <span id="speed">1.00</span>
-                            <div id="controls">
+                            <div id="speed-controls">
                                 <div class="on-hover triangle left-arrow" id="decre" title="decrease"></div>
                                 <div class="on-hover triangle right-arrow" id="incre" title="increase"></div>
-                                <button class="on-hover" id="set-normal" title="1x speed">1x</button>
+                                <button id="set-normal" title="1x speed">1x</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="content" id="c2">
+                <div class="content nonclickable" id="c2">
                     <h3>Shortcuts</h3>
                     <ul>
                         <li>

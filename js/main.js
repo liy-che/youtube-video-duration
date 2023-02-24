@@ -3,6 +3,7 @@
 const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
+const seekInterval = 10;
 
 let vidDuration;
 let playSpeed = 1;
@@ -11,9 +12,15 @@ const increButton = document.querySelector('#incre');
 const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
 const sign = document.querySelector('#sign');
-// const refreshButton = document.querySelector('#refresh');
+
 const setNormalButton = document.querySelector('#set-normal');
-// const playControlButton = document.querySelector('#play-control');
+const restartButton = document.querySelector('#restart');
+const playPauseButton = document.querySelector('#play-pause');
+const playPauseIcon = document.querySelector('#play-pause i');
+const rewindButton = document.querySelector('#rewind');
+const advanceButton = document.querySelector('#advance');
+const volumeButton = document.querySelector('#volume');
+
 const tab1 = document.getElementById('tab1');
 const tab2 = document.getElementById('tab2');
 
@@ -28,18 +35,32 @@ function hideBlock(elt) {
 
 /******************************* event listeners ******************************/
 
-// refreshButton.addEventListener('click', function() {
-//     sendMessage('videoInfo');
-// })
-
 setNormalButton.addEventListener('click', function() {
     updatePlaySpeed(1);
+    disablePersistentState(increButton, 'gray-out');
+    disablePersistentState(decreButton, 'gray-out');
     sendMessage('getRemaining');
-})
+});
 
-// playControlButton.addEventListener('click', function(event) {
-//     if (event.target.classList.contains('pause'))
-// })
+restartButton.addEventListener('click', function() {
+    sendMessage('restartVideo', {remainingTime: vidDuration});
+});
+
+playPauseButton.addEventListener('click', function() {
+    sendMessage('playPauseVideo');
+});
+
+rewindButton.addEventListener('click', function() {
+    sendMessage('seek', {interval: -seekInterval});
+});
+
+advanceButton.addEventListener('click', function() {
+    sendMessage('seek', {interval: seekInterval});
+});
+
+volumeButton.addEventListener('click', function() {
+    sendMessage('changeVolume');
+});
 
 // change speed with arrow
 decreButton.addEventListener('click', decreSpeed);
@@ -65,57 +86,93 @@ function increSpeed() {
 }
 
 
-function isUpKey(event) {
-    return event.key === 'ArrowUp' || event.key.toLowerCase() === 'w';
+function isUpKey(key) {
+    return key === 'arrowup' || key === 'w';
 }
 
-function isDownKey(event) {
-    return event.key === 'ArrowDown' || event.key.toLowerCase() === 's';
+function isDownKey(key) {
+    return key === 'arrowdown' || key === 's';
 }
 
-function isLeftKey(event) {
-    return event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a';
+function isLeftKey(key) {
+    return key === 'arrowleft' || key === 'a';
 }
 
-function isRightKey(event) {
-    return event.key === 'ArrowRight' || event.key.toLowerCase() === 'd';
+function isRightKey(key) {
+    return key === 'arrowright' || key === 'd';
 }
 
 // listen for key press
 document.onkeydown = event => {
-    if (isLeftKey(event)) {
-        decreSpeed();
+    const pressedKey = event.key.toLowerCase();
+    if (isLeftKey(pressedKey)) {
+        decreButton.click();
         if (decreButton.classList.contains('gray-out')) return;
         decreButton.classList.add('pressed-decre');
     }
-    else if (isRightKey(event)) {
-        increSpeed();
+    else if (isRightKey(pressedKey)) {
+        increButton.click();
         if (increButton.classList.contains('gray-out')) return;
         increButton.classList.add('pressed-incre');
     }
-    else if (isDownKey(event)) {
-        updatePlaySpeed(1);
-        sendMessage('getRemaining');
+    else if (isDownKey(pressedKey)) {
+        setNormalButton.click();
         setNormalButton.classList.add('pressed');
     }
-    else if (event.key === ' ') window.close();
-}
+    else if (pressedKey === 'r') {
+        restartButton.click();
+        restartButton.classList.add('pressed');
+    }
+    else if (pressedKey === 'j') {
+        rewindButton.click();
+        rewindButton.classList.add('pressed');
+    }
+    else if (pressedKey === 'k') {
+        playPauseButton.click();
+        playPauseButton.classList.add('pressed');
+    }
+    else if (pressedKey === 'l') {
+        advanceButton.click();
+        advanceButton.classList.add('pressed');
+    }
+    else if (pressedKey === 'm') {
+        volumeButton.click();
+        volumeButton.classList.add('pressed');
+    }
+    else if (pressedKey === ' ') window.close();
+};
 
 document.onkeyup = event => {
-    if (isLeftKey(event)) {
+    const pressedKey = event.key.toLowerCase();
+    if (isLeftKey(pressedKey)) {
         decreButton.classList.remove('pressed-decre');
     }
-    else if (isRightKey(event)) {
+    else if (isRightKey(pressedKey)) {
         increButton.classList.remove('pressed-incre');
     }
-    else if (isUpKey(event)) {
+    else if (isUpKey(pressedKey)) {
         if (tab1.checked) tab2.checked = true;
         else tab1.checked = true;
     }
-    else if (isDownKey(event)) {
+    else if (isDownKey(pressedKey)) {
         setNormalButton.classList.remove('pressed');
     }
-}
+    else if (pressedKey === 'r') {
+        restartButton.classList.remove('pressed');
+    }
+    else if (pressedKey === 'j') {
+        rewindButton.classList.remove('pressed');
+    }
+    else if (pressedKey === 'k') {
+        playPauseButton.classList.remove('pressed');
+    }
+    else if (pressedKey === 'l') {
+        advanceButton.classList.remove('pressed');
+    }
+    else if (pressedKey === 'm') {
+        volumeButton.classList.remove('pressed');
+    }
+};
 
 decreButton.addEventListener('mousedown', toggleColor);
 decreButton.addEventListener('mouseup', toggleColor);
@@ -158,13 +215,13 @@ function calcDuration(speed) {
 }
 
 function enablePersistentState(elt, persistentState) {
-    elt.classList.remove('on-hover');
-    elt.classList.add(persistentState);
+    if (elt.classList.contains('on-hover')) elt.classList.remove('on-hover');
+    if (!elt.classList.contains(persistentState)) elt.classList.add(persistentState);
 }
 
 function disablePersistentState(elt, persistentState) {
-    elt.classList.add('on-hover');
-    elt.classList.remove(persistentState);
+    if (!elt.classList.contains('on-hover')) elt.classList.add('on-hover');
+    if (elt.classList.contains(persistentState)) elt.classList.remove(persistentState);
 }
 
 function checkSpeed() {
@@ -185,6 +242,14 @@ function process(info) {
     document.querySelector('h3').innerText = info.vidTitle;
     updatePlaySpeed(info.speed, false);
     updateShowTime(info.durationInSec, info.speed);
+    if (info.playing) {
+        playPauseIcon.classList.replace('fa-play', 'fa-pause');
+        playPauseButton.setAttribute('title', 'pause (k)');
+    }
+    if (info.muted) {
+        volumeButton.classList.add('chosen');
+        volumeButton.setAttribute('title', 'unmute (m)');
+    }
     checkSpeed();
     showBlock('main');
 }
@@ -198,13 +263,33 @@ function sendMessage(type, msg={}) {
                 process(response);
             }
             else if (response.msgType === 'setSpeed' ||
-                     response.msgType === 'pauseVideo' ||
-                     response.msgType === 'playVideo') {
+                     response.msgType === 'seek') {
                 console.log(response.success);
             }
             else if (response.msgType === 'getRemaining') { // only for instaneous response to user input
                 updateShowTime(response.durationInSec, playSpeed);
-            } 
+            }
+            else if (response.msgType === 'restartVideo' || response.msgType === 'playPauseVideo') {
+                if (response.playing) {
+                    playPauseIcon.classList.replace('fa-play', 'fa-pause');
+                    playPauseButton.setAttribute("title", "pause (k)");
+                }
+                else {
+                    playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                    playPauseButton.setAttribute('title', 'play (k)');
+                }
+            }
+            else if (response.msgType === 'changeVolume') {
+                let isPressed = volumeButton.classList.contains('chosen');
+                if (response.muted && !isPressed) {
+                    volumeButton.classList.add('chosen');
+                    volumeButton.setAttribute('title', 'unmute (m)');
+                }
+                else if (!response.muted && isPressed) {
+                    volumeButton.classList.remove('chosen');
+                    volumeButton.setAttribute('title', 'mute (m)');
+                }
+            }
         });
     });
 }
@@ -259,5 +344,9 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const port = chrome.tabs.connect(tabs[0].id, {name: "video-progress"});
     port.onMessage.addListener(function(msg) {
         updateShowTime(msg.remainingTime, playSpeed);
+        if (msg.remainingTime === 0) {
+            playPauseIcon.classList.replace('fa-pause', 'fa-play');
+            playPauseButton.setAttribute('title', 'play (k)');
+        }
     });
 });

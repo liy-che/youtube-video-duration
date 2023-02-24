@@ -36,7 +36,12 @@ async function afterDOMLoaded(msgType){
     video = document.querySelector('video');
     let duration = video.duration - video.currentTime;
     let title = elt.textContent;
-    let info = {msgType: msgType, vidTitle: title, durationInSec: duration, speed: video.playbackRate};
+    let info = {msgType: msgType, 
+        vidTitle: title, 
+        durationInSec: duration, 
+        speed: video.playbackRate,
+        playing: !video.paused,
+        muted: video.muted};
     return info;
 }
 
@@ -52,7 +57,6 @@ function getRemainingTime() {
     return video.duration - video.currentTime;
 }
 
-
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         if (request.msgType === 'videoInfo') {
@@ -66,13 +70,30 @@ chrome.runtime.onMessage.addListener(
         else if (request.msgType === 'getRemaining') {
             sendResponse({msgType: request.msgType, durationInSec: getRemainingTime()});
         }
-        else if (request.msgType === 'pauseVideo') {
-            video.pause();
+        else if (request.msgType === 'restartVideo') {
+            video.currentTime = 0;
+            if (request.remainingTime === 0) video.play();
+            sendResponse({msgType: request.msgType, playing: !video.paused});
+        }
+        else if (request.msgType === 'playPauseVideo') {
+            if (video.paused) video.play();
+            else video.pause();
+            sendResponse({msgType: request.msgType, playing: !video.paused});
+        }
+        else if (request.msgType === 'seek') {
+            const interval = request.interval;
+            if (interval < 0 && video.currentTime <= Math.abs(interval)) {
+                video.currentTime = 0;
+            }
+            else if (interval > 0 && video.currentTime >= video.duration - interval) {
+                video.currentTime = video.duration;
+            }
+            else video.currentTime += request.interval;
             sendResponse({msgType: request.msgType, success: true});
         }
-        else if (request.msgType === 'playVideo') {
-            video.play();
-            sendResponse({msgType: request.msgType, success: true});
+        else if (request.msgType === 'changeVolume') {
+            video.muted = !video.muted;
+            sendResponse({msgType: request.msgType, muted: video.muted});
         }
     }
 );

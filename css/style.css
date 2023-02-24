@@ -107,17 +107,15 @@ h3 {
   overflow: hidden;
   display: inherit;
 }
-/* p {
-  margin: 10px 0;
+.nonclickable {
+  pointer-events: none;
 }
-p, i {
-  font-size: 13px;
-} */
 
 /******************************************
 /* PLAYING TAB
 /*******************************************/
 
+/* Time display */
 #time-display {
   text-align: center;
   position: relative;
@@ -131,28 +129,42 @@ p, i {
   height: 1em;
 }
 
+#video-controls {
+  display: flex;
+  justify-content: center;
+  column-gap: .1em;
+}
+
+/* Button interactions */
+
 button {
-  height: 2em;
-  width: 2em;
-  border: none;
   cursor: pointer;
+  border: none;
+  color: rgba(85,85,85, 0.7);
+  font-weight: 900;
+  font-size: 1.8rem;
+  border-radius: 5px;
 }
 
-/* #refresh {
-  background: url('../images/refresh-2-48.png') 50% 50% / 1.3em no-repeat;
-  position: absolute;
-  top: 0;
-  right: 10px;
-} */
-
-/* #pause {
-  background: url('../images/pause-48.png') 50% 50% / 1.3em no-repeat;
+button i, button {
+  padding: .23em;
 }
 
-#play {
-  background: url('../images/play-48.png') 50% 50% / 1.3em no-repeat;
-} */
+button:hover {
+  background-color: rgba(85,85,85, 0.1);
+  color: rgba(85,85,85, 1);
+}
 
+button:active, .pressed {
+  background-color: rgba(85,85,85, 0.15);
+  color: rgba(85,85,85, 1);
+}
+
+.chosen, .chosen:hover {
+  background-color: rgba(85,85,85, .2);
+}
+
+/*  Speed controls  */
 h2 {
   text-align: center;
   font-weight: normal;
@@ -183,7 +195,7 @@ h2 {
   justify-content: right;
 }
 
-#controls {
+#speed-controls {
   display: flex;
   align-items: center;
   column-gap: 10px;
@@ -210,7 +222,7 @@ h2 {
   transition: 0.2s;
 }
 
-.on-hover:hover, .pressed {
+.on-hover:hover {
   opacity: 1;
 }
 
@@ -239,14 +251,6 @@ small {
   margin: 5px 0;
 }
 
-#set-normal {
-  color: #555;
-  font-weight: 900;
-  font-size: 2rem;
-}
-
-
-
 ul {
   margin: 0;
   padding: 0;
@@ -261,6 +265,10 @@ li {
 
 li div:first-child {
   font-weight: bold;
+}
+
+p {
+  margin: 0 auto;
 }
 
 /******************************************
