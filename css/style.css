@@ -246,9 +246,13 @@ h2 {
 
 small {
   font-size: .9rem;
-  color: #808080;
+  color: white;
+  background-color: #4bb1cf;
+  padding: 1px 1px 0 1px;
   float: right;
-  margin: 5px 0;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: 200;
 }
 
 ul {
