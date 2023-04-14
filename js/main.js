@@ -328,7 +328,7 @@ function updateCalcResult(newTime) {
 }
 
 function updatePlaySpeed(newSpeed, sendMsg=true) {
-    playSpeed = newSpeed;
+    playSpeed = newSpeed > 16 ? 16 : newSpeed;
     if (sendMsg) sendMessage('setSpeed', {speed: playSpeed});
     document.querySelector('#speed').innerText = playSpeed.toFixed(2);
 }

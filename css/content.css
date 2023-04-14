@@ -1,0 +1,7 @@
+.ytp-autohide .vdc-controller {
+    visibility: hidden;
+}
+
+.vdc-controller:hover {
+    visibility: visible;
+}
