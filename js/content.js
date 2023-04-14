@@ -1,3 +1,5 @@
+// TODO move const vars here
+
 let video;
 let curSpeed = 1;
 let resetButton;
@@ -39,9 +41,8 @@ function waitForElm(selector) {
     });
 }
 
-
-// document.querySelector('h1 yt-formatted-string.style-scope.ytd-video-primary-info-renderer').innerText
-// document.querySelector('a.ytp-title-link').textContent
+// TODO move calc here
+// duration (remaining) -> convert to timestamp -> calculate diff -> convert to timestamp
 
 async function afterDOMLoaded(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
@@ -94,7 +95,7 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.msgType === 'seek') {
             seekVideo(request.interval);
-            sendResponse({msgType: request.msgType, success: true});
+            sendResponse({msgType: request.msgType, durationInSec: getRemainingTime(), success: true});
         }
         else if (request.msgType === 'changeVolume') {
             video.muted = !video.muted;
@@ -117,7 +118,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 
 /************************* Onscreen video controller **************************/
 
-
+// TODO seeking needs immediate remaining update
 function seekVideo(interval) {
     if (interval < 0 && video.currentTime <= Math.abs(interval)) {
         video.currentTime = 0;

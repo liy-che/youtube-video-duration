@@ -262,9 +262,11 @@ function sendMessage(type, msg={}) {
             if (response.msgType === 'videoInfo') {
                 process(response);
             }
-            else if (response.msgType === 'setSpeed' ||
-                     response.msgType === 'seek') {
+            else if (response.msgType === 'setSpeed') {
                 console.log(response.success);
+            }
+            else if (response.msgType === 'seek') {
+                updateShowTime(response.durationInSec, playSpeed);
             }
             else if (response.msgType === 'getRemaining') { // only for instaneous response to user input
                 updateShowTime(response.durationInSec, playSpeed);
