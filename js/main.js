@@ -4,15 +4,20 @@ const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
+const zeroTime = '00:00';
+const infTime = '&infin;';
 
-let vidDuration;
 let playSpeed = 1;
-const decreButton = document.querySelector('#decre');
-const increButton = document.querySelector('#incre');
+
+// Displays
 const timeDisplay = document.querySelector('#time');
 const diffDisplay = document.querySelector('#diff');
+const speedDisplay = document.querySelector('#speed');
 const sign = document.querySelector('#sign');
 
+// Buttons
+const decreButton = document.querySelector('#decre');
+const increButton = document.querySelector('#incre');
 const setNormalButton = document.querySelector('#set-normal');
 const restartButton = document.querySelector('#restart');
 const playPauseButton = document.querySelector('#play-pause');
@@ -21,6 +26,7 @@ const rewindButton = document.querySelector('#rewind');
 const advanceButton = document.querySelector('#advance');
 const volumeButton = document.querySelector('#volume');
 
+// Tabs
 const tab1 = document.getElementById('tab1');
 const tab2 = document.getElementById('tab2');
 
@@ -32,18 +38,16 @@ function hideBlock(elt) {
     document.getElementById(elt).style.display ='none';
 }
 
-
 /******************************* event listeners ******************************/
 
 setNormalButton.addEventListener('click', function() {
-    updatePlaySpeed(1);
+    setPlaySpeed(1);
     disablePersistentState(increButton, 'gray-out');
     disablePersistentState(decreButton, 'gray-out');
-    sendMessage('getRemaining');
 });
 
 restartButton.addEventListener('click', function() {
-    sendMessage('restartVideo', {remainingTime: vidDuration});
+    sendMessage('restartVideo');
 });
 
 playPauseButton.addEventListener('click', function() {
@@ -68,10 +72,8 @@ decreButton.addEventListener('click', decreSpeed);
 function decreSpeed() {
     if (increButton.classList.contains('gray-out')) disablePersistentState(increButton, 'gray-out');
     if (playSpeed > minSpeed) {
-        updatePlaySpeed(playSpeed-interval);
-        sendMessage('getRemaining');
+        setPlaySpeed(playSpeed-interval);
     }
-    checkSpeed();
 }
 
 increButton.addEventListener('click', increSpeed);
@@ -79,10 +81,8 @@ increButton.addEventListener('click', increSpeed);
 function increSpeed() {
     if (decreButton.classList.contains('gray-out')) disablePersistentState(decreButton, 'gray-out');
     if (playSpeed < maxSpeed) {
-        updatePlaySpeed(playSpeed+interval);
-        sendMessage('getRemaining');
+        setPlaySpeed(playSpeed+interval);
     }
-    checkSpeed();
 }
 
 
@@ -192,28 +192,6 @@ function toggleColor(event) {
 
 /******************************* helper functions *****************************/
 
-
-function zeroPad(num, numFigure=2, char='0') {
-    // assume num is a number
-    num = num.toString();
-    return num < 10 ? num.padStart(numFigure, char) : num;
-}
-
-function convertSecondToTimestamp(totalSeconds) {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor(totalSeconds/60 - hours*60);
-    const seconds = Math.floor(totalSeconds % 60);
-
-    let timeStr = hours !== 0 ? `${hours}:` : '';
-    timeStr += hours !== 0 ? `${zeroPad(minutes)}:` : `${minutes}:`;
-    timeStr += zeroPad(seconds);
-    return timeStr;
-}
-
-function calcDuration(speed) {
-    return vidDuration/speed;
-}
-
 function enablePersistentState(elt, persistentState) {
     if (elt.classList.contains('on-hover')) elt.classList.remove('on-hover');
     if (!elt.classList.contains(persistentState)) elt.classList.add(persistentState);
@@ -230,9 +208,14 @@ function checkSpeed() {
     else if (playSpeed === 0) enablePersistentState(decreButton, 'gray-out');
 }
 
-function updateShowTime(time, speed) {
-    vidDuration = time;
-    updateCalcResult(calcDuration(speed))
+function updateShowTime(speed, remainTimestamp, diffTimestamp) {
+    if (!speed) {
+        timeDisplay.innerHTML = infTime;
+        diffDisplay.innerHTML = infTime;
+        showTimeUp();
+        return;
+    }
+    updateCalcResult(remainTimestamp, diffTimestamp);
 }
 
 /********************************* functions **********************************/
@@ -240,8 +223,9 @@ function updateShowTime(time, speed) {
 function process(info) {
     hideBlock('loading');
     document.querySelector('h3').innerText = info.vidTitle;
-    updatePlaySpeed(info.speed, false);
-    updateShowTime(info.durationInSec, info.speed);
+    playSpeed = info.speed;
+    updateShowSpeed();
+    updateShowTime(info.speed, info.remainTimestamp, info.diffTimestamp);
     if (info.playing) {
         playPauseIcon.classList.replace('fa-play', 'fa-pause');
         playPauseButton.setAttribute('title', 'pause (k)');
@@ -250,7 +234,6 @@ function process(info) {
         volumeButton.classList.add('chosen');
         volumeButton.setAttribute('title', 'unmute (m)');
     }
-    checkSpeed();
     showBlock('main');
 }
 
@@ -263,13 +246,12 @@ function sendMessage(type, msg={}) {
                 process(response);
             }
             else if (response.msgType === 'setSpeed') {
-                console.log(response.success);
+                playSpeed = response.speed;
+                updateShowSpeed();
+                updateShowTime(playSpeed, response.remainTimestamp, response.diffTimestamp);
             }
             else if (response.msgType === 'seek') {
-                updateShowTime(response.durationInSec, playSpeed);
-            }
-            else if (response.msgType === 'getRemaining') { // only for instaneous response to user input
-                updateShowTime(response.durationInSec, playSpeed);
+                updateShowTime(playSpeed, response.remainTimestamp, response.diffTimestamp);
             }
             else if (response.msgType === 'restartVideo' || response.msgType === 'playPauseVideo') {
                 if (response.playing) {
@@ -308,31 +290,28 @@ function showTimeDown() {
     sign.setAttribute('alt', 'Down');
 }
 
-function updateCalcResult(newTime) {
-    if (!isFinite(newTime)) {
-        timeDisplay.innerHTML = '&infin;';
-        diffDisplay.innerHTML = '&infin;';
-        showTimeUp();
-        return;
-    }
+// diffTimestamp has a prefix that indicates direction of difference
+// the prefix can be '+', '-', or '.'
+function updateCalcResult(remainTimestamp, diffTimestamp) {
+    timeDisplay.innerText = remainTimestamp;
+    diffDisplay.innerText = diffTimestamp.substring(1);
 
-    const timeDiff = newTime - vidDuration;
-
-    timeDisplay.innerText = convertSecondToTimestamp(newTime);
-    diffDisplay.innerText = convertSecondToTimestamp(Math.abs(timeDiff));
-
-    if (timeDiff < 0) showTimeDown();
-    else if (timeDiff > 0) showTimeUp();
+    if (diffTimestamp.charAt(0) === '-') showTimeDown();
+    else if (diffTimestamp.charAt(0) === '+') showTimeUp();
     else {
         sign.style.display = 'none';
-        diffDisplay.innerText = '00:00';
+        diffDisplay.innerText = zeroTime;
     }
 }
 
-function updatePlaySpeed(newSpeed, sendMsg=true) {
-    playSpeed = newSpeed > 16 ? 16 : newSpeed;
-    if (sendMsg) sendMessage('setSpeed', {speed: playSpeed});
-    document.querySelector('#speed').innerText = playSpeed.toFixed(2);
+// TODO transfer: called in 3 places
+function setPlaySpeed(newSpeed) {
+    sendMessage('setSpeed', {speed: newSpeed});
+}
+
+function updateShowSpeed() {
+    speedDisplay.innerText = playSpeed.toFixed(2);
+    checkSpeed();
 }
 
 /******************************* main program *********************************/
@@ -345,7 +324,7 @@ sendMessage('videoInfo')
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const port = chrome.tabs.connect(tabs[0].id, {name: "video-progress"});
     port.onMessage.addListener(function(msg) {
-        updateShowTime(msg.remainingTime, playSpeed);
+        updateShowTime(playSpeed, msg.remainTimestamp, msg.diffTimestamp);
         if (msg.remainingTime === 0) {
             playPauseIcon.classList.replace('fa-pause', 'fa-play');
             playPauseButton.setAttribute('title', 'play (k)');

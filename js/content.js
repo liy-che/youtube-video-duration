@@ -1,7 +1,6 @@
 // TODO move const vars here
 
 let video;
-let curSpeed = 1;
 let resetButton;
 let increButton;
 let decreButton;
@@ -41,22 +40,65 @@ function waitForElm(selector) {
     });
 }
 
-// TODO move calc here
-// duration (remaining) -> convert to timestamp -> calculate diff -> convert to timestamp
+/******************************* calculations *******************************/
+
+
+function zeroPad(num, numFigure=2, char='0') {
+    // assume num is a number
+    num = num.toString();
+    return num < 10 ? num.padStart(numFigure, char) : num;
+}
+
+
+function convertSecondToTimestamp(totalSeconds) {
+    const totalSecondsAbs = Math.abs(totalSeconds);
+    const hours = Math.floor(totalSecondsAbs / 3600);
+    const minutes = Math.floor(totalSecondsAbs/60 - hours*60);
+    const seconds = Math.floor(totalSecondsAbs % 60);
+
+    let timeStr = hours !== 0 ? `${hours}:` : '';
+    timeStr += hours !== 0 ? `${zeroPad(minutes)}:` : `${minutes}:`;
+    timeStr += zeroPad(seconds);
+    
+    if (!totalSeconds) return '.' + timeStr;
+    return (totalSeconds > 0? '+' : '-') + timeStr;
+}
+
+
+// calculates remaining time at chosen speed
+function calcDuration(time, speed) {
+    return time/speed;
+}
+
+function getTimestamps() {
+    // 1. remaining video time at 1x speed
+    let remainTime = video.duration - video.currentTime;
+    // 2. remaining video time at chosen speed (display in timestamp)
+    let remainTimeAtSpeed = calcDuration(remainTime, video.playbackRate);
+    let remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed).substring(1);
+    // 3. differece between 1 and 2 (display in timestamp)
+    let timeDiff = remainTimeAtSpeed - remainTime;
+    let diffTimestamp = convertSecondToTimestamp(timeDiff);
+    return [remainTimestamp, diffTimestamp];
+}
 
 async function afterDOMLoaded(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
     let elt = await waitForElm('a.ytp-title-link');
-    let duration = video.duration - video.currentTime;
     let title = elt.textContent;
+    let [remainTimestamp, diffTimestamp] = getTimestamps();
     let info = {msgType: msgType, 
         vidTitle: title, 
-        durationInSec: duration, 
+        remainTimestamp: remainTimestamp,
+        diffTimestamp: diffTimestamp,
         speed: video.playbackRate,
         playing: !video.paused,
         muted: video.muted};
     return info;
 }
+
+
+/***************************** Message handlers ******************************/
 
 
 function sendMessage(type, msg={}) {
@@ -66,9 +108,6 @@ function sendMessage(type, msg={}) {
     });
 }
 
-function getRemainingTime() {
-    return video.duration - video.currentTime;
-}
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
@@ -78,14 +117,12 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.msgType === 'setSpeed') {
             changeSpeed(request.speed);
-            sendResponse({msgType: request.msgType, success: true});
-        }
-        else if (request.msgType === 'getRemaining') {
-            sendResponse({msgType: request.msgType, durationInSec: getRemainingTime()});
+            let [remainTimestamp, diffTimestamp] = getTimestamps();
+            sendResponse({msgType: request.msgType, speed: video.playbackRate, remainTimestamp: remainTimestamp, diffTimestamp: diffTimestamp});
         }
         else if (request.msgType === 'restartVideo') {
             video.currentTime = 0;
-            if (request.remainingTime === 0) video.play();
+            if (video.ended) video.play();
             sendResponse({msgType: request.msgType, playing: !video.paused});
         }
         else if (request.msgType === 'playPauseVideo') {
@@ -95,7 +132,8 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.msgType === 'seek') {
             seekVideo(request.interval);
-            sendResponse({msgType: request.msgType, durationInSec: getRemainingTime(), success: true});
+            let [remainTimestamp, diffTimestamp] = getTimestamps();
+            sendResponse({msgType: request.msgType, remainTimestamp: remainTimestamp, diffTimestamp: diffTimestamp});
         }
         else if (request.msgType === 'changeVolume') {
             video.muted = !video.muted;
@@ -108,7 +146,8 @@ chrome.runtime.onMessage.addListener(
 // handle incoming connections from popup
 chrome.runtime.onConnect.addListener(function(port) {
     let heartBeatId = setInterval(function() {
-        port.postMessage({"remainingTime": getRemainingTime()});
+        let [remainTimestamp, diffTimestamp] = getTimestamps();
+        port.postMessage({"remainTimestamp": remainTimestamp, "diffTimestamp": diffTimestamp});
     }, 1000);
 
     port.onDisconnect.addListener(function(port) {
@@ -132,16 +171,11 @@ function seekVideo(interval) {
 function changeSpeed(newSpeed) {
     newSpeed = newSpeed < minSpeed ? minSpeed : newSpeed;
     newSpeed = newSpeed > maxSpeed ? maxSpeed : newSpeed;
-    curSpeed = video.playbackRate = newSpeed;
+    video.playbackRate = newSpeed;
 }
 
 function displaySpeed(newSpeed) {
     speedDisplay.textContent = newSpeed.toFixed(2);
-}
-
-function updateSpeed(newSpeed) {
-    changeSpeed(newSpeed);
-    displaySpeed(curSpeed);
 }
 
 
@@ -151,7 +185,7 @@ async function waitForVideo() {
     observer = new MutationObserver((changes) => {
     changes.forEach(change => {
         if(change.attributeName.includes('src')){
-            updateSpeed(video.playbackRate);
+            displaySpeed(video.playbackRate);
         }
     });
     });
@@ -242,7 +276,7 @@ async function waitForVideo() {
             <span class="display remain">1:20:01</span><!--
             --><button class="reset">&#49;&times;</button><!--
             --><button class="left">&minus;</button><!--
-            --><span class="display speed">${curSpeed}</span><!--
+            --><span class="display speed">${video.playbackRate}</span><!--
             --><button class="right">&plus;</button><!--
             --><button class="backward">&laquo;</button><!--
             --><button class="forward">&raquo;</button>
@@ -253,13 +287,10 @@ async function waitForVideo() {
     videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
     speedDisplay = shadowRoot.querySelector('.speed');
-    displaySpeed(curSpeed);
+    displaySpeed(video.playbackRate);
 
     document.addEventListener('ratechange', function() {
-        if (curSpeed !== video.playbackRate) {
-            curSpeed = video.playbackRate;
-            displaySpeed(curSpeed);
-        }
+        displaySpeed(video.playbackRate);
     }, true);
 
     resetButton = shadowRoot.querySelector('.reset');
@@ -277,15 +308,15 @@ async function waitForVideo() {
     });
 
     resetButton.addEventListener('click', function() {
-        updateSpeed(1);
+        changeSpeed(1);
     });
 
     increButton.addEventListener('click', function() {
-        updateSpeed(curSpeed+interval);
+        changeSpeed(video.playbackRate+interval);
     });
 
     decreButton.addEventListener('click', function() {
-        updateSpeed(curSpeed-interval);
+        changeSpeed(video.playbackRate-interval);
     });
 }
 
