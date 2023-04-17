@@ -304,7 +304,6 @@ function updateCalcResult(remainTimestamp, diffTimestamp) {
     }
 }
 
-// TODO transfer: called in 3 places
 function setPlaySpeed(newSpeed) {
     sendMessage('setSpeed', {speed: newSpeed});
 }

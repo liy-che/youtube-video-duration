@@ -1,5 +1,3 @@
-// TODO move const vars here
-
 let video;
 let resetButton;
 let increButton;
@@ -7,6 +5,8 @@ let decreButton;
 let rewindButton;
 let advanceButton;
 let speedDisplay;
+let remainDisplay;
+let diffDisplay;
 let navigateEnd = true;
 
 const minSpeed = 0.25;
@@ -116,7 +116,7 @@ chrome.runtime.onMessage.addListener(
             return true;
         }
         else if (request.msgType === 'setSpeed') {
-            changeSpeed(request.speed);
+            setPlaySpeed(request.speed);
             let [remainTimestamp, diffTimestamp] = getTimestamps();
             sendResponse({msgType: request.msgType, speed: video.playbackRate, remainTimestamp: remainTimestamp, diffTimestamp: diffTimestamp});
         }
@@ -168,14 +168,21 @@ function seekVideo(interval) {
     else video.currentTime += interval;
 }
 
-function changeSpeed(newSpeed) {
+function setPlaySpeed(newSpeed) {
+    // when ratechange event is triggered by rate change, updateShowSpeed is called
     newSpeed = newSpeed < minSpeed ? minSpeed : newSpeed;
     newSpeed = newSpeed > maxSpeed ? maxSpeed : newSpeed;
     video.playbackRate = newSpeed;
 }
 
-function displaySpeed(newSpeed) {
+function updateShowSpeed(newSpeed) {
     speedDisplay.textContent = newSpeed.toFixed(2);
+}
+
+function updateShowTime() {
+    let [remainTimestamp, diffTimestamp] = getTimestamps();
+    remainDisplay.innerText = remainTimestamp;
+    diffDisplay.innerText = diffTimestamp;
 }
 
 
@@ -185,7 +192,7 @@ async function waitForVideo() {
     observer = new MutationObserver((changes) => {
     changes.forEach(change => {
         if(change.attributeName.includes('src')){
-            displaySpeed(video.playbackRate);
+            updateShowSpeed(video.playbackRate);
         }
     });
     });
@@ -262,18 +269,24 @@ async function waitForVideo() {
             font-size: 15px;
             line-height: 15px;
         }
-        .remain {
+        .time {
             border-radius: 5px;
             margin-right: 2px;
             display: none;
         }
-        #controller:hover .remain {
-            display: inline-block;
+        #controller:hover .time {
+            display: inline;
         }
-        
+        #sign {
+            height: 1em;
+        }
     </style>
         <div id="controller">
-            <span class="display remain">1:20:01</span><!--
+            <span class="display time">
+                <span id="remain"></span><!--
+                --><img id="sign" src="" alt=""/><!--
+                --><span id="diff"></span>
+            </span><!--
             --><button class="reset">&#49;&times;</button><!--
             --><button class="left">&minus;</button><!--
             --><span class="display speed">${video.playbackRate}</span><!--
@@ -287,11 +300,35 @@ async function waitForVideo() {
     videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
     speedDisplay = shadowRoot.querySelector('.speed');
-    displaySpeed(video.playbackRate);
+    updateShowSpeed(video.playbackRate);
+    remainDisplay = shadowRoot.querySelector('#remain');
+    diffDisplay = shadowRoot.querySelector('#diff');
+    const controller = shadowRoot.querySelector('#controller');
+    let updateTime;
+
+    document.addEventListener('loadedmetadata', function() {
+        updateShowTime();
+    }, true);
+
 
     document.addEventListener('ratechange', function() {
-        displaySpeed(video.playbackRate);
+        updateShowSpeed(video.playbackRate);
+        updateShowTime();
     }, true);
+
+    document.addEventListener('seeked', function() {
+        updateShowTime();
+    }, true);
+
+    controller.addEventListener('mouseover', function() {
+        updateTime = setInterval(function() {
+            updateShowTime();
+        }, 1000);
+    });
+
+    controller.addEventListener('mouseout', function() {
+        clearInterval(updateTime);
+    });
 
     resetButton = shadowRoot.querySelector('.reset');
     increButton = shadowRoot.querySelector('.right');
@@ -308,15 +345,15 @@ async function waitForVideo() {
     });
 
     resetButton.addEventListener('click', function() {
-        changeSpeed(1);
+        setPlaySpeed(1);
     });
 
     increButton.addEventListener('click', function() {
-        changeSpeed(video.playbackRate+interval);
+        setPlaySpeed(video.playbackRate+interval);
     });
 
     decreButton.addEventListener('click', function() {
-        changeSpeed(video.playbackRate-interval);
+        setPlaySpeed(video.playbackRate-interval);
     });
 }
 
