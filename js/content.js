@@ -162,7 +162,6 @@ chrome.runtime.onConnect.addListener(function(port) {
 
 /************************* Onscreen video controller **************************/
 
-// TODO seeking needs immediate remaining update
 function seekVideo(interval) {
     if (interval < 0 && video.currentTime <= Math.abs(interval)) {
         video.currentTime = 0;
@@ -341,9 +340,7 @@ async function waitForVideo() {
 
     speedDisplay = shadowRoot.querySelector('.speed');
     timeDisplay = shadowRoot.querySelector('.time');
-    const controller = shadowRoot.querySelector('#controller');
 
-    // TODO only need to show when controller is hovered or other events
     updateShowSpeed();
     document.addEventListener('loadedmetadata', function() {
         updateShowTime();
@@ -359,7 +356,10 @@ async function waitForVideo() {
     }, true);
 
     let updateTime;
+    const controller = shadowRoot.querySelector('#controller');
     controller.addEventListener('mouseover', function() {
+        // for immediate update
+        updateShowTime();
         updateTime = setInterval(function() {
             updateShowTime();
         }, 1000);
