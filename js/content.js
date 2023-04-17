@@ -5,14 +5,17 @@ let decreButton;
 let rewindButton;
 let advanceButton;
 let speedDisplay;
-let remainDisplay;
-let diffDisplay;
+let timeDisplay;
 let navigateEnd = true;
 
 const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
+const zeroTime = '00:00';
+const infTime = '&infin;';
+const downArrow = chrome.runtime.getURL('../images/arrow-216-24.png');
+const upArrow = chrome.runtime.getURL('../images/arrow-154-24.png');
 
 document.addEventListener('yt-navigate-start', () => navigateEnd = false);
 document.addEventListener('yt-navigate-finish', () => navigateEnd = true);
@@ -71,11 +74,18 @@ function calcDuration(time, speed) {
 }
 
 function getTimestamps() {
+    let speed = video.playbackRate;
+    if (!speed) {
+        return [infTime, '+'+infTime];
+    }
     // 1. remaining video time at 1x speed
     let remainTime = video.duration - video.currentTime;
     // 2. remaining video time at chosen speed (display in timestamp)
     let remainTimeAtSpeed = calcDuration(remainTime, video.playbackRate);
     let remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed).substring(1);
+
+    if (speed === 1) return [remainTimestamp, '.'+zeroTime];
+
     // 3. differece between 1 and 2 (display in timestamp)
     let timeDiff = remainTimeAtSpeed - remainTime;
     let diffTimestamp = convertSecondToTimestamp(timeDiff);
@@ -86,11 +96,9 @@ async function afterDOMLoaded(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
     let elt = await waitForElm('a.ytp-title-link');
     let title = elt.textContent;
-    let [remainTimestamp, diffTimestamp] = getTimestamps();
     let info = {msgType: msgType, 
         vidTitle: title, 
-        remainTimestamp: remainTimestamp,
-        diffTimestamp: diffTimestamp,
+        timeDisplay: getTimeDisplay(),
         speed: video.playbackRate,
         playing: !video.paused,
         muted: video.muted};
@@ -117,8 +125,7 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.msgType === 'setSpeed') {
             setPlaySpeed(request.speed);
-            let [remainTimestamp, diffTimestamp] = getTimestamps();
-            sendResponse({msgType: request.msgType, speed: video.playbackRate, remainTimestamp: remainTimestamp, diffTimestamp: diffTimestamp});
+            sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
         }
         else if (request.msgType === 'restartVideo') {
             video.currentTime = 0;
@@ -132,8 +139,7 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.msgType === 'seek') {
             seekVideo(request.interval);
-            let [remainTimestamp, diffTimestamp] = getTimestamps();
-            sendResponse({msgType: request.msgType, remainTimestamp: remainTimestamp, diffTimestamp: diffTimestamp});
+            sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
         }
         else if (request.msgType === 'changeVolume') {
             video.muted = !video.muted;
@@ -146,8 +152,7 @@ chrome.runtime.onMessage.addListener(
 // handle incoming connections from popup
 chrome.runtime.onConnect.addListener(function(port) {
     let heartBeatId = setInterval(function() {
-        let [remainTimestamp, diffTimestamp] = getTimestamps();
-        port.postMessage({"remainTimestamp": remainTimestamp, "diffTimestamp": diffTimestamp});
+        port.postMessage({"timeDisplay": getTimeDisplay()});
     }, 1000);
 
     port.onDisconnect.addListener(function(port) {
@@ -175,14 +180,51 @@ function setPlaySpeed(newSpeed) {
     video.playbackRate = newSpeed;
 }
 
-function updateShowSpeed(newSpeed) {
-    speedDisplay.textContent = newSpeed.toFixed(2);
+function updateShowSpeed() {
+    speedDisplay.textContent = video.playbackRate.toFixed(2);
 }
 
 function updateShowTime() {
+    timeDisplay.innerHTML = getTimeDisplay();
+}
+
+function showTimeUp(isUp) {
+    let src;
+    let alt;
+
+    if (isUp) {
+        src = upArrow;
+        alt = 'Up';
+    }
+    else {
+        src = downArrow;
+        alt = 'Down';
+    }
+
+    return `<img id="sign" style="display:inline" src="${src}" alt="${alt}"/>`;
+}
+
+// can use documentFragment here
+// diffTimestamp has a prefix that indicates direction of difference
+    // the prefix can be '+', '-', or '.'
+    // if speed is 0, diffTimestamp = '+InfTime'
+    // if speed is 1, diffTimestamp = '.zeroTime'
+function getTimeInfo(remainTimestamp, diffTimestamp) {
+    let sign;
+    if (diffTimestamp.charAt(0) === '-') sign = showTimeUp(0);
+    else if (diffTimestamp.charAt(0) === '+') sign = showTimeUp(1);
+    else sign = `<img id="sign" style="display:none"/>`;
+
+    return `
+        <span id="remain">${remainTimestamp}</span> (<!--
+        -->${sign}<!--
+        --><span id="diff">${diffTimestamp.substring(1)})</span>
+    `
+}
+
+function getTimeDisplay() {
     let [remainTimestamp, diffTimestamp] = getTimestamps();
-    remainDisplay.innerText = remainTimestamp;
-    diffDisplay.innerText = diffTimestamp;
+    return getTimeInfo(remainTimestamp, diffTimestamp);
 }
 
 
@@ -192,7 +234,7 @@ async function waitForVideo() {
     observer = new MutationObserver((changes) => {
     changes.forEach(change => {
         if(change.attributeName.includes('src')){
-            updateShowSpeed(video.playbackRate);
+            updateShowSpeed();
         }
     });
     });
@@ -283,9 +325,7 @@ async function waitForVideo() {
     </style>
         <div id="controller">
             <span class="display time">
-                <span id="remain"></span><!--
-                --><img id="sign" src="" alt=""/><!--
-                --><span id="diff"></span>
+                
             </span><!--
             --><button class="reset">&#49;&times;</button><!--
             --><button class="left">&minus;</button><!--
@@ -300,19 +340,17 @@ async function waitForVideo() {
     videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
     speedDisplay = shadowRoot.querySelector('.speed');
-    updateShowSpeed(video.playbackRate);
-    remainDisplay = shadowRoot.querySelector('#remain');
-    diffDisplay = shadowRoot.querySelector('#diff');
+    timeDisplay = shadowRoot.querySelector('.time');
     const controller = shadowRoot.querySelector('#controller');
-    let updateTime;
 
+    // TODO only need to show when controller is hovered or other events
+    updateShowSpeed();
     document.addEventListener('loadedmetadata', function() {
         updateShowTime();
     }, true);
 
-
     document.addEventListener('ratechange', function() {
-        updateShowSpeed(video.playbackRate);
+        updateShowSpeed();
         updateShowTime();
     }, true);
 
@@ -320,6 +358,7 @@ async function waitForVideo() {
         updateShowTime();
     }, true);
 
+    let updateTime;
     controller.addEventListener('mouseover', function() {
         updateTime = setInterval(function() {
             updateShowTime();

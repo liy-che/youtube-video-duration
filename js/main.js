@@ -4,16 +4,12 @@ const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
-const zeroTime = '00:00';
-const infTime = '&infin;';
 
 let playSpeed = 1;
 
 // Displays
-const timeDisplay = document.querySelector('#time');
-const diffDisplay = document.querySelector('#diff');
+const timeDisplay = document.querySelector('#time-display');
 const speedDisplay = document.querySelector('#speed');
-const sign = document.querySelector('#sign');
 
 // Buttons
 const decreButton = document.querySelector('#decre');
@@ -208,14 +204,8 @@ function checkSpeed() {
     else if (playSpeed === 0) enablePersistentState(decreButton, 'gray-out');
 }
 
-function updateShowTime(speed, remainTimestamp, diffTimestamp) {
-    if (!speed) {
-        timeDisplay.innerHTML = infTime;
-        diffDisplay.innerHTML = infTime;
-        showTimeUp();
-        return;
-    }
-    updateCalcResult(remainTimestamp, diffTimestamp);
+function updateShowTime(timeBlock) {
+    timeDisplay.innerHTML = timeBlock;
 }
 
 /********************************* functions **********************************/
@@ -225,7 +215,7 @@ function process(info) {
     document.querySelector('h3').innerText = info.vidTitle;
     playSpeed = info.speed;
     updateShowSpeed();
-    updateShowTime(info.speed, info.remainTimestamp, info.diffTimestamp);
+    updateShowTime(info.timeDisplay);
     if (info.playing) {
         playPauseIcon.classList.replace('fa-play', 'fa-pause');
         playPauseButton.setAttribute('title', 'pause (k)');
@@ -248,10 +238,10 @@ function sendMessage(type, msg={}) {
             else if (response.msgType === 'setSpeed') {
                 playSpeed = response.speed;
                 updateShowSpeed();
-                updateShowTime(playSpeed, response.remainTimestamp, response.diffTimestamp);
+                updateShowTime(response.timeDisplay);
             }
             else if (response.msgType === 'seek') {
-                updateShowTime(playSpeed, response.remainTimestamp, response.diffTimestamp);
+                updateShowTime(response.timeDisplay);
             }
             else if (response.msgType === 'restartVideo' || response.msgType === 'playPauseVideo') {
                 if (response.playing) {
@@ -278,32 +268,6 @@ function sendMessage(type, msg={}) {
     });
 }
 
-function showTimeUp() {
-    sign.style.display = 'inline';
-    sign.setAttribute('src', '../images/arrow-154-24.png');
-    sign.setAttribute('alt', 'Up');
-}
-
-function showTimeDown() {
-    sign.style.display = 'inline';
-    sign.setAttribute('src', '../images/arrow-216-24.png')
-    sign.setAttribute('alt', 'Down');
-}
-
-// diffTimestamp has a prefix that indicates direction of difference
-// the prefix can be '+', '-', or '.'
-function updateCalcResult(remainTimestamp, diffTimestamp) {
-    timeDisplay.innerText = remainTimestamp;
-    diffDisplay.innerText = diffTimestamp.substring(1);
-
-    if (diffTimestamp.charAt(0) === '-') showTimeDown();
-    else if (diffTimestamp.charAt(0) === '+') showTimeUp();
-    else {
-        sign.style.display = 'none';
-        diffDisplay.innerText = zeroTime;
-    }
-}
-
 function setPlaySpeed(newSpeed) {
     sendMessage('setSpeed', {speed: newSpeed});
 }
@@ -323,7 +287,7 @@ sendMessage('videoInfo')
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const port = chrome.tabs.connect(tabs[0].id, {name: "video-progress"});
     port.onMessage.addListener(function(msg) {
-        updateShowTime(playSpeed, msg.remainTimestamp, msg.diffTimestamp);
+        updateShowTime(msg.timeDisplay);
         if (msg.remainingTime === 0) {
             playPauseIcon.classList.replace('fa-pause', 'fa-play');
             playPauseButton.setAttribute('title', 'play (k)');
