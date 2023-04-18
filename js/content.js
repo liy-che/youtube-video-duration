@@ -203,7 +203,7 @@ function showTimeUp(isUp) {
     return `<img id="sign" style="display:inline" src="${src}" alt="${alt}"/>`;
 }
 
-// can use documentFragment here
+// TODO can use documentFragment here
 // diffTimestamp has a prefix that indicates direction of difference
     // the prefix can be '+', '-', or '.'
     // if speed is 0, diffTimestamp = '+InfTime'
@@ -224,6 +224,23 @@ function getTimeInfo(remainTimestamp, diffTimestamp) {
 function getTimeDisplay() {
     let [remainTimestamp, diffTimestamp] = getTimestamps();
     return getTimeInfo(remainTimestamp, diffTimestamp);
+}
+
+function showController(controller) {
+    let timer;
+
+    function show() {
+        controller.classList.add("vdc-show");
+    
+        if (timer) clearTimeout(timer);
+    
+        timer = setTimeout(function () {
+        controller.classList.remove("vdc-show");
+        timer = false;
+        }, 2000);
+    }
+
+    return show;
 }
 
 
@@ -315,6 +332,7 @@ async function waitForVideo() {
             margin-right: 2px;
             display: none;
         }
+        .vdc-show,
         #controller:hover .time {
             display: inline;
         }
@@ -340,23 +358,29 @@ async function waitForVideo() {
 
     speedDisplay = shadowRoot.querySelector('.speed');
     timeDisplay = shadowRoot.querySelector('.time');
+    const controller = shadowRoot.querySelector('#controller');
 
     updateShowSpeed();
     document.addEventListener('loadedmetadata', function() {
         updateShowTime();
     }, true);
 
+    let showButtons = showController(newNode);
+    let showTimeDisplay = showController(timeDisplay);
     document.addEventListener('ratechange', function() {
         updateShowSpeed();
         updateShowTime();
+        showButtons();
+        showTimeDisplay();
     }, true);
 
     document.addEventListener('seeked', function() {
         updateShowTime();
+        showButtons();
+        showTimeDisplay();
     }, true);
 
     let updateTime;
-    const controller = shadowRoot.querySelector('#controller');
     controller.addEventListener('mouseover', function() {
         // for immediate update
         updateShowTime();
@@ -394,6 +418,38 @@ async function waitForVideo() {
     decreButton.addEventListener('click', function() {
         setPlaySpeed(video.playbackRate-interval);
     });
+
+    // TODO can use key codes instead of characters
+    document.addEventListener('keydown', function(event) {
+        const pressedKey = event.key.toLowerCase();
+        // Ignore if following modifier is active.
+        if (
+            !event.getModifierState ||
+            event.getModifierState("Alt") ||
+            event.getModifierState("Control") ||
+            event.getModifierState("Fn") ||
+            event.getModifierState("Meta") ||
+            event.getModifierState("Hyper") ||
+            event.getModifierState("OS")
+        ) {
+            return;
+        }
+
+        // Ignore keydown event if typing in an input box
+        if (
+            event.target.nodeName === "INPUT" ||
+            event.target.nodeName === "TEXTAREA" ||
+            event.target.isContentEditable
+        ) {
+            return false;
+        }
+
+        if (pressedKey === '=') increButton.click();
+        else if (pressedKey === '-') decreButton.click();
+
+        return false;
+
+    }, true);
 }
 
 waitForVideo();

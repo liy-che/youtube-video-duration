@@ -2,6 +2,7 @@
     visibility: hidden;
 }
 
+.ytp-autohide .vdc-show,
 .vdc-controller:hover {
     visibility: visible;
 }
