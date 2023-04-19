@@ -255,10 +255,21 @@ small {
   font-weight: 200;
 }
 
+small.left {
+  float: left;
+  margin-left: 0px;
+  margin-right: 4px;
+}
+
+.notice {
+  margin-top: 10px;
+}
+
 ul {
   margin: 0;
   padding: 0;
   list-style-type: none;
+  margin-top: 15px;
 }
 
 li {
@@ -273,6 +284,10 @@ li div:first-child {
 
 p {
   margin: 0 auto;
+}
+
+.highlight {
+  background-color: pink;
 }
 
 /******************************************

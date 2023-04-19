@@ -98,6 +98,7 @@ function isRightKey(key) {
     return key === 'arrowright' || key === 'd';
 }
 
+// TODO can use key codes instead of characters
 // listen for key press
 document.onkeydown = event => {
     const pressedKey = event.key.toLowerCase();

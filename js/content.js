@@ -128,8 +128,7 @@ chrome.runtime.onMessage.addListener(
             sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
         }
         else if (request.msgType === 'restartVideo') {
-            video.currentTime = 0;
-            if (video.ended) video.play();
+            restartVideo();
             sendResponse({msgType: request.msgType, playing: !video.paused});
         }
         else if (request.msgType === 'playPauseVideo') {
@@ -170,6 +169,11 @@ function seekVideo(interval) {
         video.currentTime = video.duration;
     }
     else video.currentTime += interval;
+}
+
+function restartVideo() {
+    video.currentTime = 0;
+    if (video.ended) video.play();
 }
 
 function setPlaySpeed(newSpeed) {
@@ -341,13 +345,12 @@ async function waitForVideo() {
         }
     </style>
         <div id="controller">
-            <span class="display time">
-                
+            <span class="display time"> 
             </span><!--
-            --><button class="reset">&#49;&times;</button><!--
             --><button class="left">&minus;</button><!--
             --><span class="display speed">${video.playbackRate}</span><!--
             --><button class="right">&plus;</button><!--
+            --><button class="reset">&#49;&times;</button><!--
             --><button class="backward">&laquo;</button><!--
             --><button class="forward">&raquo;</button>
         </div>
@@ -444,8 +447,14 @@ async function waitForVideo() {
             return false;
         }
 
-        if (pressedKey === '=') increButton.click();
-        else if (pressedKey === '-') decreButton.click();
+        if (pressedKey === 'd') increButton.click();
+        else if (pressedKey === 'a') decreButton.click();
+        else if (pressedKey === 's') {
+            resetButton.click();
+            showButtons();
+            showTimeDisplay();
+        }
+        else if (pressedKey === 'r') restartVideo();
 
         return false;
 
