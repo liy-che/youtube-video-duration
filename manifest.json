@@ -5,7 +5,7 @@
     "manifest_version": 3,
     "author": "liyche",
     "permissions": [
-        "activeTab", "declarativeContent", "commands"
+        "activeTab", "declarativeContent", "commands", "scripting"
     ],
     "background": {
         "service_worker": "js/background.js"
@@ -15,6 +15,7 @@
         "js": ["js/content.js"],
         "css": ["css/content.css"]
     }],
+    "host_permissions": ["*://*.youtube.com/*"],
     "action": {
         "default_popup": "index.html",
         "default_title": "YouTube Video Duration",
