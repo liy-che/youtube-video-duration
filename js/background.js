@@ -31,6 +31,11 @@ chrome.runtime.onInstalled.addListener((details) => {
           target: {tabId: tab.id},
           files: cs.js,
         });
+
+        chrome.scripting.insertCSS({
+          target: {tabId: tab.id},
+          files: cs.css,
+        });
         
         if (details.reason === 'update') {
           opened = false;

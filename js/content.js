@@ -243,6 +243,8 @@ function showController(controller) {
 async function waitForVideo() {
     video = await waitForElm('video');
 
+    if (document.querySelector(".vdc-controller")) return;
+
     observer = new MutationObserver((changes) => {
     changes.forEach(change => {
         if(change.attributeName.includes('src')){
@@ -252,111 +254,104 @@ async function waitForVideo() {
     });
     observer.observe(video, {attributes : true});
 
-    let shadowRoot;
-    const foundController = document.querySelector('.vdc-controller');
-    if (foundController) {
-        shadowRoot = foundController.shadowRoot;
-    }
-    else {
-        let newNode = document.createElement("div");
-        newNode.classList.add("vdc-controller");
-        shadowRoot = newNode.attachShadow({ mode: "open" });
+    let newNode = document.createElement("div");
+    newNode.classList.add("vdc-controller");
+    let shadowRoot = newNode.attachShadow({ mode: "open" });
 
-        let shadowTemplate = `
-        <style>
-            * {
-                line-height: 1.8em;
-                font-family: sans-serif;
-                font-size: 13px;
-            }
-            #controller {
-                position: absolute;
-                top: 0;
-                right: 0;
-                
-                background: transparent;
-                color: black;
+    let shadowTemplate = `
+    <style>
+        * {
+            line-height: 1.8em;
+            font-family: sans-serif;
+            font-size: 13px;
+        }
+        #controller {
+            position: absolute;
+            top: 0;
+            right: 0;
+            
+            background: transparent;
+            color: black;
 
-                margin: 5px 5px 5px 10px;
-                
-                cursor: default;
-                z-index: 9999999;
-                user-select: none;
-            }
-            button {
-                opacity: 0.6;
-                cursor: pointer;
-                color: black;
-                background: #F5F5F5;
-                font-weight: normal;
-                padding: 1px 5px 3px 5px;
-                font-size: 20px;
-                line-height: 20px;
-                border: 1px solid #696969;
-                font-family: "Lucida Console", Monaco, monospace;
-                margin: 0px;
-                transition: background 0.2s, color 0.2s;
-                border-radius: 5px;
-            }
-            button:focus {
-                outline: 0;
-            }
-            button:hover {
-                opacity: 0.8;
-                background: #F5F5F5;
-                color: black;
-            }
-            button:active {
-                background: #F5F5F5;
-                color: black;
-                font-weight: bold;
-            }
-            button.left, button.backward {
-                border-radius: 5px 0 0 5px;
-                margin-left: 2px;
-            }
-            button.right, button.forward {
-                border-radius: 0 5px 5px 0;
-                margin-right: 2px;
-            }
-            .reset {
-                margin: 0 2px;
-            }
-            .display {
-                color: white;
-                background-color: rgba(48, 48, 48, 0.6);
-                padding: 5px 5px 4px 5px;
-                font-size: 15px;
-                line-height: 15px;
-            }
-            .time {
-                border-radius: 5px;
-                margin-right: 2px;
-                display: none;
-            }
-            .vdc-show,
-            #controller:hover .time {
-                display: inline;
-            }
-            #sign {
-                height: 1em;
-            }
-        </style>
-            <div id="controller">
-                <span class="display time"> 
-                </span><!--
-                --><button class="left">&minus;</button><!--
-                --><span class="display speed">${video.playbackRate}</span><!--
-                --><button class="right">&plus;</button><!--
-                --><button class="reset">&#49;&times;</button><!--
-                --><button class="backward">&laquo;</button><!--
-                --><button class="forward">&raquo;</button>
-            </div>
-        `
-        shadowRoot.innerHTML = shadowTemplate;
-        let videoContainer = document.querySelector('.html5-video-container');
-        videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
-    }
+            margin: 5px 5px 5px 10px;
+            
+            cursor: default;
+            z-index: 9999999;
+            user-select: none;
+        }
+        button {
+            opacity: 0.6;
+            cursor: pointer;
+            color: black;
+            background: #F5F5F5;
+            font-weight: normal;
+            padding: 1px 5px 3px 5px;
+            font-size: 20px;
+            line-height: 20px;
+            border: 1px solid #696969;
+            font-family: "Lucida Console", Monaco, monospace;
+            margin: 0px;
+            transition: background 0.2s, color 0.2s;
+            border-radius: 5px;
+        }
+        button:focus {
+            outline: 0;
+        }
+        button:hover {
+            opacity: 0.8;
+            background: #F5F5F5;
+            color: black;
+        }
+        button:active {
+            background: #F5F5F5;
+            color: black;
+            font-weight: bold;
+        }
+        button.left, button.backward {
+            border-radius: 5px 0 0 5px;
+            margin-left: 2px;
+        }
+        button.right, button.forward {
+            border-radius: 0 5px 5px 0;
+            margin-right: 2px;
+        }
+        .reset {
+            margin: 0 2px;
+        }
+        .display {
+            color: white;
+            background-color: rgba(48, 48, 48, 0.6);
+            padding: 5px 5px 4px 5px;
+            font-size: 15px;
+            line-height: 15px;
+        }
+        .time {
+            border-radius: 5px;
+            margin-right: 2px;
+            display: none;
+        }
+        .vdc-show,
+        #controller:hover .time {
+            display: inline;
+        }
+        #sign {
+            height: 1em;
+        }
+    </style>
+        <div id="controller">
+            <span class="display time"> 
+            </span><!--
+            --><button class="left">&minus;</button><!--
+            --><span class="display speed">${video.playbackRate}</span><!--
+            --><button class="right">&plus;</button><!--
+            --><button class="reset">&#49;&times;</button><!--
+            --><button class="backward">&laquo;</button><!--
+            --><button class="forward">&raquo;</button>
+        </div>
+    `
+    shadowRoot.innerHTML = shadowTemplate;
+    let videoContainer = document.querySelector('.html5-video-container');
+    videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
     speedDisplay = shadowRoot.querySelector('.speed');
     timeDisplay = shadowRoot.querySelector('.time');
