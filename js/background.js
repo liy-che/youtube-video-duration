@@ -37,7 +37,7 @@ chrome.runtime.onInstalled.addListener((details) => {
           files: cs.css,
         });
         
-        if (details.reason === 'update') {
+        if (details.reason === 'update' || details.reason === 'install') {
           opened = false;
           chrome.action.setBadgeText({
             text: "new",
