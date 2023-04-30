@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener((details) => {
         if (details.reason === 'update' || details.reason === 'install') {
           opened = false;
           chrome.action.setBadgeText({
-            text: "new",
+            text: "NEW",
             tabId: tab.id,
           });
         }
@@ -57,6 +57,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         for (const tab of tabs) {
             chrome.action.setBadgeText({
               text: "",
+              tabId: tab.id,
+            });
+        }
+      });
+    }
+  }
+});
+
+chrome.tabs.onUpdated.addListener(() => {
+  if (!opened) {
+    for (const cs of chrome.runtime.getManifest().content_scripts) {
+      chrome.tabs.query({active: true, currentWindow: true, url: cs.matches}, (tabs)=> {
+        for (const tab of tabs) {
+            chrome.action.setBadgeText({
+              text: "NEW",
               tabId: tab.id,
             });
         }
