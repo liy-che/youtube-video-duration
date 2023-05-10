@@ -190,6 +190,13 @@ function toggleColor(event) {
     }
 }
 
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+      if (request.msgType === 'updatePopup')
+        process(request);
+    }
+);
+
 /******************************* helper functions *****************************/
 
 function enablePersistentState(elt, persistentState) {
@@ -236,8 +243,12 @@ function sendMessage(type, msg={}) {
     msg['msgType'] = type;
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, msg, function(response) {
-            if (response.msgType === 'videoInfo') {
+            if (chrome.runtime.lastError) {
+                setTimeout(sendMessage, 500, 'videoInfo');
+            }
+            else if (response.msgType === 'videoInfo') {
                 process(response);
+                connectPort();
             }
             else if (response.msgType === 'setSpeed') {
                 playSpeed = response.speed;
@@ -272,6 +283,19 @@ function sendMessage(type, msg={}) {
     });
 }
 
+function connectPort() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        const port = chrome.tabs.connect(tabs[0].id, {name: "video-progress"});
+        port.onMessage.addListener(function(msg) {
+            updateShowTime(msg.timeDisplay);
+            if (msg.remainingTime === 0) {
+                playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                playPauseButton.setAttribute('title', 'play (k)');
+            }
+        });
+    });
+}
+
 function setPlaySpeed(newSpeed) {
     sendMessage('setSpeed', {speed: newSpeed});
 }
@@ -287,17 +311,6 @@ function updateShowSpeed() {
 hideBlock('main');
 
 sendMessage('videoInfo')
-
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    const port = chrome.tabs.connect(tabs[0].id, {name: "video-progress"});
-    port.onMessage.addListener(function(msg) {
-        updateShowTime(msg.timeDisplay);
-        if (msg.remainingTime === 0) {
-            playPauseIcon.classList.replace('fa-pause', 'fa-play');
-            playPauseButton.setAttribute('title', 'play (k)');
-        }
-    });
-});
 
 chrome.runtime.sendMessage({msgType: "handshake"});
 

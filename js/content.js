@@ -1,4 +1,4 @@
-let video;
+const video = document.querySelector('video');
 let resetButton;
 let increButton;
 let decreButton;
@@ -27,27 +27,6 @@ document.addEventListener('yt-navigate-start', () => navigateEnd = false);
 document.addEventListener('yt-navigate-finish', () => navigateEnd = true);
 
 // mutations.addedNodes.find(node => node.matchesSelector("..."))
-
-// wait for element to exist
-function waitForElm(selector) {
-    return new Promise(resolve => {
-        if (navigateEnd && document.querySelector(selector)) {
-            return resolve(document.querySelector(selector));
-        }
-
-        const observer = new MutationObserver((mutations, obs) => {
-            if (navigateEnd && document.querySelector(selector)) {
-                obs.disconnect();
-                resolve(document.querySelector(selector));
-            }
-        });
-
-        observer.observe(document.documentElement, {
-            childList: true,
-            subtree: true
-        });
-    });
-}
 
 /******************************* calculations *******************************/
 
@@ -98,9 +77,9 @@ function getTimestamps() {
     return [remainTimestamp, diffTimestamp];
 }
 
-async function afterDOMLoaded(msgType){
+function getVideoInfo(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
-    let elt = await waitForElm('a.ytp-title-link');
+    let elt = document.querySelector('a.ytp-title-link');
     let title = elt.textContent;
     let info = {msgType: msgType, 
         vidTitle: title, 
@@ -118,8 +97,7 @@ async function afterDOMLoaded(msgType){
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         if (request.msgType === 'videoInfo') {
-            afterDOMLoaded(request.msgType).then(sendResponse);
-            return true;
+            sendResponse(getVideoInfo(request.msgType));
         }
         else if (request.msgType === 'setSpeed') {
             setPlaySpeed(request.speed);
@@ -246,17 +224,17 @@ function showController(controller) {
 }
 
 
-async function waitForVideo() {
-    video = await waitForElm('video');
+function waitForVideo() {
 
     if (document.querySelector(".vdc-controller")) return;
 
     observer = new MutationObserver((changes) => {
-    changes.forEach(change => {
-        if(change.attributeName.includes('src')){
-            updateShowSpeed();
-        }
-    });
+        changes.forEach(change => {
+            if(change.attributeName.includes('src')){
+                chrome.runtime.sendMessage(getVideoInfo('updatePopup'));
+                updateShowSpeed();
+            }
+        });
     });
     observer.observe(video, {attributes : true});
 
