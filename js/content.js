@@ -17,6 +17,12 @@ const infTime = '&infin;';
 const downArrow = chrome.runtime.getURL('../images/arrow-216-24.png');
 const upArrow = chrome.runtime.getURL('../images/arrow-154-24.png');
 
+let settings = {
+    enable: true,
+    enableController: true,
+    enableShortcuts: true
+};
+
 document.addEventListener('yt-navigate-start', () => navigateEnd = false);
 document.addEventListener('yt-navigate-finish', () => navigateEnd = true);
 

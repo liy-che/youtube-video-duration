@@ -18,9 +18,11 @@
 	<body>
         <main class="container">
             <input type="radio" id="tab1" name="tab" checked>
-            <label for="tab1"><i class="fa-regular fa-circle-play"></i> Playing</label>
+            <label for="tab1"><i class="fa-regular fa-circle-play"></i></label>
             <input type="radio" id="tab2" name="tab">
-            <label for="tab2"><i class="fa-regular fa-keyboard"></i> Shortcuts</label>
+            <label for="tab2"><i class="fa-regular fa-keyboard"></i></label>
+            <input type="radio" id="tab3" name="tab">
+            <label for="tab3"><i class="fa-solid fa-gear"></i></label>
             
             <div class="line"></div>
             
@@ -89,6 +91,39 @@
                             <div>M</div>
                         </li>
                     </ul>
+                </div>
+                <div class="content" id="c3">
+                    <h3>Settings</h3>
+                    <ul>
+                        <li>
+                            <div>Enable</div>
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" id="enable">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div>Controller</div>
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" id="enableController">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div>Keyboard shortcuts</div>
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" id="enableShortcuts">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                    
                 </div>
             </div>
         </main>

@@ -21,6 +21,9 @@ const playPauseIcon = document.querySelector('#play-pause i');
 const rewindButton = document.querySelector('#rewind');
 const advanceButton = document.querySelector('#advance');
 const volumeButton = document.querySelector('#volume');
+const enable = document.querySelector('#enable');
+const enableController = document.querySelector('#enableController');
+const enableShortcuts = document.querySelector('#enableShortcuts');
 
 // Tabs
 const tab1 = document.getElementById('tab1');
@@ -297,3 +300,34 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 });
 
 chrome.runtime.sendMessage({msgType: "handshake"});
+
+enable.addEventListener('click', function() {
+    if (enable.checked) {
+        enableController.checked = true;
+        enableShortcuts.checked = true;
+    }
+    else {
+        enableController.checked = false;
+        enableShortcuts.checked = false;
+    }
+});
+
+enableController.addEventListener('click', function() {
+    if (enableController.checked) {
+        enable.checked = true;
+    }
+    else if (!enableShortcuts.checked) {
+        enable.checked = false;
+    }
+});
+
+enableShortcuts.addEventListener('click', function() {
+    if (enableShortcuts.checked) {
+        enable.checked = true;
+    }
+    else if (!enableController.checked) {
+        enable.checked = false;
+    }
+});
+
+// document.addEventListener('DOMContentLoaded', restoreOptions);
