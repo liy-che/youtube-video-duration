@@ -6,7 +6,6 @@ let rewindButton;
 let advanceButton;
 let speedDisplay;
 let timeDisplay;
-let navigateEnd = true;
 
 const minSpeed = 0.25;
 const interval = 0.25;
@@ -22,11 +21,6 @@ let settings = {
     enableController: true,
     enableShortcuts: true
 };
-
-document.addEventListener('yt-navigate-start', () => navigateEnd = false);
-document.addEventListener('yt-navigate-finish', () => navigateEnd = true);
-
-// mutations.addedNodes.find(node => node.matchesSelector("..."))
 
 /******************************* calculations *******************************/
 
@@ -224,7 +218,7 @@ function showController(controller) {
 }
 
 
-function waitForVideo() {
+function injectController() {
 
     if (document.querySelector(".vdc-controller")) return;
 
@@ -439,4 +433,4 @@ function waitForVideo() {
     }, true);
 }
 
-waitForVideo();
+injectController();
