@@ -22,7 +22,7 @@ chrome.runtime.onInstalled.addListener((details) => {
   });
 
   // re-inject content scripts and set badge to matches after install or update
-  chrome.storage.sync.set({ opened: false});
+  chrome.storage.sync.set({ opened: false });
   
   for (const cs of chrome.runtime.getManifest().content_scripts) {
     chrome.tabs.query({url: cs.matches}, (tabs)=> {

@@ -22,6 +22,13 @@ let settings = {
     enableShortcuts: true
 };
 
+chrome.storage.sync.get(settings, function(storage) {
+    settings = storage;
+    chrome.storage.sync.set(settings);
+});
+
+injectController();
+
 /******************************* calculations *******************************/
 
 
@@ -52,6 +59,7 @@ function calcDuration(time, speed) {
     return time/speed;
 }
 
+
 function getTimestamps() {
     let speed = video.playbackRate;
     if (!speed) {
@@ -70,6 +78,7 @@ function getTimestamps() {
     let diffTimestamp = convertSecondToTimestamp(timeDiff);
     return [remainTimestamp, diffTimestamp];
 }
+
 
 function getVideoInfo(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
@@ -141,10 +150,12 @@ function seekVideo(interval) {
     else video.currentTime += interval;
 }
 
+
 function restartVideo() {
     video.currentTime = 0;
     if (video.ended) video.play();
 }
+
 
 function setPlaySpeed(newSpeed) {
     // when ratechange event is triggered by rate change, updateShowSpeed is called
@@ -153,13 +164,16 @@ function setPlaySpeed(newSpeed) {
     video.playbackRate = newSpeed;
 }
 
+
 function updateShowSpeed() {
     speedDisplay.textContent = video.playbackRate.toFixed(2);
 }
 
+
 function updateShowTime() {
     timeDisplay.innerHTML = getTimeDisplay();
 }
+
 
 function showTimeUp(isUp) {
     let src;
@@ -176,6 +190,7 @@ function showTimeUp(isUp) {
 
     return `<img id="sign" style="display:inline" src="${src}" alt="${alt}"/>`;
 }
+
 
 // TODO can use documentFragment here
 // diffTimestamp has a prefix that indicates direction of difference
@@ -195,10 +210,12 @@ function getTimeInfo(remainTimestamp, diffTimestamp) {
     `
 }
 
+
 function getTimeDisplay() {
     let [remainTimestamp, diffTimestamp] = getTimestamps();
     return getTimeInfo(remainTimestamp, diffTimestamp);
 }
+
 
 function showController(controller) {
     let timer;
@@ -218,20 +235,8 @@ function showController(controller) {
 }
 
 
-function injectController() {
-
-    if (document.querySelector(".vdc-controller")) return;
-
-    observer = new MutationObserver((changes) => {
-        changes.forEach(change => {
-            if(change.attributeName.includes('src')){
-                chrome.runtime.sendMessage(getVideoInfo('updatePopup'));
-                updateShowSpeed();
-            }
-        });
-    });
-    observer.observe(video, {attributes : true});
-
+function constructShadowDOM() {
+    // construct a new node with a shadow DOM and insert node into DOM
     let newNode = document.createElement("div");
     newNode.classList.add("vdc-controller");
     let shadowRoot = newNode.attachShadow({ mode: "open" });
@@ -331,6 +336,12 @@ function injectController() {
     let videoContainer = document.querySelector('.html5-video-container');
     videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
+    return newNode;
+}
+
+
+function setupListeners(node) {
+    let shadowRoot = node.shadowRoot;
     speedDisplay = shadowRoot.querySelector('.speed');
     timeDisplay = shadowRoot.querySelector('.time');
     const controller = shadowRoot.querySelector('#controller');
@@ -340,7 +351,7 @@ function injectController() {
         updateShowTime();
     }, true);
 
-    let showButtons = showController(newNode);
+    let showButtons = showController(node);
     let showTimeDisplay = showController(timeDisplay);
     document.addEventListener('ratechange', function() {
         updateShowSpeed();
@@ -394,6 +405,7 @@ function injectController() {
         setPlaySpeed(video.playbackRate-interval);
     });
 
+    // set up listener for keyboard shortcuts
     // TODO can use key codes instead of characters
     document.addEventListener('keydown', function(event) {
         const pressedKey = event.key.toLowerCase();
@@ -433,4 +445,26 @@ function injectController() {
     }, true);
 }
 
-injectController();
+
+function injectController() {
+
+    // if controller already exists on the page, don't inject
+    if (document.querySelector(".vdc-controller")) return;
+
+    // detects when YouTube video is changed, even when change is dynamic, ie. no page reload
+    observer = new MutationObserver((changes) => {
+        changes.forEach(change => {
+            if(change.attributeName.includes('src')){
+                chrome.runtime.sendMessage(getVideoInfo('updatePopup'));
+                updateShowSpeed();
+            }
+        });
+    });
+    observer.observe(video, {attributes : true});
+
+    // construct a new node with a shadow DOM and insert node into DOM
+    let controllerNode = constructShadowDOM();
+
+    // set up event listeners for controller
+    setupListeners(controllerNode);
+}
