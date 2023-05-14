@@ -6,3 +6,7 @@
 .vdc-controller:hover {
     visibility: visible;
 }
+
+.vdc-disable {
+    opacity: 0;
+}

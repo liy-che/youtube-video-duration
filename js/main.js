@@ -25,6 +25,13 @@ const enable = document.querySelector('#enable');
 const enableController = document.querySelector('#enableController');
 const enableShortcuts = document.querySelector('#enableShortcuts');
 
+// User settings
+let settings = {
+    enable: true,
+    enableController: true,
+    enableShortcuts: true
+};
+
 // Tabs
 const tab1 = document.getElementById('tab1');
 const tab2 = document.getElementById('tab2');
@@ -315,32 +322,36 @@ sendMessage('videoInfo')
 chrome.runtime.sendMessage({msgType: "handshake"});
 
 enable.addEventListener('click', function() {
-    if (enable.checked) {
-        enableController.checked = true;
-        enableShortcuts.checked = true;
-    }
-    else {
-        enableController.checked = false;
-        enableShortcuts.checked = false;
-    }
+    enableController.checked = enableShortcuts.checked = enable.checked;
+    chrome.storage.sync.set({
+        enable: enable.checked,
+        enableController: enableController.checked,
+        enableShortcuts: enableShortcuts.checked
+    });
+
 });
 
 enableController.addEventListener('click', function() {
-    if (enableController.checked) {
-        enable.checked = true;
-    }
-    else if (!enableShortcuts.checked) {
-        enable.checked = false;
-    }
+    enable.checked = enableController.checked || enableShortcuts.checked ? true : false;
+    chrome.storage.sync.set({
+        enable: enable.checked,
+        enableController: enableController.checked
+    });
 });
 
 enableShortcuts.addEventListener('click', function() {
-    if (enableShortcuts.checked) {
-        enable.checked = true;
-    }
-    else if (!enableController.checked) {
-        enable.checked = false;
-    }
+    enable.checked = enableShortcuts.checked || enableController.checked? true : false;
+    chrome.storage.sync.set({
+        enable: enable.checked,
+        enableShortcuts: enableShortcuts.checked
+    });
 });
 
-// document.addEventListener('DOMContentLoaded', restoreOptions);
+// restore options
+document.addEventListener('DOMContentLoaded', function() {
+    chrome.storage.sync.get(settings, function(storage) {
+        enable.checked = storage.enable;
+        enableController.checked = storage.enableController;
+        enableShortcuts.checked = storage.enableShortcuts;
+    });
+});

@@ -1,4 +1,8 @@
 const video = document.querySelector('video');
+let controllerExists;
+let controllerNode;
+let showButtons;
+let showTimeDisplay;
 let resetButton;
 let increButton;
 let decreButton;
@@ -22,12 +26,61 @@ let settings = {
     enableShortcuts: true
 };
 
+// TODO can use key codes instead of characters
+let setupShortcuts = (event) => {
+    const pressedKey = event.key.toLowerCase();
+    // Ignore if following modifier is active.
+    if (
+        !event.getModifierState ||
+        event.getModifierState("Alt") ||
+        event.getModifierState("Control") ||
+        event.getModifierState("Fn") ||
+        event.getModifierState("Meta") ||
+        event.getModifierState("Hyper") ||
+        event.getModifierState("OS")
+    ) {
+        return;
+    }
+
+    // Ignore keydown event if typing in an input box
+    if (
+        event.target.nodeName === "INPUT" ||
+        event.target.nodeName === "TEXTAREA" ||
+        event.target.isContentEditable
+    ) {
+        return false;
+    }
+
+    if (pressedKey === 'd') increButton.click();
+    else if (pressedKey === 'a') decreButton.click();
+    else if (pressedKey === 's') {
+        resetButton.click();
+        showButtons();
+        showTimeDisplay();
+    }
+    else if (pressedKey === 'r') restartVideo();
+
+    return false;
+};
+
+// initialize user settings
 chrome.storage.sync.get(settings, function(storage) {
     settings = storage;
     chrome.storage.sync.set(settings);
+    injectController();
 });
 
-injectController();
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (changes.enableController) {
+        changes.enableController.newValue ? 
+            controllerNode.classList.remove('vdc-disable') : controllerNode.classList.add('vdc-disable');
+    }
+
+    if (changes.enableShortcuts) {
+        changes.enableShortcuts.newValue ? 
+            document.addEventListener('keydown', setupShortcuts, true) : document.removeEventListener('keydown', setupShortcuts, true);
+    }
+});
 
 /******************************* calculations *******************************/
 
@@ -340,19 +393,27 @@ function constructShadowDOM() {
 }
 
 
-function setupListeners(node) {
-    let shadowRoot = node.shadowRoot;
+function setupListeners() {
+    let shadowRoot = controllerNode.shadowRoot;
     speedDisplay = shadowRoot.querySelector('.speed');
     timeDisplay = shadowRoot.querySelector('.time');
-    const controller = shadowRoot.querySelector('#controller');
+
+    showButtons = showController(controllerNode);
+    showTimeDisplay = showController(timeDisplay);
+
+    resetButton = shadowRoot.querySelector('.reset');
+    increButton = shadowRoot.querySelector('.right');
+    decreButton = shadowRoot.querySelector('.left');
+    rewindButton = shadowRoot.querySelector('.backward');
+    advanceButton = shadowRoot.querySelector('.forward');
+
+    if (controllerExists) return;
 
     updateShowSpeed();
     document.addEventListener('loadedmetadata', function() {
         updateShowTime();
     }, true);
 
-    let showButtons = showController(node);
-    let showTimeDisplay = showController(timeDisplay);
     document.addEventListener('ratechange', function() {
         updateShowSpeed();
         updateShowTime();
@@ -367,6 +428,7 @@ function setupListeners(node) {
     }, true);
 
     let updateTime;
+    const controller = shadowRoot.querySelector('#controller');
     controller.addEventListener('mouseover', function() {
         // for immediate update
         updateShowTime();
@@ -378,12 +440,6 @@ function setupListeners(node) {
     controller.addEventListener('mouseout', function() {
         clearInterval(updateTime);
     });
-
-    resetButton = shadowRoot.querySelector('.reset');
-    increButton = shadowRoot.querySelector('.right');
-    decreButton = shadowRoot.querySelector('.left');
-    rewindButton = shadowRoot.querySelector('.backward');
-    advanceButton = shadowRoot.querySelector('.forward');
 
     rewindButton.addEventListener('click', function() {
         seekVideo(-seekInterval);
@@ -404,67 +460,40 @@ function setupListeners(node) {
     decreButton.addEventListener('click', function() {
         setPlaySpeed(video.playbackRate-interval);
     });
-
-    // set up listener for keyboard shortcuts
-    // TODO can use key codes instead of characters
-    document.addEventListener('keydown', function(event) {
-        const pressedKey = event.key.toLowerCase();
-        // Ignore if following modifier is active.
-        if (
-            !event.getModifierState ||
-            event.getModifierState("Alt") ||
-            event.getModifierState("Control") ||
-            event.getModifierState("Fn") ||
-            event.getModifierState("Meta") ||
-            event.getModifierState("Hyper") ||
-            event.getModifierState("OS")
-        ) {
-            return;
-        }
-
-        // Ignore keydown event if typing in an input box
-        if (
-            event.target.nodeName === "INPUT" ||
-            event.target.nodeName === "TEXTAREA" ||
-            event.target.isContentEditable
-        ) {
-            return false;
-        }
-
-        if (pressedKey === 'd') increButton.click();
-        else if (pressedKey === 'a') decreButton.click();
-        else if (pressedKey === 's') {
-            resetButton.click();
-            showButtons();
-            showTimeDisplay();
-        }
-        else if (pressedKey === 'r') restartVideo();
-
-        return false;
-
-    }, true);
 }
 
 
 function injectController() {
 
+    controllerNode = document.querySelector(".vdc-controller");
+    controllerExists = Boolean(controllerNode);
+
     // if controller already exists on the page, don't inject
-    if (document.querySelector(".vdc-controller")) return;
-
-    // detects when YouTube video is changed, even when change is dynamic, ie. no page reload
-    observer = new MutationObserver((changes) => {
-        changes.forEach(change => {
-            if(change.attributeName.includes('src')){
-                chrome.runtime.sendMessage(getVideoInfo('updatePopup'));
-                updateShowSpeed();
-            }
+    if (!controllerExists) {
+        // detects when YouTube video is changed, even when change is dynamic, ie. no page reload
+        observer = new MutationObserver((changes) => {
+            changes.forEach(change => {
+                if(change.attributeName.includes('src')){
+                    chrome.runtime.sendMessage(getVideoInfo('updatePopup'));
+                    updateShowSpeed();
+                }
+            });
         });
-    });
-    observer.observe(video, {attributes : true});
+        observer.observe(video, {attributes : true});
 
-    // construct a new node with a shadow DOM and insert node into DOM
-    let controllerNode = constructShadowDOM();
+        // construct a new node with a shadow DOM and insert node into DOM
+        controllerNode = constructShadowDOM();
+    }
 
     // set up event listeners for controller
-    setupListeners(controllerNode);
+    setupListeners();
+
+    if (!settings.enableController) controllerNode.classList.add('vdc-disable');
+    // set up listener for keyboard shortcuts
+    if (settings.enableShortcuts) {
+        if (!controllerExists) document.addEventListener('keydown', setupShortcuts, true);
+    }
+    else {
+        document.removeEventListener('keydown', setupShortcuts, true);
+    }
 }
