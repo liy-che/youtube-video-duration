@@ -1,4 +1,4 @@
-const video = document.querySelector('video');
+let video;
 let controllerExists;
 let controllerNode;
 let showButtons;
@@ -19,6 +19,33 @@ const zeroTime = '00:00';
 const infTime = '&infin;';
 const downArrow = chrome.runtime.getURL('../images/arrow-216-24.png');
 const upArrow = chrome.runtime.getURL('../images/arrow-154-24.png');
+
+let navigateEnd = true;
+document.addEventListener('yt-navigate-start', () => navigateEnd = false);
+document.addEventListener('yt-navigate-finish', () => navigateEnd = true);
+
+// mutations.addedNodes.find(node => node.matchesSelector("..."))
+
+// wait for element to exist
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (navigateEnd && document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver((mutations, obs) => {
+            if (navigateEnd && document.querySelector(selector)) {
+                obs.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
 
 let settings = {
     enable: true,
@@ -64,22 +91,26 @@ let setupShortcuts = (event) => {
 };
 
 // initialize user settings
-chrome.storage.sync.get(settings, function(storage) {
+chrome.storage.sync.get(settings, async function(storage) {
     settings = storage;
     chrome.storage.sync.set(settings);
+    // page does not reload (ie. no content script is inserted on watch page) when video is chosen from home page
+    // so content script is inserted on home page
+    // wait for user to click into a video watch page from the home page
+    video = await waitForElm('video');
     injectController();
-});
 
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (changes.enableController) {
-        changes.enableController.newValue ? 
-            controllerNode.classList.remove('vdc-disable') : controllerNode.classList.add('vdc-disable');
-    }
-
-    if (changes.enableShortcuts) {
-        changes.enableShortcuts.newValue ? 
-            document.addEventListener('keydown', setupShortcuts, true) : document.removeEventListener('keydown', setupShortcuts, true);
-    }
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (changes.enableController) {
+            changes.enableController.newValue ? 
+                controllerNode.classList.remove('vdc-disable') : controllerNode.classList.add('vdc-disable');
+        }
+    
+        if (changes.enableShortcuts) {
+            changes.enableShortcuts.newValue ? 
+                document.addEventListener('keydown', setupShortcuts, true) : document.removeEventListener('keydown', setupShortcuts, true);
+        }
+    });
 });
 
 /******************************* calculations *******************************/
@@ -373,6 +404,9 @@ function constructShadowDOM() {
         #sign {
             height: 1em;
         }
+        .vdc-hidden {
+            display: none;
+        }
     </style>
         <div id="controller">
             <span class="display time"> 
@@ -407,6 +441,23 @@ function setupListeners() {
     rewindButton = shadowRoot.querySelector('.backward');
     advanceButton = shadowRoot.querySelector('.forward');
 
+    let timer;
+    function showDisplay() {
+        let nodes = shadowRoot.querySelectorAll('button');
+        nodes.forEach((node)=>{
+            node.classList.add('vdc-hidden');
+        });
+    
+        if (timer) clearTimeout(timer);
+    
+        timer = setTimeout(function () {
+        nodes.forEach((node)=>{
+            node.classList.remove('vdc-hidden');
+        });
+        timer = false;
+        }, 2000);
+    }
+
     if (controllerExists) return;
 
     updateShowSpeed();
@@ -414,7 +465,7 @@ function setupListeners() {
         updateShowTime();
     }, true);
 
-    document.addEventListener('ratechange', function() {
+    document.addEventListener('ratechange', function(e) {
         updateShowSpeed();
         updateShowTime();
         showButtons();

@@ -11,7 +11,7 @@
         "service_worker": "js/background.js"
     },
     "content_scripts": [{
-        "matches": ["*://*.youtube.com/watch*"],
+        "matches": ["*://*.youtube.com/*"],
         "js": ["js/content.js"],
         "css": ["css/content.css"]
     }],
