@@ -53,6 +53,26 @@ let settings = {
     enableShortcuts: true
 };
 
+let handleRewind = () => {
+    seekVideo(-seekInterval);
+};
+
+let handleAdvance = () => {
+    seekVideo(seekInterval);
+};
+
+let handleReset = () => {
+    setPlaySpeed(1);
+};
+
+let handleIncre = () => {
+    setPlaySpeed(video.playbackRate+interval);
+};
+
+let handleDecre = () => {
+    setPlaySpeed(video.playbackRate-interval);
+};
+
 // TODO can use key codes instead of characters
 let setupShortcuts = (event) => {
     const pressedKey = event.key.toLowerCase();
@@ -78,10 +98,10 @@ let setupShortcuts = (event) => {
         return false;
     }
 
-    if (pressedKey === 'd') increButton.click();
-    else if (pressedKey === 'a') decreButton.click();
+    if (pressedKey === 'd') handleIncre();
+    else if (pressedKey === 'a') handleDecre();
     else if (pressedKey === 's') {
-        resetButton.click();
+        handleReset();
         showButtons();
         showTimeDisplay();
     }
@@ -323,6 +343,7 @@ function constructShadowDOM() {
     // construct a new node with a shadow DOM and insert node into DOM
     let newNode = document.createElement("div");
     newNode.classList.add("vdc-controller");
+    newNode.classList.add("no-button");
     let shadowRoot = newNode.attachShadow({ mode: "open" });
 
     let shadowTemplate = `
@@ -407,6 +428,9 @@ function constructShadowDOM() {
         .vdc-hidden {
             display: none;
         }
+        :host(.no-button) button {
+            display: none;
+        }
     </style>
         <div id="controller">
             <span class="display time"> 
@@ -441,22 +465,22 @@ function setupListeners() {
     rewindButton = shadowRoot.querySelector('.backward');
     advanceButton = shadowRoot.querySelector('.forward');
 
-    let timer;
-    function showDisplay() {
-        let nodes = shadowRoot.querySelectorAll('button');
-        nodes.forEach((node)=>{
-            node.classList.add('vdc-hidden');
-        });
+    // let timer;
+    // function showDisplay() {
+    //     let nodes = shadowRoot.querySelectorAll('button');
+    //     nodes.forEach((node)=>{
+    //         node.classList.add('vdc-hidden');
+    //     });
     
-        if (timer) clearTimeout(timer);
+    //     if (timer) clearTimeout(timer);
     
-        timer = setTimeout(function () {
-        nodes.forEach((node)=>{
-            node.classList.remove('vdc-hidden');
-        });
-        timer = false;
-        }, 2000);
-    }
+    //     timer = setTimeout(function () {
+    //     nodes.forEach((node)=>{
+    //         node.classList.remove('vdc-hidden');
+    //     });
+    //     timer = false;
+    //     }, 2000);
+    // }
 
     if (controllerExists) return;
 
@@ -492,24 +516,23 @@ function setupListeners() {
         clearInterval(updateTime);
     });
 
-    rewindButton.addEventListener('click', function() {
-        seekVideo(-seekInterval);
-    });
+    rewindButton.addEventListener('click', handleRewind);
     
-    advanceButton.addEventListener('click', function() {
-        seekVideo(seekInterval);
+    advanceButton.addEventListener('click', handleAdvance);
+
+    resetButton.addEventListener('click', handleReset);
+
+    increButton.addEventListener('click', handleIncre);
+
+    decreButton.addEventListener('click', handleDecre);
+
+    let player = document.querySelector('.html5-video-player');
+    player.addEventListener('mouseenter', function() {
+        controllerNode.classList.remove('no-button');
     });
 
-    resetButton.addEventListener('click', function() {
-        setPlaySpeed(1);
-    });
-
-    increButton.addEventListener('click', function() {
-        setPlaySpeed(video.playbackRate+interval);
-    });
-
-    decreButton.addEventListener('click', function() {
-        setPlaySpeed(video.playbackRate-interval);
+    player.addEventListener('mouseleave', function() {
+        controllerNode.classList.add('no-button');
     });
 }
 
