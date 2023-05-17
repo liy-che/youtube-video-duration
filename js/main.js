@@ -230,7 +230,7 @@ function updateShowTime(timeBlock) {
 
 function process(info) {
     hideBlock('loading');
-    document.querySelector('h3').innerText = info.vidTitle;
+    document.querySelector('#main h3').innerText = info.vidTitle;
     playSpeed = info.speed;
     updateShowSpeed();
     updateShowTime(info.timeDisplay);
@@ -314,6 +314,15 @@ function updateShowSpeed() {
 
 /******************************* main program *********************************/
 
+// restore options
+document.addEventListener('DOMContentLoaded', function() {
+    chrome.storage.sync.get(settings, function(storage) {
+        enable.checked = storage.enable;
+        enableController.checked = storage.enableController;
+        enableShortcuts.checked = storage.enableShortcuts;
+    });
+});
+
 // when pop up is opened, get video duration
 hideBlock('main');
 
@@ -344,14 +353,5 @@ enableShortcuts.addEventListener('click', function() {
     chrome.storage.sync.set({
         enable: enable.checked,
         enableShortcuts: enableShortcuts.checked
-    });
-});
-
-// restore options
-document.addEventListener('DOMContentLoaded', function() {
-    chrome.storage.sync.get(settings, function(storage) {
-        enable.checked = storage.enable;
-        enableController.checked = storage.enableController;
-        enableShortcuts.checked = storage.enableShortcuts;
     });
 });

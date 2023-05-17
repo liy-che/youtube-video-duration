@@ -18,16 +18,52 @@
 	<body>
         <main class="container">
             <input type="radio" id="tab1" name="tab" checked>
-            <label for="tab1"><i class="fa-regular fa-circle-play"></i></label>
+            <label for="tab1"><i class="fa-solid fa-gear"></i></label>
             <input type="radio" id="tab2" name="tab">
-            <label for="tab2"><i class="fa-regular fa-keyboard"></i></label>
+            <label for="tab2"><i class="fa-regular fa-circle-play"></i></label>
             <input type="radio" id="tab3" name="tab">
-            <label for="tab3"><i class="fa-solid fa-gear"></i></label>
+            <label for="tab3"><i class="fa-regular fa-keyboard"></i></label>
             
             <div class="line"></div>
             
             <div class="content-container">
                 <div class="content" id="c1">
+                    <h3>Settings</h3>
+                    <div class="alert info"><b>NEW</b><br>
+                        Tailor the extension to your likings.
+                    </div>
+                    <ul>
+                        <li>
+                            <div>Enable</div>
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" id="enable">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div>Controller</div>
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" id="enableController">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div>Keyboard shortcuts</div>
+                            <div>
+                                <label class="switch">
+                                    <input type="checkbox" id="enableShortcuts">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                    
+                </div>
+                <div class="content" id="c2">
                     <div id="loading">
                         <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
                         <span class="sr-only">Loading...</span>
@@ -60,11 +96,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="content nonclickable" id="c2">
+                <div class="content nonclickable" id="c3">
                     <h3>Shortcuts</h3>
-                    <div class="alert info"><b>NEW</b><br>
-                        Use these shortcuts without ever opening this popup!
-                    </div>
                     <ul>
                         <li>
                             <div>Change Speed</div>
@@ -91,39 +124,6 @@
                             <div>M</div>
                         </li>
                     </ul>
-                </div>
-                <div class="content" id="c3">
-                    <h3>Settings</h3>
-                    <ul>
-                        <li>
-                            <div>Enable</div>
-                            <div>
-                                <label class="switch">
-                                    <input type="checkbox" id="enable">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </li>
-                        <li>
-                            <div>Controller</div>
-                            <div>
-                                <label class="switch">
-                                    <input type="checkbox" id="enableController">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </li>
-                        <li>
-                            <div>Keyboard shortcuts</div>
-                            <div>
-                                <label class="switch">
-                                    <input type="checkbox" id="enableShortcuts">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </li>
-                    </ul>
-                    
                 </div>
             </div>
         </main>

@@ -47,12 +47,6 @@ function waitForElm(selector) {
     });
 }
 
-let settings = {
-    enable: true,
-    enableController: true,
-    enableShortcuts: true
-};
-
 let handleRewind = () => {
     seekVideo(-seekInterval);
 };
@@ -110,6 +104,12 @@ let setupShortcuts = (event) => {
     return false;
 };
 
+let settings = {
+    enable: true,
+    enableController: true,
+    enableShortcuts: true
+};
+
 // initialize user settings
 chrome.storage.sync.get(settings, async function(storage) {
     settings = storage;
@@ -127,10 +127,22 @@ chrome.storage.sync.get(settings, async function(storage) {
         }
     
         if (changes.enableShortcuts) {
-            changes.enableShortcuts.newValue ? 
-                document.addEventListener('keydown', setupShortcuts, true) : document.removeEventListener('keydown', setupShortcuts, true);
+            if (changes.enableShortcuts.newValue) {
+                document.addEventListener('keydown', setupShortcuts, true);
+            }
+            else {
+                // cannot simply remove event listener if shortcuts were enabled in orphaned content script
+                document.dispatchEvent(
+                    new CustomEvent("removeshortcuts")
+                );
+            }
         }
     });
+});
+
+// disable shortcuts in orphaned content script
+document.addEventListener('removeshortcuts', function() {
+    document.removeEventListener('keydown', setupShortcuts, true);
 });
 
 /******************************* calculations *******************************/
@@ -343,7 +355,6 @@ function constructShadowDOM() {
     // construct a new node with a shadow DOM and insert node into DOM
     let newNode = document.createElement("div");
     newNode.classList.add("vdc-controller");
-    newNode.classList.add("no-button");
     let shadowRoot = newNode.attachShadow({ mode: "open" });
 
     let shadowTemplate = `
@@ -416,19 +427,17 @@ function constructShadowDOM() {
         .time {
             border-radius: 5px;
             margin-right: 2px;
-            display: none;
         }
-        .vdc-show,
-        #controller:hover .time {
+        .vdc-show {
             display: inline;
         }
         #sign {
             height: 1em;
         }
-        .vdc-hidden {
+        :host(.no-button) button {
             display: none;
         }
-        :host(.no-button) button {
+        :host-context(.ytp-autohide) button {
             display: none;
         }
     </style>
@@ -465,23 +474,6 @@ function setupListeners() {
     rewindButton = shadowRoot.querySelector('.backward');
     advanceButton = shadowRoot.querySelector('.forward');
 
-    // let timer;
-    // function showDisplay() {
-    //     let nodes = shadowRoot.querySelectorAll('button');
-    //     nodes.forEach((node)=>{
-    //         node.classList.add('vdc-hidden');
-    //     });
-    
-    //     if (timer) clearTimeout(timer);
-    
-    //     timer = setTimeout(function () {
-    //     nodes.forEach((node)=>{
-    //         node.classList.remove('vdc-hidden');
-    //     });
-    //     timer = false;
-    //     }, 2000);
-    // }
-
     if (controllerExists) return;
 
     updateShowSpeed();
@@ -502,19 +494,11 @@ function setupListeners() {
         showTimeDisplay();
     }, true);
 
-    let updateTime;
-    const controller = shadowRoot.querySelector('#controller');
-    controller.addEventListener('mouseover', function() {
-        // for immediate update
-        updateShowTime();
-        updateTime = setInterval(function() {
+    if (settings.enableController) {
+        setInterval(function() {
             updateShowTime();
         }, 1000);
-    });
-
-    controller.addEventListener('mouseout', function() {
-        clearInterval(updateTime);
-    });
+    }
 
     rewindButton.addEventListener('click', handleRewind);
     
@@ -568,6 +552,8 @@ function injectController() {
         if (!controllerExists) document.addEventListener('keydown', setupShortcuts, true);
     }
     else {
-        document.removeEventListener('keydown', setupShortcuts, true);
+        document.dispatchEvent(
+            new CustomEvent("removeshortcuts")
+        );
     }
 }

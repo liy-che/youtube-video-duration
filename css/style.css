@@ -42,13 +42,13 @@ input:checked + label {
 }
 #tab1:checked ~ .content-container #c1 {
   display: inline;
+  padding: 10px 40px;
 }
 #tab2:checked ~ .line {
   left: 33%;
 }
 #tab2:checked ~ .content-container #c2 {
   display: inline;
-  padding: 10px 40px;
 }
 #tab3:checked ~ .line {
   left: 66%;

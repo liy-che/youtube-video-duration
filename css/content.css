@@ -1,12 +1,8 @@
-.ytp-autohide .vdc-controller {
+.vdc-disable {
     visibility: hidden;
 }
 
 .ytp-autohide .vdc-show,
 .vdc-controller:hover {
     visibility: visible;
-}
-
-.vdc-disable {
-    opacity: 0;
 }
