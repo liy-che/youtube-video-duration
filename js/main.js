@@ -320,6 +320,11 @@ document.addEventListener('DOMContentLoaded', function() {
         enable.checked = storage.enable;
         enableController.checked = storage.enableController;
         enableShortcuts.checked = storage.enableShortcuts;
+
+        // force reflow
+        // https://stackoverflow.com/questions/11131875/what-is-the-cleanest-way-to-disable-css-transition-effects-temporarily
+        document.body.offsetHeight;
+        document.body.classList.remove('preload');
     });
 });
 

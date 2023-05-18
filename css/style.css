@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+.preload *, .preload :before {
+  transition: none !important;
+}
+
 /******************************************
 /* BASE STYLES
 /*******************************************/
@@ -265,7 +269,20 @@ li {
   margin-bottom: 10px;
 }
 
-li div:first-child {
+li div:first-child,
+ul.settings div {
+  font-weight: bold;
+}
+
+ul.settings label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+}
+
+ul.settings label p {
+  padding-left: 15px;
+  flex: 1;
   font-weight: bold;
 }
 
@@ -328,7 +345,6 @@ p {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: .4s;
   transition: .4s;
 }
 
@@ -340,7 +356,6 @@ p {
   left: 0px;
   bottom: 0px;
   background-color: white;
-  -webkit-transition: .4s;
   transition: .4s;
 }
 

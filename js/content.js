@@ -434,6 +434,7 @@ function constructShadowDOM() {
         #sign {
             height: 1em;
         }
+        :host(.vdc-disable) button,
         :host(.no-button) button {
             display: none;
         }
@@ -494,11 +495,9 @@ function setupListeners() {
         showTimeDisplay();
     }, true);
 
-    if (settings.enableController) {
-        setInterval(function() {
-            updateShowTime();
-        }, 1000);
-    }
+    setInterval(function() {
+        updateShowTime();
+    }, 1000);
 
     rewindButton.addEventListener('click', handleRewind);
     
