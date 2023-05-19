@@ -14,6 +14,7 @@ Find it here:
 :white_check_mark: Find out how much time will be saved or added comparing to watching in 1x speed  
 :white_check_mark: Know how long it takes to watch the rest of the video at current speed  
 :white_check_mark: Continue using your favorite shortcuts already provided by YouTube  
+:white_check_mark: Tailor the extension to your liking with settings  
 
 ## 💥 Keyboard shortcuts 💥
 | Action                     | Shortcut                                |
@@ -26,6 +27,12 @@ Find it here:
 | Mute / unmute              | M                                       |
 
 ## 🎉 Updates 🎉
+**1.0.6**
+- Basic settings allow users to enable/disable the extension, use controller only, use keyword shortcuts only, or use both simultaneously (default)
+- **(User requested)** Timing information will persist if controller is selected in settings
+- Feedback form is available upon uninstall
+- Bug fix: "New" badge to persist over extension icon on update until open
+
 **1.0.5**
 - Speed controller is added to the top right corner of the video on YouTube so it can be used without the need to open the extension popup.
 - Extension shortcuts are updated so that they can be used together with native shortcuts on YouTube without conflict.
