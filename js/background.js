@@ -46,6 +46,13 @@ chrome.runtime.onInstalled.addListener((details) => {
       }
     });
   }
+
+  if (details.reason === 'update' || details.reason === 'install') {
+    let feedbackLink = 'https://forms.gle/v7gJ9aZswYx1dGoQ7';
+    if (chrome.runtime.setUninstallURL) {
+      chrome.runtime.setUninstallURL(feedbackLink);
+    }
+  }
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
