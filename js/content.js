@@ -67,9 +67,9 @@ let handleDecre = () => {
     setPlaySpeed(video.playbackRate-interval);
 };
 
-// TODO can use key codes instead of characters
+
 let setupShortcuts = (event) => {
-    const pressedKey = event.key.toLowerCase();
+    const pressedCode = event.code
     // Ignore if following modifier is active.
     if (
         !event.getModifierState ||
@@ -92,14 +92,14 @@ let setupShortcuts = (event) => {
         return false;
     }
 
-    if (pressedKey === 'd') handleIncre();
-    else if (pressedKey === 'a') handleDecre();
-    else if (pressedKey === 's') {
+    if (pressedCode === 'KeyD') handleIncre();
+    else if (pressedCode === 'KeyA') handleDecre();
+    else if (pressedCode === 'KeyS') {
         handleReset();
         showButtons();
         showTimeDisplay();
     }
-    else if (pressedKey === 'r') restartVideo();
+    else if (pressedCode === 'KeyR') restartVideo();
 
     return false;
 };

@@ -93,90 +93,90 @@ function increSpeed() {
 
 
 function isUpKey(key) {
-    return key === 'arrowup' || key === 'w';
+    return key === 'ArrowUp' || key === 'KeyW';
 }
 
 function isDownKey(key) {
-    return key === 'arrowdown' || key === 's';
+    return key === 'ArrowDown' || key === 'KeyS';
 }
 
 function isLeftKey(key) {
-    return key === 'arrowleft' || key === 'a';
+    return key === 'ArrowLeft' || key === 'KeyA';
 }
 
 function isRightKey(key) {
-    return key === 'arrowright' || key === 'd';
+    return key === 'ArrowRight' || key === 'KeyD';
 }
 
-// TODO can use key codes instead of characters
+
 // listen for key press
 document.onkeydown = event => {
-    const pressedKey = event.key.toLowerCase();
-    if (isLeftKey(pressedKey)) {
+    const pressedCode = event.code;
+    if (isLeftKey(pressedCode)) {
         decreButton.click();
         if (decreButton.classList.contains('gray-out')) return;
         decreButton.classList.add('pressed-decre');
     }
-    else if (isRightKey(pressedKey)) {
+    else if (isRightKey(pressedCode)) {
         increButton.click();
         if (increButton.classList.contains('gray-out')) return;
         increButton.classList.add('pressed-incre');
     }
-    else if (isDownKey(pressedKey)) {
+    else if (isDownKey(pressedCode)) {
         setNormalButton.click();
         setNormalButton.classList.add('pressed');
     }
-    else if (pressedKey === 'r') {
+    else if (pressedCode === 'KeyR') {
         restartButton.click();
         restartButton.classList.add('pressed');
     }
-    else if (pressedKey === 'j') {
+    else if (pressedCode === 'KeyJ') {
         rewindButton.click();
         rewindButton.classList.add('pressed');
     }
-    else if (pressedKey === 'k') {
+    else if (pressedCode === 'KeyK') {
         playPauseButton.click();
         playPauseButton.classList.add('pressed');
     }
-    else if (pressedKey === 'l') {
+    else if (pressedCode === 'KeyL') {
         advanceButton.click();
         advanceButton.classList.add('pressed');
     }
-    else if (pressedKey === 'm') {
+    else if (pressedCode === 'KeyM') {
         volumeButton.click();
         volumeButton.classList.add('pressed');
     }
-    else if (pressedKey === ' ') window.close();
+    else if (pressedCode === 'Space') window.close();
 };
 
 document.onkeyup = event => {
-    const pressedKey = event.key.toLowerCase();
-    if (isLeftKey(pressedKey)) {
+    const pressedCode = event.code;
+    if (isLeftKey(pressedCode)) {
         decreButton.classList.remove('pressed-decre');
     }
-    else if (isRightKey(pressedKey)) {
+    else if (isRightKey(pressedCode)) {
         increButton.classList.remove('pressed-incre');
     }
-    else if (isUpKey(pressedKey)) {
+    else if (isUpKey(pressedCode)) {
         if (tab1.checked) tab2.checked = true;
         else tab1.checked = true;
     }
-    else if (isDownKey(pressedKey)) {
+    else if (isDownKey(pressedCode)) {
         setNormalButton.classList.remove('pressed');
     }
-    else if (pressedKey === 'r') {
+    else if (pressedCode === 'KeyR') {
         restartButton.classList.remove('pressed');
     }
-    else if (pressedKey === 'j') {
+    else if (pressedCode === 'KeyJ') {
         rewindButton.classList.remove('pressed');
     }
-    else if (pressedKey === 'k') {
+    else if (pressedCode === 'KeyK') {
         playPauseButton.classList.remove('pressed');
     }
-    else if (pressedKey === 'l') {
+    else if (pressedCode === 'KeyL') {
         advanceButton.classList.remove('pressed');
     }
-    else if (pressedKey === 'm') {
+    else if (pressedCode === 'KeyM') {
         volumeButton.classList.remove('pressed');
     }
 };
