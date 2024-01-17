@@ -159,6 +159,7 @@ document.onkeyup = event => {
     }
     else if (isUpKey(pressedCode)) {
         if (tab1.checked) tab2.checked = true;
+        else if (tab2.checked) tab3.checked = true;
         else tab1.checked = true;
     }
     else if (isDownKey(pressedCode)) {
