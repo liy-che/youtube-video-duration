@@ -48,7 +48,7 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 
   if (details.reason === 'update' || details.reason === 'install') {
-    let feedbackLink = 'https://forms.gle/v7gJ9aZswYx1dGoQ7';
+    let feedbackLink = 'https://docs.google.com/forms/d/e/1FAIpQLSegS8BO6kGBKUNNnMlfZknkwHoQCdMTmcYC98CT6iote4s45g/viewform?usp=pp_url&entry.114183664=n/a&entry.1747003213=No,+thank+you';
     if (chrome.runtime.setUninstallURL) {
       chrome.runtime.setUninstallURL(feedbackLink);
     }
