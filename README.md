@@ -28,11 +28,11 @@ Find it here:
 
 ## 🎉 Updates 🎉
 **1.0.6.2**
-- Keyboard hortcuts now work for all keyboard languages and layouts without the need to switch input source
+- Keyboard shortcuts now work for all keyboard languages and layouts without the need to switch input source
 - Feedback questions upon uninstall are improved to capture more user insights
 
 **1.0.6**
-- Basic settings allow users to enable/disable the extension, use controller only, use keyword shortcuts only, or use both simultaneously (default)
+- Basic settings allow users to enable/disable the extension, use controller only, use keyboard shortcuts only, or use both simultaneously (default)
 - **(User requested)** Timing information will persist if controller is selected in settings
 - Feedback form is available upon uninstall
 - Bug fix: "New" badge to persist over extension icon on update until open
