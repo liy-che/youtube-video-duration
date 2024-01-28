@@ -27,6 +27,9 @@ Find it here:
 | Mute / unmute              | M                                       |
 
 ## 🎉 Updates 🎉
+**1.0.6.3**
+- BUG FIX: controller not appearing in video watch page sometimes
+
 **1.0.6.2**
 - Keyboard shortcuts now work for all keyboard languages and layouts without the need to switch input source
 - Feedback questions upon uninstall are improved to capture more user insights
