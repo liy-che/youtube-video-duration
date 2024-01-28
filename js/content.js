@@ -22,7 +22,9 @@ const upArrow = chrome.runtime.getURL('../images/arrow-154-24.png');
 
 let navigateEnd = true;
 document.addEventListener('yt-navigate-start', () => navigateEnd = false);
-document.addEventListener('yt-navigate-finish', () => navigateEnd = true);
+document.addEventListener('yt-navigate-finish', () => {
+    navigateEnd = true;
+});
 
 // mutations.addedNodes.find(node => node.matchesSelector("..."))
 
@@ -104,6 +106,7 @@ let setupShortcuts = (event) => {
     return false;
 };
 
+// TODO: stop everything when disabled, including in the popup
 let settings = {
     enable: true,
     enableController: true,
@@ -117,7 +120,7 @@ chrome.storage.sync.get(settings, async function(storage) {
     // page does not reload (ie. no content script is inserted on watch page) when video is chosen from home page
     // so content script is inserted on home page
     // wait for user to click into a video watch page from the home page
-    video = await waitForElm('video');
+    video = await waitForElm('#content video[src]');
     injectController();
 
     chrome.storage.onChanged.addListener((changes, area) => {
@@ -244,9 +247,11 @@ chrome.runtime.onMessage.addListener(
 
 
 // handle incoming connections from popup
+// TODO: do not send if there's no change
 chrome.runtime.onConnect.addListener(function(port) {
     let heartBeatId = setInterval(function() {
         port.postMessage({"timeDisplay": getTimeDisplay()});
+        //console.log("sending update to popup")
     }, 1000);
 
     port.onDisconnect.addListener(function(port) {
@@ -288,6 +293,7 @@ function updateShowSpeed() {
 
 function updateShowTime() {
     timeDisplay.innerHTML = getTimeDisplay();
+    //console.log("Updating showtime")
 }
 
 
@@ -454,7 +460,7 @@ function constructShadowDOM() {
         </div>
     `
     shadowRoot.innerHTML = shadowTemplate;
-    let videoContainer = document.querySelector('.html5-video-container');
+    let videoContainer = document.querySelector('#content .html5-video-container');
     videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
     return newNode;
@@ -495,6 +501,8 @@ function setupListeners() {
         showTimeDisplay();
     }, true);
 
+    // TODO save work when time is not changing ie. paused / finished
+    // TODO or when controller is not shown, then update only at showing
     setInterval(function() {
         updateShowTime();
     }, 1000);
@@ -522,7 +530,7 @@ function setupListeners() {
 
 function injectController() {
 
-    controllerNode = document.querySelector(".vdc-controller");
+    controllerNode = document.querySelector("#content .vdc-controller");
     controllerExists = Boolean(controllerNode);
 
     // if controller already exists on the page, don't inject
