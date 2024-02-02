@@ -25,7 +25,7 @@ const enable = document.querySelector('#enable');
 const enableController = document.querySelector('#enableController');
 const enableShortcuts = document.querySelector('#enableShortcuts');
 
-// User settings
+// User settings, only using keys to get settings from chrome storage
 let settings = {
     enable: true,
     enableController: true,

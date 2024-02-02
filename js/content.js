@@ -1,5 +1,4 @@
 let video;
-let controllerExists;
 let controllerNode;
 let showButtons;
 let showTimeDisplay;
@@ -10,6 +9,8 @@ let rewindButton;
 let advanceButton;
 let speedDisplay;
 let timeDisplay;
+let videoContainer;
+let insertedNode;
 
 const minSpeed = 0.25;
 const interval = 0.25;
@@ -21,9 +22,21 @@ const downArrow = chrome.runtime.getURL('../images/arrow-216-24.png');
 const upArrow = chrome.runtime.getURL('../images/arrow-154-24.png');
 
 let navigateEnd = true;
-document.addEventListener('yt-navigate-start', () => navigateEnd = false);
-document.addEventListener('yt-navigate-finish', () => {
+
+document.addEventListener('yt-navigate-start', () => {
+    navigateEnd = false;
+});
+document.addEventListener('yt-navigate-finish', async () => {
     navigateEnd = true;
+    video = await waitForElm('video[src]');
+    videoContainer = video.parentElement; // html5-video-player
+    // remove controller for video tags without src attribute
+        // find the video controller inserted previously if exists
+        // remove the inserted controller
+    if (insertedNode) insertedNode.remove();
+
+    // inject controller for video tag with src attribute
+    injectController();
 });
 
 // mutations.addedNodes.find(node => node.matchesSelector("..."))
@@ -69,7 +82,6 @@ let handleDecre = () => {
     setPlaySpeed(video.playbackRate-interval);
 };
 
-
 let setupShortcuts = (event) => {
     const pressedCode = event.code
     // Ignore if following modifier is active.
@@ -107,6 +119,7 @@ let setupShortcuts = (event) => {
 };
 
 // TODO: stop everything when disabled, including in the popup
+// values set default for first-time users
 let settings = {
     enable: true,
     enableController: true,
@@ -116,21 +129,19 @@ let settings = {
 // initialize user settings
 chrome.storage.sync.get(settings, async function(storage) {
     settings = storage;
-    chrome.storage.sync.set(settings);
-    // page does not reload (ie. no content script is inserted on watch page) when video is chosen from home page
-    // so content script is inserted on home page
-    // wait for user to click into a video watch page from the home page
-    video = await waitForElm('#content video[src]');
-    injectController();
 
-    chrome.storage.onChanged.addListener((changes, area) => {
+    chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (!controllerNode) controllerNode = await waitForElm(".vdc-controller");
+
         if (changes.enableController) {
-            changes.enableController.newValue ? 
+            settings.enableController = changes.enableController.newValue;
+            settings.enableController ? 
                 controllerNode.classList.remove('vdc-disable') : controllerNode.classList.add('vdc-disable');
         }
     
         if (changes.enableShortcuts) {
-            if (changes.enableShortcuts.newValue) {
+            settings.enableShortcuts = changes.enableShortcuts.newValue;
+            if (settings.enableShortcuts) {
                 document.addEventListener('keydown', setupShortcuts, true);
             }
             else {
@@ -348,9 +359,9 @@ function showController(controller) {
         if (timer) clearTimeout(timer);
     
         timer = setTimeout(function () {
-        controller.classList.remove("vdc-show");
-        timer = false;
-        }, 2000);
+            controller.classList.remove("vdc-show");
+            timer = false;
+        }, 3000);
     }
 
     return show;
@@ -361,6 +372,7 @@ function constructShadowDOM() {
     // construct a new node with a shadow DOM and insert node into DOM
     let newNode = document.createElement("div");
     newNode.classList.add("vdc-controller");
+    if (!settings.enableController) newNode.classList.add('vdc-disable');
     let shadowRoot = newNode.attachShadow({ mode: "open" });
 
     let shadowTemplate = `
@@ -398,6 +410,7 @@ function constructShadowDOM() {
             margin: 0px;
             transition: background 0.2s, color 0.2s;
             border-radius: 5px;
+            display: none;
         }
         button:focus {
             outline: 0;
@@ -440,12 +453,11 @@ function constructShadowDOM() {
         #sign {
             height: 1em;
         }
-        :host(.vdc-disable) button,
-        :host(.no-button) button {
+        :host(.vdc-disable) button {
             display: none;
         }
-        :host-context(.ytp-autohide) button {
-            display: none;
+        :host(:hover) button {
+            display: inline;
         }
     </style>
         <div id="controller">
@@ -460,8 +472,7 @@ function constructShadowDOM() {
         </div>
     `
     shadowRoot.innerHTML = shadowTemplate;
-    let videoContainer = document.querySelector('#content .html5-video-container');
-    videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
+    insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
     return newNode;
 }
@@ -480,8 +491,6 @@ function setupListeners() {
     decreButton = shadowRoot.querySelector('.left');
     rewindButton = shadowRoot.querySelector('.backward');
     advanceButton = shadowRoot.querySelector('.forward');
-
-    if (controllerExists) return;
 
     updateShowSpeed();
     document.addEventListener('loadedmetadata', function() {
@@ -516,47 +525,19 @@ function setupListeners() {
     increButton.addEventListener('click', handleIncre);
 
     decreButton.addEventListener('click', handleDecre);
-
-    let player = document.querySelector('.html5-video-player');
-    player.addEventListener('mouseenter', function() {
-        controllerNode.classList.remove('no-button');
-    });
-
-    player.addEventListener('mouseleave', function() {
-        controllerNode.classList.add('no-button');
-    });
 }
 
 
 function injectController() {
-
-    controllerNode = document.querySelector("#content .vdc-controller");
-    controllerExists = Boolean(controllerNode);
-
-    // if controller already exists on the page, don't inject
-    if (!controllerExists) {
-        // detects when YouTube video is changed, even when change is dynamic, ie. no page reload
-        observer = new MutationObserver((changes) => {
-            changes.forEach(change => {
-                if(change.attributeName.includes('src')){
-                    chrome.runtime.sendMessage(getVideoInfo('updatePopup'));
-                    updateShowSpeed();
-                }
-            });
-        });
-        observer.observe(video, {attributes : true});
-
-        // construct a new node with a shadow DOM and insert node into DOM
-        controllerNode = constructShadowDOM();
-    }
+    // construct a new node with a shadow DOM and insert node into DOM
+    controllerNode = constructShadowDOM();
 
     // set up event listeners for controller
     setupListeners();
 
-    if (!settings.enableController) controllerNode.classList.add('vdc-disable');
     // set up listener for keyboard shortcuts
     if (settings.enableShortcuts) {
-        if (!controllerExists) document.addEventListener('keydown', setupShortcuts, true);
+        document.addEventListener('keydown', setupShortcuts, true);
     }
     else {
         document.dispatchEvent(
