@@ -13,6 +13,7 @@ Find it here:
 :white_check_mark: Adjust video playback speed beyond 2x, or jump to 1x   
 :white_check_mark: Find out how much time will be saved or added comparing to watching in 1x speed  
 :white_check_mark: Know how long it takes to watch the rest of the video at current speed  
+:white_check_mark: Know your YouTube Shorts: know video length, change video speed, skip through video
 :white_check_mark: Continue using your favorite shortcuts already provided by YouTube  
 :white_check_mark: Tailor the extension to your liking with settings  
 
@@ -27,6 +28,9 @@ Find it here:
 | Mute / unmute              | M                                       |
 
 ## 🎉 Updates 🎉
+**1.0.7**
+- Beta: Works on YouTube shorts and video previews (some shortcuts are temporarily unavailable)
+
 **1.0.6.3**
 - BUG FIX: controller not appearing in video watch page sometimes
 
