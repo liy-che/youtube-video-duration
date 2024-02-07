@@ -11,6 +11,8 @@ let speedDisplay;
 let timeDisplay;
 let videoContainer;
 let insertedNode;
+let showTime;
+let hasListeners;
 
 const minSpeed = 0.25;
 const interval = 0.25;
@@ -262,7 +264,7 @@ chrome.runtime.onMessage.addListener(
 chrome.runtime.onConnect.addListener(function(port) {
     let heartBeatId = setInterval(function() {
         port.postMessage({"timeDisplay": getTimeDisplay()});
-        //console.log("sending update to popup")
+        console.log("sending update to popup")
     }, 1000);
 
     port.onDisconnect.addListener(function(port) {
@@ -304,7 +306,7 @@ function updateShowSpeed() {
 
 function updateShowTime() {
     timeDisplay.innerHTML = getTimeDisplay();
-    //console.log("Updating showtime")
+    console.log("Updating showtime")
 }
 
 
@@ -474,16 +476,10 @@ function constructShadowDOM() {
     shadowRoot.innerHTML = shadowTemplate;
     insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
-    return newNode;
-}
-
-
-function setupListeners() {
-    let shadowRoot = controllerNode.shadowRoot;
     speedDisplay = shadowRoot.querySelector('.speed');
     timeDisplay = shadowRoot.querySelector('.time');
 
-    showButtons = showController(controllerNode);
+    showButtons = showController(newNode);
     showTimeDisplay = showController(timeDisplay);
 
     resetButton = shadowRoot.querySelector('.reset');
@@ -492,29 +488,11 @@ function setupListeners() {
     rewindButton = shadowRoot.querySelector('.backward');
     advanceButton = shadowRoot.querySelector('.forward');
 
-    updateShowSpeed();
-    document.addEventListener('loadedmetadata', function() {
-        updateShowTime();
-    }, true);
+    return newNode;
+}
 
-    document.addEventListener('ratechange', function(e) {
-        updateShowSpeed();
-        updateShowTime();
-        showButtons();
-        showTimeDisplay();
-    }, true);
 
-    document.addEventListener('seeked', function() {
-        updateShowTime();
-        showButtons();
-        showTimeDisplay();
-    }, true);
-
-    // TODO save work when time is not changing ie. paused / finished
-    // TODO or when controller is not shown, then update only at showing
-    setInterval(function() {
-        updateShowTime();
-    }, 1000);
+function setupListeners() {
 
     rewindButton.addEventListener('click', handleRewind);
     
@@ -525,6 +503,55 @@ function setupListeners() {
     increButton.addEventListener('click', handleIncre);
 
     decreButton.addEventListener('click', handleDecre);
+
+    updateShowSpeed();
+
+    // TODO or when controller is not shown, then update only at showing
+    clearInterval(showTime);
+    showTime = setInterval(function() {
+        updateShowTime();
+    }, 1000);
+
+    if (hasListeners) return;
+
+    console.log("set up listeners yuuuuuuuuuuuuuuu")
+
+    document.addEventListener('loadedmetadata', function() {
+        updateShowTime();
+    }, true);
+
+    document.addEventListener('ratechange', function(e) {
+        updateShowSpeed();
+        updateShowTime();
+        showButtons();
+        showTimeDisplay();
+        console.log("ratechange")
+    }, true);
+
+    document.addEventListener('seeked', function() {
+        updateShowTime();
+        showButtons();
+        showTimeDisplay();
+    }, true);
+
+    document.addEventListener('pause', function() {
+        console.log("pause")
+        clearInterval(showTime);
+    }, true);
+
+    document.addEventListener('waiting', function() {
+        clearInterval(showTime);
+    }, true);
+
+    document.addEventListener('playing', function() {
+        console.log("playing")
+        clearInterval(showTime);
+        showTime = setInterval(function() {
+            updateShowTime();
+        }, 1000);
+    }, true);
+
+    hasListeners = true;
 }
 
 
