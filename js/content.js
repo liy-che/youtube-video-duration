@@ -13,6 +13,7 @@ let videoContainer;
 let insertedNode;
 let showTime;
 let hasListeners;
+let hasTimeUpdateListeners;
 
 const minSpeed = 0.25;
 const interval = 0.25;
@@ -84,7 +85,7 @@ let handleDecre = () => {
     setPlaySpeed(video.playbackRate-interval);
 };
 
-let setupShortcuts = (event) => {
+let handleShortcuts = (event) => {
     const pressedCode = event.code
     // Ignore if following modifier is active.
     if (
@@ -111,7 +112,8 @@ let setupShortcuts = (event) => {
     if (pressedCode === 'KeyD') handleIncre();
     else if (pressedCode === 'KeyA') handleDecre();
     else if (pressedCode === 'KeyS') {
-        handleReset();
+        if (video.playbackRate == 1) updateShowTime();
+        else handleReset();
         showButtons();
         showTimeDisplay();
     }
@@ -137,14 +139,19 @@ chrome.storage.sync.get(settings, async function(storage) {
 
         if (changes.enableController) {
             settings.enableController = changes.enableController.newValue;
-            settings.enableController ? 
-                controllerNode.classList.remove('vdc-disable') : controllerNode.classList.add('vdc-disable');
+            if (settings.enableController) {
+                controllerNode.classList.remove('vdc-disable');
+                setupTimeUpdates();
+            } else {
+                controllerNode.classList.add('vdc-disable');
+                removeTimeUpdates();
+            }
         }
     
         if (changes.enableShortcuts) {
             settings.enableShortcuts = changes.enableShortcuts.newValue;
             if (settings.enableShortcuts) {
-                document.addEventListener('keydown', setupShortcuts, true);
+                document.addEventListener('keydown', handleShortcuts, true);
             }
             else {
                 // cannot simply remove event listener if shortcuts were enabled in orphaned content script
@@ -158,7 +165,7 @@ chrome.storage.sync.get(settings, async function(storage) {
 
 // disable shortcuts in orphaned content script
 document.addEventListener('removeshortcuts', function() {
-    document.removeEventListener('keydown', setupShortcuts, true);
+    document.removeEventListener('keydown', handleShortcuts, true);
 });
 
 /******************************* calculations *******************************/
@@ -264,7 +271,7 @@ chrome.runtime.onMessage.addListener(
 chrome.runtime.onConnect.addListener(function(port) {
     let heartBeatId = setInterval(function() {
         port.postMessage({"timeDisplay": getTimeDisplay()});
-        console.log("sending update to popup")
+        //console.log("sending update to popup")
     }, 1000);
 
     port.onDisconnect.addListener(function(port) {
@@ -506,53 +513,75 @@ function setupListeners() {
 
     updateShowSpeed();
 
-    // TODO or when controller is not shown, then update only at showing
+    if (!hasListeners) {
+        document.addEventListener('loadedmetadata', handleLoadedMetadata, true);
+
+        document.addEventListener('ratechange', handleRatechange, true);
+
+        document.addEventListener('seeked', handleSeeked, true);
+
+        hasListeners = true;
+    }
+    
+    setupTimeUpdates();
+}
+
+function setupTimeUpdates() {
+    if (!settings.enableController) return;
+
     clearInterval(showTime);
     showTime = setInterval(function() {
         updateShowTime();
     }, 1000);
 
-    if (hasListeners) return;
+    if (hasTimeUpdateListeners) return;
 
-    console.log("set up listeners yuuuuuuuuuuuuuuu")
+    document.addEventListener('pause', handlePause, true);
 
-    document.addEventListener('loadedmetadata', function() {
-        updateShowTime();
-    }, true);
+    document.addEventListener('waiting', handleWaiting, true);
 
-    document.addEventListener('ratechange', function(e) {
-        updateShowSpeed();
-        updateShowTime();
-        showButtons();
-        showTimeDisplay();
-        console.log("ratechange")
-    }, true);
+    document.addEventListener('playing', handlePlaying, true);
 
-    document.addEventListener('seeked', function() {
-        updateShowTime();
-        showButtons();
-        showTimeDisplay();
-    }, true);
-
-    document.addEventListener('pause', function() {
-        console.log("pause")
-        clearInterval(showTime);
-    }, true);
-
-    document.addEventListener('waiting', function() {
-        clearInterval(showTime);
-    }, true);
-
-    document.addEventListener('playing', function() {
-        console.log("playing")
-        clearInterval(showTime);
-        showTime = setInterval(function() {
-            updateShowTime();
-        }, 1000);
-    }, true);
-
-    hasListeners = true;
+    hasTimeUpdateListeners = true;
 }
+
+function removeTimeUpdates() {
+    clearInterval(showTime);
+    document.removeEventListener('pause', handlePause, true);
+    document.removeEventListener('waiting', handleWaiting, true);
+    document.removeEventListener('playing', handlePlaying, true);
+    hasTimeUpdateListeners = false;
+}
+
+let handleLoadedMetadata = () => {
+    updateShowTime();
+};
+
+let handleRatechange = () => {
+    updateShowSpeed();
+    updateShowTime();
+    showButtons();
+    showTimeDisplay();
+};
+
+let handleSeeked = () => {
+    updateShowTime();
+    showButtons();
+    showTimeDisplay();
+};
+
+let handlePause = () => {
+    clearInterval(showTime);
+};
+
+let handleWaiting = handlePause;
+
+let handlePlaying = () => {
+    clearInterval(showTime);
+    showTime = setInterval(function() {
+        updateShowTime();
+    }, 1000);
+};
 
 
 function injectController() {
@@ -564,7 +593,7 @@ function injectController() {
 
     // set up listener for keyboard shortcuts
     if (settings.enableShortcuts) {
-        document.addEventListener('keydown', setupShortcuts, true);
+        document.addEventListener('keydown', handleShortcuts, true);
     }
     else {
         document.dispatchEvent(
