@@ -28,6 +28,9 @@ Find it here:
 | Mute / unmute              | M                                       |
 
 ## 🎉 Updates 🎉
+**1.0.7.1**
+- Improve performance by removing unnecessary time updates
+
 **1.0.7**
 - Beta: Works on YouTube shorts and video previews (some shortcuts are temporarily unavailable)
 
