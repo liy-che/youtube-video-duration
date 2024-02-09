@@ -313,7 +313,7 @@ function updateShowSpeed() {
 
 function updateShowTime() {
     timeDisplay.innerHTML = getTimeDisplay();
-    console.log("Updating showtime")
+    //console.log("Updating showtime")
 }
 
 
