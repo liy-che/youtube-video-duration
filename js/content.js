@@ -117,6 +117,14 @@ let handleShortcuts = (event) => {
         showButtons();
         showTimeDisplay();
     }
+    else if (pressedCode === 'KeyL') {
+        event.preventDefault();
+        handleAdvance();
+    }
+    else if (pressedCode === 'KeyJ') {
+        event.preventDefault();
+        handleRewind();
+    }
     else if (pressedCode === 'KeyR') restartVideo();
 
     return false;
