@@ -21,6 +21,7 @@ const maxSpeed = 16;
 const seekInterval = 10;
 const zeroTime = '00:00';
 const infTime = '&infin;';
+const noTime = '--:--:--';
 const downArrow = chrome.runtime.getURL('../images/arrow-216-24.png');
 const upArrow = chrome.runtime.getURL('../images/arrow-154-24.png');
 
@@ -214,6 +215,10 @@ function getTimestamps() {
     }
     // 1. remaining video time at 1x speed
     let remainTime = video.duration - video.currentTime;
+
+    // if remainTime is NaN
+    if (remainTime !== remainTime) return [noTime, '.'+noTime];
+
     // 2. remaining video time at chosen speed (display in timestamp)
     let remainTimeAtSpeed = calcDuration(remainTime, video.playbackRate);
     let remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed).substring(1);
