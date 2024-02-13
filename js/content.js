@@ -19,11 +19,9 @@ const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
-const zeroTime = '00:00';
 const infTime = '&infin;';
 const noTime = '--:--:--';
-const downArrow = chrome.runtime.getURL('../images/arrow-216-24.png');
-const upArrow = chrome.runtime.getURL('../images/arrow-154-24.png');
+const zeroTime = '0:00';
 
 let navigateEnd = true;
 
@@ -197,38 +195,13 @@ function convertSecondToTimestamp(totalSeconds) {
     timeStr += hours !== 0 ? `${zeroPad(minutes)}:` : `${minutes}:`;
     timeStr += zeroPad(seconds);
     
-    if (!totalSeconds) return '.' + timeStr;
-    return (totalSeconds > 0? '+' : '-') + timeStr;
+    return timeStr;
 }
 
 
 // calculates remaining time at chosen speed
 function calcDuration(time, speed) {
     return time/speed;
-}
-
-
-function getTimestamps() {
-    let speed = video.playbackRate;
-    if (!speed) {
-        return [infTime, '+'+infTime];
-    }
-    // 1. remaining video time at 1x speed
-    let remainTime = video.duration - video.currentTime;
-
-    // if remainTime is NaN
-    if (remainTime !== remainTime) return [noTime, '.'+noTime];
-
-    // 2. remaining video time at chosen speed (display in timestamp)
-    let remainTimeAtSpeed = calcDuration(remainTime, video.playbackRate);
-    let remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed).substring(1);
-
-    if (speed === 1) return [remainTimestamp, '.'+zeroTime];
-
-    // 3. differece between 1 and 2 (display in timestamp)
-    let timeDiff = remainTimeAtSpeed - remainTime;
-    let diffTimestamp = convertSecondToTimestamp(timeDiff);
-    return [remainTimestamp, diffTimestamp];
 }
 
 
@@ -325,50 +298,59 @@ function updateShowSpeed() {
 
 
 function updateShowTime() {
-    timeDisplay.innerHTML = getTimeDisplay();
     //console.log("Updating showtime")
-}
+    let [remainTimestamp, diffTimestamp, sign] = getTimeDisplay();
 
-
-function showTimeUp(isUp) {
-    let src;
-    let alt;
-
-    if (isUp) {
-        src = upArrow;
-        alt = 'Up';
+    if (sign === '▲') {
+        sign = `<span id="upArrow">${sign}</span>`;
+    } else if (sign === '▼') {
+        sign = `<span id="downArrow">${sign}</span>`
     }
-    else {
-        src = downArrow;
-        alt = 'Down';
+    
+
+    if (diffTimestamp) {
+        timeDisplay.innerHTML = `
+            <span id="remain">${remainTimestamp}&nbsp;</span>${sign}<!--
+            --><span id="diff">${diffTimestamp}</span>
+        `
+    } else {
+        timeDisplay.innerHTML = `
+            <span id="remain">${remainTimestamp}</span>
+        `
     }
-
-    return `<img id="sign" style="display:inline" src="${src}" alt="${alt}"/>`;
 }
 
 
-// TODO can use documentFragment here
-// diffTimestamp has a prefix that indicates direction of difference
-    // the prefix can be '+', '-', or '.'
-    // if speed is 0, diffTimestamp = '+InfTime'
-    // if speed is 1, diffTimestamp = '.zeroTime'
-function getTimeInfo(remainTimestamp, diffTimestamp) {
-    let sign;
-    if (diffTimestamp.charAt(0) === '-') sign = showTimeUp(0);
-    else if (diffTimestamp.charAt(0) === '+') sign = showTimeUp(1);
-    else sign = `<img id="sign" style="display:none"/>`;
-
-    return `
-        <span id="remain">${remainTimestamp}</span> (<!--
-        -->${sign}<!--
-        --><span id="diff">${diffTimestamp.substring(1)})</span>
-    `
-}
-
-
+// loading, speed==1, difference==0   -------> no sign
+// speed < 1                          -------> up sign
+// speed > 1                          -------> down sign
 function getTimeDisplay() {
-    let [remainTimestamp, diffTimestamp] = getTimestamps();
-    return getTimeInfo(remainTimestamp, diffTimestamp);
+    let speed = video.playbackRate;
+    if (!speed) {
+        return [infTime, infTime, '▲'];
+    }
+
+    // 1. remaining video time at 1x speed
+    let remainTime = video.duration - video.currentTime;
+    // if remainTime is NaN
+    if (remainTime !== remainTime) return [noTime, noTime, ''];
+
+    // 2. remaining video time at chosen speed (displayed in timestamp)
+    let remainTimeAtSpeed = calcDuration(remainTime, speed);
+    let remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed);
+
+    if (speed === 1) return [remainTimestamp, '', ''];
+
+    // 3. differece between 1 and 2 (displayed in timestamp)
+    let timeDiff = remainTimeAtSpeed - remainTime;
+    let diffTimestamp = convertSecondToTimestamp(timeDiff);
+
+    let sign;
+    if (diffTimestamp === zeroTime) sign = '';
+    else if (speed > 1) sign = '▼';
+    else if (speed < 1) sign = '▲';
+
+    return [remainTimestamp, diffTimestamp, sign];
 }
 
 
@@ -417,6 +399,12 @@ function constructShadowDOM() {
             cursor: default;
             z-index: 9999999;
             user-select: none;
+        }
+        #upArrow {
+            color: #cc3300;
+        }
+        #downArrow {
+            color: #99cc33;
         }
         button {
             opacity: 0.6;
@@ -483,8 +471,7 @@ function constructShadowDOM() {
         }
     </style>
         <div id="controller">
-            <span class="display time"> 
-            </span><!--
+            <span class="display time">${noTime}</span><!--
             --><button class="left">&minus;</button><!--
             --><span class="display speed">${video.playbackRate}</span><!--
             --><button class="right">&plus;</button><!--

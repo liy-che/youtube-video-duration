@@ -4,6 +4,7 @@ const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
+const zeroTime = '0:00';
 
 let playSpeed = 1;
 
