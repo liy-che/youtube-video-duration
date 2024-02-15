@@ -147,6 +147,13 @@ h3 {
   column-gap: .1em;
 }
 
+#upArrow {
+  color: #cc3300;
+}
+#downArrow {
+  color: #99cc33;
+}
+
 /* Button interactions */
 
 button {

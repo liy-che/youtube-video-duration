@@ -11,6 +11,7 @@ let playSpeed = 1;
 // Displays
 const timeDisplay = document.querySelector('#time-display');
 const speedDisplay = document.querySelector('#speed');
+const titleDisplay = document.querySelector('#main h3');
 
 // Buttons
 const decreButton = document.querySelector('#decre');
@@ -224,15 +225,44 @@ function checkSpeed() {
     else if (playSpeed === 0) enablePersistentState(decreButton, 'gray-out');
 }
 
+function togglePlayPauseButton(isPlaying) {
+    if (isPlaying) {
+        playPauseIcon.classList.replace('fa-play', 'fa-pause');
+        playPauseButton.setAttribute("title", "pause (k)");
+    }
+    else {
+        playPauseIcon.classList.replace('fa-pause', 'fa-play');
+        playPauseButton.setAttribute('title', 'play (k)');
+    }
+}
+
 function updateShowTime(timeBlock) {
-    timeDisplay.innerHTML = timeBlock;
+    //console.log("Updating showtime")
+    let [remainTimestamp, diffTimestamp, sign] = timeBlock;
+
+    if (sign === '▲') {
+        sign = `<span id="upArrow">${sign}</span>`;
+    } else if (sign === '▼') {
+        sign = `<span id="downArrow">${sign}</span>`
+    }
+
+    if (diffTimestamp) {
+        timeDisplay.innerHTML = `
+            <span id="remain">${remainTimestamp}&nbsp;</span>${sign}<!--
+            --><span id="diff">${diffTimestamp}</span>
+        `
+    } else {
+        timeDisplay.innerHTML = `
+            <span id="remain">${remainTimestamp}</span>
+        `
+    }
 }
 
 /********************************* functions **********************************/
 
 function process(info) {
     hideBlock('loading');
-    document.querySelector('#main h3').innerText = info.vidTitle;
+    titleDisplay.innerText = info.vidTitle;
     playSpeed = info.speed;
     updateShowSpeed();
     updateShowTime(info.timeDisplay);
@@ -268,14 +298,7 @@ function sendMessage(type, msg={}) {
                 updateShowTime(response.timeDisplay);
             }
             else if (response.msgType === 'restartVideo' || response.msgType === 'playPauseVideo') {
-                if (response.playing) {
-                    playPauseIcon.classList.replace('fa-play', 'fa-pause');
-                    playPauseButton.setAttribute("title", "pause (k)");
-                }
-                else {
-                    playPauseIcon.classList.replace('fa-pause', 'fa-play');
-                    playPauseButton.setAttribute('title', 'play (k)');
-                }
+                togglePlayPauseButton(response.playing);
             }
             else if (response.msgType === 'changeVolume') {
                 let isPressed = volumeButton.classList.contains('chosen');
@@ -296,11 +319,9 @@ function connectPort() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const port = chrome.tabs.connect(tabs[0].id, {name: "video-progress"});
         port.onMessage.addListener(function(msg) {
+            titleDisplay.innerText = msg.vidTitle;
             updateShowTime(msg.timeDisplay);
-            if (msg.remainingTime === 0) {
-                playPauseIcon.classList.replace('fa-pause', 'fa-play');
-                playPauseButton.setAttribute('title', 'play (k)');
-            }
+            togglePlayPauseButton(!msg.paused);
         });
     });
 }

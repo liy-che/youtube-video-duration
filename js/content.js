@@ -22,6 +22,7 @@ const seekInterval = 10;
 const infTime = '&infin;';
 const noTime = '--:--:--';
 const zeroTime = '0:00';
+const titleElt = document.querySelector('a.ytp-title-link');
 
 let navigateEnd = true;
 
@@ -207,8 +208,7 @@ function calcDuration(time, speed) {
 
 function getVideoInfo(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
-    let elt = document.querySelector('a.ytp-title-link');
-    let title = elt.textContent;
+    let title = titleElt.textContent;
     let info = {msgType: msgType, 
         vidTitle: title, 
         timeDisplay: getTimeDisplay(),
@@ -256,7 +256,7 @@ chrome.runtime.onMessage.addListener(
 // TODO: do not send if there's no change
 chrome.runtime.onConnect.addListener(function(port) {
     let heartBeatId = setInterval(function() {
-        port.postMessage({"timeDisplay": getTimeDisplay()});
+        port.postMessage({"timeDisplay": getTimeDisplay(), "paused": video.paused, "vidTitle": titleElt.textContent});
         //console.log("sending update to popup")
     }, 1000);
 
@@ -306,7 +306,6 @@ function updateShowTime() {
     } else if (sign === '▼') {
         sign = `<span id="downArrow">${sign}</span>`
     }
-    
 
     if (diffTimestamp) {
         timeDisplay.innerHTML = `
