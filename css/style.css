@@ -380,6 +380,35 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  line-height: 1.2;
+  font-size: 100%;
+  visibility: hidden;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: rgba(238, 238, 238, 1);
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  width: 100px;
+  top: -5px;
+  left: 145%;
+  font-family: "Roboto", Arial, Helvetica, sans-serif;
+  opacity: 0;
+  transition: opacity .5s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
 /* Rounded sliders */
 .slider.round {
   border-radius: 24px;
