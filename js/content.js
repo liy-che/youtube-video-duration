@@ -14,6 +14,7 @@ let insertedNode;
 let showTime;
 let hasListeners;
 let hasTimeUpdateListeners;
+let titleElt;
 
 const minSpeed = 0.25;
 const interval = 0.25;
@@ -22,7 +23,6 @@ const seekInterval = 10;
 const infTime = '&infin;';
 const noTime = '--:--:--';
 const zeroTime = '0:00';
-const titleElt = document.querySelector('a.ytp-title-link');
 
 let navigateEnd = true;
 
@@ -208,9 +208,9 @@ function calcDuration(time, speed) {
 
 function getVideoInfo(msgType){
     //Everything that needs to happen after the DOM has initially loaded.
-    let title = titleElt.textContent;
+    titleElt = document.querySelector('a.ytp-title-link');
     let info = {msgType: msgType, 
-        vidTitle: title, 
+        vidTitle: titleElt.textContent, 
         timeDisplay: getTimeDisplay(),
         speed: video.playbackRate,
         playing: !video.paused,
