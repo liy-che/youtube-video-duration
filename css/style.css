@@ -28,6 +28,24 @@ html {
   font-size: 62.5%;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+#links {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  margin-left: 20px;
+  text-align: right;
+  color: #808080;
+  font-size: 15px;
+}
+
+a {
+  color: #808080;
+}
+
 /******************************************
 /* CSS TABS
 /*******************************************/
@@ -46,7 +64,6 @@ input:checked + label {
 }
 #tab1:checked ~ .content-container #c1 {
   display: inline;
-  padding: 10px 40px;
 }
 #tab2:checked ~ .line {
   left: 33%;
@@ -59,7 +76,6 @@ input:checked + label {
 }
 #tab3:checked ~ .content-container #c3 {
   display: inline;
-  padding: 10px 40px;
 }
 main > label {
   display: inline-block;
@@ -99,28 +115,21 @@ main > label:hover::after {
   transition: 0.25s ease;
 }
 .content-container {
-  position: relative;
+  padding: 20px;
   font-size: 16px;
 }
 .content {
-  position: absolute;
-  padding: 10px;
   width: 100%;
-  top: 0;
   display: none;
   transition: 0.25s ease;
   color: #333;
 }
 h3 {
   font-weight: 200;
-  margin: 10px 0;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   display: inherit;
-}
-.nonclickable {
-  pointer-events: none;
 }
 
 /******************************************
@@ -264,10 +273,8 @@ h2 {
 }
 
 ul {
-  margin: 0;
   padding: 0;
   list-style-type: none;
-  margin-top: 15px;
 }
 
 li {
@@ -331,6 +338,7 @@ p {
 /******************************************
 /* SETTINGS TAB
 /*******************************************/
+
 .switch {
   position: relative;
   display: inline-block;
@@ -380,18 +388,18 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+/* Tooltip */
 .tooltip {
   position: relative;
   display: inline-block;
 }
 
 .tooltip .tooltiptext {
-  line-height: 1.2;
-  font-size: 100%;
+  line-height: 1.15;
+  font-size: 80%;
   visibility: hidden;
   background-color: rgba(0, 0, 0, 0.7);
   color: rgba(238, 238, 238, 1);
-  text-align: center;
   border-radius: 6px;
   padding: 5px;
   position: absolute;
@@ -402,6 +410,10 @@ input:checked + .slider:before {
   font-family: "Roboto", Arial, Helvetica, sans-serif;
   opacity: 0;
   transition: opacity .5s;
+}
+
+.tooltip .widetip {
+  width: 120px;
 }
 
 .tooltip:hover .tooltiptext {
