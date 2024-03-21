@@ -26,8 +26,13 @@ Find it here:
 | Rewind / advance 10 secs   | J / L                                   |
 | Play / pause               | K                                       |
 | Mute / unmute              | M                                       |
+| Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.0.7.3**
+- Add shortcut to show/hide controller
+- Add banner to notify users of new updates
+
 **1.0.7.2**
 - All shortcuts are available for YouTube Shorts.
 

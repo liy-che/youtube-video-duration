@@ -42,6 +42,7 @@ chrome.runtime.onInstalled.addListener((details) => {
             text: "NEW",
             tabId: tab.id,
           });
+          chrome.storage.sync.set({seen: false});
         }
       }
     });

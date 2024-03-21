@@ -126,6 +126,16 @@ let handleShortcuts = (event) => {
         handleRewind();
     }
     else if (pressedCode === 'KeyR') restartVideo();
+    else if (pressedCode === 'KeyV') {
+        // toggle controller
+        settings.enableController = !settings.enableController;
+        // update settings var and sync to chrome storage
+        chrome.storage.sync.set({
+            enableController: settings.enableController
+        });
+        // update UI
+        showHideController();
+    }
 
     return false;
 };
@@ -138,6 +148,16 @@ let settings = {
     enableShortcuts: true
 };
 
+function showHideController() {
+    if (settings.enableController) {
+        setupTimeUpdates();
+        controllerNode.classList.remove('vdc-disable');
+    } else {
+        removeTimeUpdates();
+        controllerNode.classList.add('vdc-disable');
+    }
+}
+
 // initialize user settings
 chrome.storage.sync.get(settings, async function(storage) {
     settings = storage;
@@ -147,13 +167,7 @@ chrome.storage.sync.get(settings, async function(storage) {
 
         if (changes.enableController) {
             settings.enableController = changes.enableController.newValue;
-            if (settings.enableController) {
-                controllerNode.classList.remove('vdc-disable');
-                setupTimeUpdates();
-            } else {
-                controllerNode.classList.add('vdc-disable');
-                removeTimeUpdates();
-            }
+            showHideController();
         }
     
         if (changes.enableShortcuts) {
@@ -364,7 +378,7 @@ function showController(controller) {
         timer = setTimeout(function () {
             controller.classList.remove("vdc-show");
             timer = false;
-        }, 3000);
+        }, 2000);
     }
 
     return show;
@@ -529,6 +543,7 @@ function setupTimeUpdates() {
     if (!settings.enableController) return;
 
     clearInterval(showTime);
+    updateShowTime();
     showTime = setInterval(function() {
         updateShowTime();
     }, 1000);
@@ -577,6 +592,7 @@ let handleWaiting = handlePause;
 
 let handlePlaying = () => {
     clearInterval(showTime);
+    updateShowTime();
     showTime = setInterval(function() {
         updateShowTime();
     }, 1000);

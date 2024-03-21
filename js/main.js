@@ -29,6 +29,7 @@ const enableShortcuts = document.querySelector('#enableShortcuts');
 
 // User settings, only using keys to get settings from chrome storage
 let settings = {
+    seen: false,
     enable: true,
     enableController: true,
     enableShortcuts: true
@@ -47,6 +48,10 @@ function hideBlock(elt) {
 }
 
 /******************************* event listeners ******************************/
+document.querySelector('.closebtn').addEventListener('click', function(e) {
+    e.target.parentElement.style.display='none';
+    chrome.storage.sync.set({seen: true});
+});
 
 setNormalButton.addEventListener('click', function() {
     setPlaySpeed(1);
@@ -181,6 +186,9 @@ document.onkeyup = event => {
     }
     else if (pressedCode === 'KeyM') {
         volumeButton.classList.remove('pressed');
+    }
+    else if (pressedCode === 'KeyV') {
+        enableController.click();
     }
 };
 
@@ -343,6 +351,10 @@ document.addEventListener('DOMContentLoaded', function() {
         enable.checked = storage.enable;
         enableController.checked = storage.enableController;
         enableShortcuts.checked = storage.enableShortcuts;
+
+        if(!storage.seen) {
+            document.querySelector('.alert').style.display = 'block';
+        }
 
         // force reflow
         // https://stackoverflow.com/questions/11131875/what-is-the-cleanest-way-to-disable-css-transition-effects-temporarily
