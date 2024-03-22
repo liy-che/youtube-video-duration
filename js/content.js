@@ -1,7 +1,6 @@
 let video;
 let controllerNode;
 let showButtons;
-let showTimeDisplay;
 let resetButton;
 let increButton;
 let decreButton;
@@ -15,6 +14,7 @@ let showTime;
 let hasListeners;
 let hasTimeUpdateListeners;
 let titleElt;
+let timer;
 
 const minSpeed = 0.25;
 const interval = 0.25;
@@ -115,7 +115,6 @@ let handleShortcuts = (event) => {
         if (video.playbackRate == 1) updateShowTime();
         else handleReset();
         showButtons();
-        showTimeDisplay();
     }
     else if (pressedCode === 'KeyL') {
         event.preventDefault();
@@ -126,16 +125,7 @@ let handleShortcuts = (event) => {
         handleRewind();
     }
     else if (pressedCode === 'KeyR') restartVideo();
-    else if (pressedCode === 'KeyV') {
-        // toggle controller
-        settings.enableController = !settings.enableController;
-        // update settings var and sync to chrome storage
-        chrome.storage.sync.set({
-            enableController: settings.enableController
-        });
-        // update UI
-        showHideController();
-    }
+    else if (pressedCode === 'KeyV') controlController();
 
     return false;
 };
@@ -147,6 +137,23 @@ let settings = {
     enableController: true,
     enableShortcuts: true
 };
+
+function controlController() {
+    // toggle controller
+    if (timer) {
+        clearTimeout(timer);
+        timer = false;
+        controllerNode.classList.add('vdc-disable');
+        return;
+    }
+    settings.enableController = !settings.enableController;
+    // update settings var and sync to chrome storage
+    chrome.storage.sync.set({
+        enableController: settings.enableController
+    });
+    // update UI
+    showHideController();
+}
 
 function showHideController() {
     if (settings.enableController) {
@@ -312,7 +319,7 @@ function updateShowSpeed() {
 
 
 function updateShowTime() {
-    //console.log("Updating showtime")
+    console.log("Updating showtime")
     let [remainTimestamp, diffTimestamp, sign] = getTimeDisplay();
 
     if (sign === '▲') {
@@ -368,17 +375,18 @@ function getTimeDisplay() {
 
 
 function showController(controller) {
-    let timer;
 
     function show() {
-        controller.classList.add("vdc-show");
+        if (settings.enableController) return;
+
+        controller.classList.remove("vdc-disable");
     
         if (timer) clearTimeout(timer);
     
         timer = setTimeout(function () {
-            controller.classList.remove("vdc-show");
+            controller.classList.add("vdc-disable");
             timer = false;
-        }, 2000);
+        }, 2500);
     }
 
     return show;
@@ -470,14 +478,8 @@ function constructShadowDOM() {
             border-radius: 5px;
             margin-right: 2px;
         }
-        .vdc-show {
-            display: inline;
-        }
         #sign {
             height: 1em;
-        }
-        :host(.vdc-disable) button {
-            display: none;
         }
         :host(:hover) button {
             display: inline;
@@ -500,7 +502,6 @@ function constructShadowDOM() {
     timeDisplay = shadowRoot.querySelector('.time');
 
     showButtons = showController(newNode);
-    showTimeDisplay = showController(timeDisplay);
 
     resetButton = shadowRoot.querySelector('.reset');
     increButton = shadowRoot.querySelector('.right');
@@ -575,13 +576,11 @@ let handleRatechange = () => {
     updateShowSpeed();
     updateShowTime();
     showButtons();
-    showTimeDisplay();
 };
 
 let handleSeeked = () => {
     updateShowTime();
     showButtons();
-    showTimeDisplay();
 };
 
 let handlePause = () => {
