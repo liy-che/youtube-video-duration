@@ -1,5 +1,5 @@
 /******************************* program states *******************************/
-
+const defaultSpeed = 1.0;
 const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
@@ -7,6 +7,7 @@ const seekInterval = 10;
 const zeroTime = '0:00';
 
 let playSpeed = 1;
+let secondarySpeed = defaultSpeed;
 
 // Displays
 const timeDisplay = document.querySelector('#time-display');
@@ -54,7 +55,10 @@ document.querySelector('.closebtn').addEventListener('click', function(e) {
 });
 
 setNormalButton.addEventListener('click', function() {
-    setPlaySpeed(1);
+    if (playSpeed !== defaultSpeed) {
+        secondarySpeed = playSpeed;
+        setPlaySpeed(defaultSpeed);
+    } else setPlaySpeed(secondarySpeed);
     disablePersistentState(increButton, 'gray-out');
     disablePersistentState(decreButton, 'gray-out');
 });

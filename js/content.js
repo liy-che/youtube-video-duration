@@ -16,6 +16,7 @@ let hasTimeUpdateListeners;
 let titleElt;
 let timer;
 
+const defaultSpeed = 1.0;
 const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
@@ -23,6 +24,8 @@ const seekInterval = 10;
 const infTime = '&infin;';
 const noTime = '--:--:--';
 const zeroTime = '0:00';
+
+let secondarySpeed = defaultSpeed;
 
 let navigateEnd = true;
 
@@ -74,7 +77,10 @@ let handleAdvance = () => {
 };
 
 let handleReset = () => {
-    setPlaySpeed(1);
+    if (video.playbackRate !== defaultSpeed) {
+        secondarySpeed = video.playbackRate;
+        setPlaySpeed(defaultSpeed);
+    } else setPlaySpeed(secondarySpeed);
 };
 
 let handleIncre = () => {
@@ -112,8 +118,8 @@ let handleShortcuts = (event) => {
     if (pressedCode === 'KeyD') handleIncre();
     else if (pressedCode === 'KeyA') handleDecre();
     else if (pressedCode === 'KeyS') {
-        if (video.playbackRate == 1) updateShowTime();
-        else handleReset();
+        if (video.playbackRate === defaultSpeed) updateShowTime();
+        handleReset();
         showButtons();
     }
     else if (pressedCode === 'KeyL') {
@@ -319,7 +325,7 @@ function updateShowSpeed() {
 
 
 function updateShowTime() {
-    console.log("Updating showtime")
+    //console.log("Updating showtime")
     let [remainTimestamp, diffTimestamp, sign] = getTimeDisplay();
 
     if (sign === '▲') {
@@ -490,7 +496,7 @@ function constructShadowDOM() {
             --><button class="left">&minus;</button><!--
             --><span class="display speed">${video.playbackRate}</span><!--
             --><button class="right">&plus;</button><!--
-            --><button class="reset">&#49;&times;</button><!--
+            --><button class="reset">&rlarr;</button><!--
             --><button class="backward">&laquo;</button><!--
             --><button class="forward">&raquo;</button>
         </div>
