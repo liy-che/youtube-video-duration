@@ -50,8 +50,10 @@ function hideBlock(elt) {
 
 /******************************* event listeners ******************************/
 document.querySelector('.closebtn').addEventListener('click', function(e) {
-    e.target.parentElement.style.display='none';
     chrome.storage.sync.set({seen: true});
+    let div = e.target.parentElement;
+    div.style.opacity = 0;
+    setTimeout(function(){ div.style.display = "none"; }, 600);
 });
 
 setNormalButton.addEventListener('click', function() {
@@ -171,6 +173,7 @@ document.onkeyup = event => {
     else if (isUpKey(pressedCode)) {
         if (tab1.checked) tab2.checked = true;
         else if (tab2.checked) tab3.checked = true;
+        else if (tab3.checked) tab4.checked = true;
         else tab1.checked = true;
     }
     else if (isDownKey(pressedCode)) {
