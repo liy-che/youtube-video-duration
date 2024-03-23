@@ -10,7 +10,8 @@ Find it here:
 [Chrome Web Store](https://chrome.google.com/webstore/detail/duration-calculator-for-y/djphelnkeombgogeophphofmjkbooofh)
 
 ## ⚡️ Features ⚡️
-:white_check_mark: Adjust video playback speed beyond 2x, or jump to 1x   
+:white_check_mark: Adjust video playback speed beyond 2x 
+:white_check_mark: Jump to 1x speed, then switch back to the previous speed in one click  
 :white_check_mark: Find out how much time will be saved or added compared to watching at 1x speed  
 :white_check_mark: Know how long it takes to watch the rest of the video at current speed  
 :white_check_mark: Know your YouTube Shorts: know video length, change video speed, skip through video  
@@ -29,12 +30,16 @@ Find it here:
 | Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.0.7.4**
+- The previous '1x' button can now be used to jump between 1x and the speed right between the jump
+- Improve shortcut to show/hide controller
+
 **1.0.7.3**
 - Add shortcut to show/hide controller
 - Add banner to notify users of new updates
 
 **1.0.7.2**
-- All shortcuts are available for YouTube Shorts.
+- All shortcuts are available for YouTube Shorts
 
 **1.0.7.1**
 - Improve performance by removing unnecessary time updates
