@@ -375,7 +375,9 @@ hideBlock('main');
 
 sendMessage('videoInfo')
 
-chrome.runtime.sendMessage({msgType: "handshake"});
+chrome.storage.sync.get(["opened"]).then((result) => {
+    if (!result.opened) chrome.runtime.sendMessage({msgType: "handshake"});
+});
 
 enable.addEventListener('click', function() {
     enableController.checked = enableShortcuts.checked = enable.checked;

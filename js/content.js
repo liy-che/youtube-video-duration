@@ -32,8 +32,13 @@ let navigateEnd = true;
 document.addEventListener('yt-navigate-start', () => {
     navigateEnd = false;
 });
-document.addEventListener('yt-navigate-finish', async () => {
+document.addEventListener('yt-navigate-finish', () => {
     navigateEnd = true;
+    document.dispatchEvent(
+        new CustomEvent("start-inject")
+    );
+});
+document.addEventListener('start-inject', async () => {
     video = await waitForElm('video[src]');
     videoContainer = video.parentElement; // html5-video-player
     // remove controller for video tags without src attribute
@@ -274,6 +279,11 @@ chrome.runtime.onMessage.addListener(
         else if (request.msgType === 'changeVolume') {
             video.muted = !video.muted;
             sendResponse({msgType: request.msgType, muted: video.muted});
+        }
+        else if (request.msgType === 'inject') {
+            document.dispatchEvent(
+                new CustomEvent("start-inject")
+            );
         }
     }
 );

@@ -30,6 +30,10 @@ Find it here:
 | Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.0.7.5**
+- Bug fix: "New" badge appearing for browser updates
+- Bug fix: Controller requiring page refresh to appear on install
+
 **1.0.7.4**
 - The previous '1x' button can now be used to jump between 1x and the speed right between the jump
 - Improve shortcut to show/hide controller
