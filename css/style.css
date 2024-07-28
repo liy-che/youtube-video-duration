@@ -96,21 +96,15 @@ input:checked + label {
   display: inline;
 }
 #tab2:checked ~ .line {
-  left: 25%;
+  left: 33.33%;
 }
 #tab2:checked ~ .content-container #c2 {
   display: inline;
 }
 #tab3:checked ~ .line {
-  left: 50%;
+  left: 66.66%;
 }
 #tab3:checked ~ .content-container #c3 {
-  display: inline;
-}
-#tab4:checked ~ .line {
-  left: 75%;
-}
-#tab4:checked ~ .content-container #c4 {
   display: inline;
 }
 main > label {
@@ -118,7 +112,7 @@ main > label {
   font-size: 16px;
   height: 36px;
   line-height: 36px;
-  width: 25%;
+  width: 33.33%;
   text-align: center;
   background: #f4f4f4;
   color: #555;
@@ -145,7 +139,7 @@ main > label:hover::after {
   position: absolute;
   height: 2px;
   background: #1e88e5;
-  width: 25%;
+  width: 33.33%;
   top: 34px;
   left: 0;
   transition: 0.25s ease;
@@ -169,144 +163,8 @@ h3 {
 }
 
 /******************************************
-/* PLAYING TAB
+/* SHORTCUTS TAB
 /*******************************************/
-
-/* Time display */
-#time-display {
-  text-align: center;
-  position: relative;
-}
-
-#remain {
-  font-size: 3rem;
-}
-
-#sign {
-  height: 1em;
-}
-
-#video-controls {
-  display: flex;
-  justify-content: center;
-  column-gap: .1em;
-}
-
-#upArrow {
-  color: #cc3300;
-}
-#downArrow {
-  color: #99cc33;
-}
-
-/* Button interactions */
-
-button {
-  cursor: pointer;
-  border: none;
-  color: rgba(85,85,85, 0.7);
-  font-weight: 900;
-  font-size: 1.8rem;
-  border-radius: 5px;
-}
-
-button i, button {
-  padding: .23em;
-}
-
-button:hover {
-  background-color: rgba(85,85,85, 0.1);
-  color: rgba(85,85,85, 1);
-}
-
-button:active, .pressed {
-  background-color: rgba(85,85,85, 0.15);
-  color: rgba(85,85,85, 1);
-}
-
-.chosen, .chosen:hover {
-  background-color: rgba(85,85,85, .2);
-}
-
-/*  Speed controls  */
-h2 {
-  text-align: center;
-  font-weight: normal;
-  font-size: 1.5rem;
-  margin: .7em 0;
-  background-color: lightblue;
-  padding: .2em 0;
-  border-radius: 3px;
-}
-
-.noneditable {
-  background-color: #333;
-  color: lightgray;
-}
-
-#speed-display {
-  display: flex;
-}
-
-#speed {
-  font-size: 2.6rem;
-  text-align: right;
-  flex-grow: 1;
-  flex-basis: 0;
-  padding-right: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: right;
-}
-
-#speed-controls {
-  display: flex;
-  align-items: center;
-  column-gap: 10px;
-  width: 50%;
-}
-
-.triangle {
-  cursor: pointer;
-  display: inline-block;
-  border-style: solid;
-
-  /* Size */
-  height: 0px;
-  width: 0px;
-}
-
-.gray-out {
-  opacity: 0.2;
-  cursor: default;
-}
-
-.on-hover {
-  opacity: 0.7;
-  transition: 0.2s;
-}
-
-.on-hover:hover {
-  opacity: 1;
-}
-
-.left-arrow {
-  border-color: transparent #4D96FF transparent transparent;
-  border-width: 1.2rem 1.2rem 1.2rem 0px;
-}
-
-.right-arrow {
-  border-color: transparent transparent transparent #4D96FF;
-  border-width: 1.2rem 0 1.2rem 1.2rem;
-}
-
-.pressed-decre {
-  border-color: transparent #005792 transparent transparent;
-}
-
-.pressed-incre {
-  border-color: transparent transparent transparent #005792;
-}
 
 ul {
   padding: 0;
@@ -345,41 +203,6 @@ ul.settings label p {
 
 p {
   margin: 0 auto;
-}
-
-/******************************************
-/* SHORTCUTS TAB
-/*******************************************/
-#loading {
-  text-align: center;
-}
-
-/* The alert message box */
-.alert {
-  padding: 10px 20px;
-  background: rgba(186, 208, 228, .37);
-  color: #00539f;
-  font-size: 16px;
-  opacity: 1;
-  transition: opacity 0.6s; /* 600ms to fade out */
-}
-
-
-/* The close button */
-.closebtn {
-  margin-left: 15px;
-  color: #00539f;
-  font-weight: bold;
-  float: right;
-  font-size: 22px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-/* When moving the mouse over the close button */
-.closebtn:hover {
-  color: black;
 }
 
 /******************************************
@@ -475,4 +298,32 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* The alert message box */
+.alert {
+  padding: 10px 20px;
+  background: rgba(186, 208, 228, .37);
+  color: #00539f;
+  font-size: 16px;
+  opacity: 1;
+  transition: opacity 0.6s; /* 600ms to fade out */
+}
+
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: #00539f;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
 }

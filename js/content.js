@@ -50,7 +50,6 @@ document.addEventListener('start-inject', async () => {
     injectController();
 });
 
-// mutations.addedNodes.find(node => node.matchesSelector("..."))
 
 // wait for element to exist
 function waitForElm(selector) {
@@ -238,30 +237,30 @@ function calcDuration(time, speed) {
 }
 
 
-function getVideoInfo(msgType){
-    //Everything that needs to happen after the DOM has initially loaded.
-    titleElt = document.querySelector('a.ytp-title-link');
-    let info = {msgType: msgType, 
-        vidTitle: titleElt.textContent, 
-        timeDisplay: getTimeDisplay(),
-        speed: video.playbackRate,
-        playing: !video.paused,
-        muted: video.muted};
-    return info;
-}
-
-
 /***************************** Message handlers ******************************/
 
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
-        if (request.msgType === 'videoInfo') {
-            sendResponse(getVideoInfo(request.msgType));
-        }
-        else if (request.msgType === 'setSpeed') {
-            setPlaySpeed(request.speed);
+        if (request.msgType === 'decreSpeed') {
+            handleDecre();
             sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
+        }
+        else if (request.msgType === 'increSpeed') {
+            handleIncre();
+            sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
+        }
+        else if (request.msgType === 'jumpSpeed') {
+            handleReset();
+            sendResponse({msgType: request.msgType, speed: video.playbackRate});
+        }
+        else if (request.msgType === 'rewind') {
+            handleRewind();
+            sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
+        }
+        else if (request.msgType === 'advance') {
+            handleAdvance();
+            sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
         }
         else if (request.msgType === 'restartVideo') {
             restartVideo();
@@ -271,10 +270,6 @@ chrome.runtime.onMessage.addListener(
             if (video.paused) video.play();
             else video.pause();
             sendResponse({msgType: request.msgType, playing: !video.paused});
-        }
-        else if (request.msgType === 'seek') {
-            seekVideo(request.interval);
-            sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
         }
         else if (request.msgType === 'changeVolume') {
             video.muted = !video.muted;
@@ -288,19 +283,6 @@ chrome.runtime.onMessage.addListener(
     }
 );
 
-
-// handle incoming connections from popup
-// TODO: do not send if there's no change
-chrome.runtime.onConnect.addListener(function(port) {
-    let heartBeatId = setInterval(function() {
-        port.postMessage({"timeDisplay": getTimeDisplay(), "paused": video.paused, "vidTitle": titleElt.textContent});
-        //console.log("sending update to popup")
-    }, 1000);
-
-    port.onDisconnect.addListener(function(port) {
-        clearInterval(heartBeatId);
-    });
-});
 
 /************************* Onscreen video controller **************************/
 

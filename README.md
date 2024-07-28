@@ -30,6 +30,9 @@ Find it here:
 | Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.0.7.6**
+- Since the onscreen controller and keyboard shortcuts provide convenient control, the player in the extension popup has been removed for performance and simplicity.
+
 **1.0.7.5**
 - Bug fix: "New" badge appearing for browser updates
 - Bug fix: Controller requiring page refresh to appear on install
