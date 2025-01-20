@@ -140,6 +140,29 @@ let handleShortcuts = (event) => {
     return false;
 };
 
+let lastSpeed;
+let spacePressed = false;
+let spaceHeld = false;
+document.addEventListener('keydown', function(event) {
+    if (event.code !== 'Space') return;
+    if (!spacePressed) {
+        lastSpeed = video.playbackRate;
+        spacePressed = true;
+    } else {
+        spaceHeld = true;
+    }
+});
+
+document.addEventListener('keyup', function(event) {
+    if (event.code !== 'Space') return;
+    if (spaceHeld) {
+        setPlaySpeed(lastSpeed);
+        spaceHeld = false;
+    }
+    spacePressed = false;
+});
+
+
 // TODO: stop everything when disabled, including in the popup
 // values set default for first-time users
 let settings = {
