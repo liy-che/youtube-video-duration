@@ -590,6 +590,7 @@ function removeTimeUpdates() {
 }
 
 let handleLoadedMetadata = () => {
+    updateShowSpeed();
     updateShowTime();
 };
 
