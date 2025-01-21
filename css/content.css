@@ -1,3 +1,9 @@
 .vdc-disable {
     visibility: hidden;
 }
+
+.ytp-fullscreen:not(.ytp-autohide) .vdc-controller {
+    position: relative;
+    top: 63px;
+    left: 12px;
+}
