@@ -30,6 +30,9 @@ Find it here:
 | Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.0.7.7**
+- Bug fix: releasing the "2x" spacebar changed speed back to the one controlled by YouTube instead of the one set by the controller
+
 **1.0.7.6**
 - Since the onscreen controller and keyboard shortcuts provide convenient control, the player in the extension popup has been removed for performance and simplicity.
 
