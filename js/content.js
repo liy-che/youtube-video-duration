@@ -422,105 +422,132 @@ function constructShadowDOM() {
     let shadowRoot = newNode.attachShadow({ mode: "open" });
 
     let shadowTemplate = `
-    <style>
-        * {
-            line-height: 1.8em;
-            font-family: sans-serif;
-            font-size: 13px;
-        }
-        #controller {
-            position: absolute;
-            top: 0;
-            left: 0;
-            
-            background: transparent;
-            color: black;
+        <style>
+            :host {
+                --controller-height: 25px;
+                --text-size: 20px;
+            }
+            * {
+                font-family: sans-serif;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            #controller {     
+                background: transparent;
+                color: black;     
+                display: flex;
+                flex-direction: row;
+                gap: 4px;
+                align-items: stretch;
+                height: var(--controller-height);
+                cursor: default;
+                user-select: none;
+            }
+            .speed, .seek {
+                display: flex;
+            }
+            button {
+                font-size: var(--text-size);
+                line-height: var(--text-size);
+                opacity: 0.6;
+                cursor: pointer;
+                color: black;
+                background: #F5F5F5;
+                font-weight: normal;
+                border: 1px solid #696969;
+                font-family: "Lucida Console", Monaco, monospace;
+                transition: background 0.2s, color 0.2s;
+                border-radius: 5px;
+                display: none;
+                width: var(--controller-height);
+            }
+            button:focus {
+                outline: 0;
+            }
+            button:hover {
+                opacity: 0.8;
+                background: #F5F5F5;
+            }
+            button:active {
+                background: #F5F5F5;
+                font-weight: bold;
+            }
+            button.left, button.backward {
+                border-radius: 5px 0 0 5px;
+            }
+            button.right, button.forward {
+                border-radius: 0 5px 5px 0;
+            }
+            .display {
+                font-size: 15px;
+                line-height: 15px;
+                color: white;
+                background-color: rgba(48, 48, 48, 0.6);
+                padding: 0 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 5px;
+            }
+            span {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            #upArrow {
+                color: #cc3300;
+            }
+            #downArrow {
+                color: #99cc33;
+            }
+            #sign {
+                height: 1em;
+            }
+            :host(:hover) button {
+                display: inline;
+            }
+            :host(:hover) .speed .display {
+                border-radius: 0;
+            }
+            .time {
+                order: 4;
+            }
+            .speed {
+                order: 3;
+            }
+            .reset {
+                order: 2;
+            }
+            .seek {
+                order: 1;
+            }
+        </style>
 
-            margin: 5px 5px 5px 10px;
-            
-            cursor: default;
-            z-index: 9999999;
-            user-select: none;
-        }
-        #upArrow {
-            color: #cc3300;
-        }
-        #downArrow {
-            color: #99cc33;
-        }
-        button {
-            opacity: 0.6;
-            cursor: pointer;
-            color: black;
-            background: #F5F5F5;
-            font-weight: normal;
-            padding: 1px 5px 3px 5px;
-            font-size: 20px;
-            line-height: 20px;
-            border: 1px solid #696969;
-            font-family: "Lucida Console", Monaco, monospace;
-            margin: 0px;
-            transition: background 0.2s, color 0.2s;
-            border-radius: 5px;
-            display: none;
-        }
-        button:focus {
-            outline: 0;
-        }
-        button:hover {
-            opacity: 0.8;
-            background: #F5F5F5;
-            color: black;
-        }
-        button:active {
-            background: #F5F5F5;
-            color: black;
-            font-weight: bold;
-        }
-        button.left, button.backward {
-            border-radius: 5px 0 0 5px;
-            margin-left: 2px;
-        }
-        button.right, button.forward {
-            border-radius: 0 5px 5px 0;
-            margin-right: 2px;
-        }
-        .reset {
-            margin: 0 2px;
-        }
-        .display {
-            color: white;
-            background-color: rgba(48, 48, 48, 0.6);
-            padding: 5px 5px 4px 5px;
-            font-size: 15px;
-            line-height: 15px;
-        }
-        .time {
-            border-radius: 5px;
-            margin-right: 2px;
-        }
-        #sign {
-            height: 1em;
-        }
-        :host(:hover) button {
-            display: inline;
-        }
-    </style>
         <div id="controller">
-            <span class="display time">${noTime}</span><!--
-            --><button class="left">&minus;</button><!--
-            --><span class="display speed">${video.playbackRate}</span><!--
-            --><button class="right">&plus;</button><!--
-            --><button class="reset">&rlarr;</button><!--
-            --><button class="backward">&laquo;</button><!--
-            --><button class="forward">&raquo;</button>
+            <div class="display time">
+                ${noTime}
+            </div>
+
+            <div class="speed">
+                <button class="left">&minus;</button>
+                <span class="display">${video.playbackRate}</span>
+                <button class="right">&plus;</button>
+            </div>
+
+            <button class="reset">&rlarr;</button>
+
+            <div class="seek">
+                <button class="backward">&laquo;</button>
+                <button class="forward">&raquo;</button>
+            </div>
         </div>
     `
     shadowRoot.innerHTML = shadowTemplate;
     insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
 
-    speedDisplay = shadowRoot.querySelector('.speed');
-    timeDisplay = shadowRoot.querySelector('.time');
+    speedDisplay = shadowRoot.querySelector('.speed .display');
+    timeDisplay = shadowRoot.querySelector('.display.time');
 
     showButtons = showController(newNode);
 

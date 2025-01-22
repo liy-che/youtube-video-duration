@@ -2,8 +2,13 @@
     visibility: hidden;
 }
 
-.ytp-fullscreen:not(.ytp-autohide) .vdc-controller {
-    position: relative;
-    top: 63px;
+.vdc-controller {
+    position: absolute;
+    top: 12px;
     left: 12px;
+    z-index: 99999;
+}
+
+.ytp-fullscreen:not(.ytp-autohide) .vdc-controller {
+    top: 63px;
 }
