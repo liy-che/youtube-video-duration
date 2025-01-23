@@ -184,15 +184,13 @@ li {
   justify-content: space-between;
 }
 
-li div:first-child,
-ul.settings div {
+li div:first-child {
   font-weight: bold;
 }
 
 ul.settings label {
   cursor: pointer;
   display: flex;
-  width: 100%;
 }
 
 ul.settings label p {
@@ -300,6 +298,31 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
+/* Radio buttons */
+.radio input[type='radio'] {
+  display: initial;
+  accent-color: #2196F3;
+}
+
+.radio {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  margin-left: 55px;
+}
+
+.radio label {
+  font-weight: normal;
+}
+
+.radio input {
+  margin-right: 5px;
+}
+
+/******************************************
+/* ALERT MESSAGE
+/*******************************************/
+
 /* The alert message box */
 .alert {
   padding: 10px 20px;
@@ -309,7 +332,6 @@ input:checked + .slider:before {
   opacity: 1;
   transition: opacity 0.6s; /* 600ms to fade out */
 }
-
 
 /* The close button */
 .closebtn {

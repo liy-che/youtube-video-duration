@@ -168,7 +168,8 @@ document.addEventListener('keyup', function(event) {
 let settings = {
     enable: true,
     enableController: true,
-    enableShortcuts: true
+    enableShortcuts: true,
+    setLocation: 'right'
 };
 
 function controlController() {
@@ -220,6 +221,16 @@ chrome.storage.sync.get(settings, async function(storage) {
                 document.dispatchEvent(
                     new CustomEvent("removeshortcuts")
                 );
+            }
+        }
+
+        if (changes.setLocation) {
+            settings.setLocation = changes.setLocation.newValue;
+            if (settings.setLocation === 'left') {
+                controllerNode.classList.replace('top-right', 'top-left');
+            } 
+            else {
+                controllerNode.classList.replace('top-left', 'top-right');
             }
         }
     });
@@ -417,7 +428,7 @@ function showController(controller) {
 function constructShadowDOM() {
     // construct a new node with a shadow DOM and insert node into DOM
     let newNode = document.createElement("div");
-    newNode.classList.add("vdc-controller");
+    newNode.classList.add("vdc-controller", `top-${settings.setLocation}`);
     if (!settings.enableController) newNode.classList.add('vdc-disable');
     let shadowRoot = newNode.attachShadow({ mode: "open" });
 
@@ -437,7 +448,7 @@ function constructShadowDOM() {
                 background: transparent;
                 color: black;     
                 display: flex;
-                flex-direction: row;
+                flex-direction: var(--controller-direction);
                 gap: 4px;
                 align-items: stretch;
                 height: var(--controller-height);
@@ -510,32 +521,19 @@ function constructShadowDOM() {
             :host(:hover) .speed .display {
                 border-radius: 0;
             }
-            .time {
-                order: 4;
-            }
-            .speed {
-                order: 3;
-            }
-            .reset {
-                order: 2;
-            }
-            .seek {
-                order: 1;
-            }
         </style>
 
         <div id="controller">
-            <div class="display time">
-                ${noTime}
-            </div>
-
+            <button class="reset">&rlarr;</button>
             <div class="speed">
                 <button class="left">&minus;</button>
                 <span class="display">${video.playbackRate}</span>
                 <button class="right">&plus;</button>
             </div>
 
-            <button class="reset">&rlarr;</button>
+            <div class="display time">
+                ${noTime}
+            </div>
 
             <div class="seek">
                 <button class="backward">&laquo;</button>

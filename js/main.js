@@ -5,13 +5,15 @@ const seekInterval = 10;
 const enable = document.querySelector('#enable');
 const enableController = document.querySelector('#enableController');
 const enableShortcuts = document.querySelector('#enableShortcuts');
+const setLocation = document.querySelectorAll('input[name="location"]');
 
 // User settings, only using keys to get settings from chrome storage
 let settings = {
     seen: false,
     enable: true,
     enableController: true,
-    enableShortcuts: true
+    enableShortcuts: true,
+    setLocation: 'right'
 };
 
 // Tabs
@@ -104,6 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         enable.checked = storage.enable;
         enableController.checked = storage.enableController;
         enableShortcuts.checked = storage.enableShortcuts;
+        document.querySelector(`input[name="location"][value="${storage.setLocation}`).checked = true;
 
         if(!storage.seen) {
             document.querySelector('.alert').style.display = 'block';
@@ -143,5 +146,15 @@ enableShortcuts.addEventListener('click', function() {
     chrome.storage.sync.set({
         enable: enable.checked,
         enableShortcuts: enableShortcuts.checked
+    });
+});
+
+setLocation.forEach(radio => {
+    radio.addEventListener('change', function() {
+        if (this.checked) {
+            chrome.storage.sync.set({
+                setLocation: this.value
+            });
+        }
     });
 });
