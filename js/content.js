@@ -25,14 +25,17 @@ const infTime = '&infin;';
 const noTime = '--:--:--';
 const zeroTime = '0:00';
 
+
 let secondarySpeed = defaultSpeed;
 
 let navigateEnd = true;
 
 document.addEventListener('yt-navigate-start', () => {
+    console.log('navigation start')
     navigateEnd = false;
 });
 document.addEventListener('yt-navigate-finish', () => {
+    console.log('nagivation ended')
     navigateEnd = true;
     document.dispatchEvent(
         new CustomEvent("start-inject")
@@ -47,8 +50,33 @@ document.addEventListener('start-inject', async () => {
     if (insertedNode) insertedNode.remove();
 
     // inject controller for video tag with src attribute
+    console.log('start injecting')
     injectController();
 });
+
+waitForElm2('.playing-mode').then(() => {
+    console.log("playing video")
+});
+
+function waitForElm2(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver((mutations, obs) => {
+            if (document.querySelector(selector)) {
+                obs.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
 
 
 // wait for element to exist
