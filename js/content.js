@@ -25,6 +25,7 @@ const infTime = '&infin;';
 const noTime = '--:--:--';
 const zeroTime = '0:00';
 
+
 let secondarySpeed = defaultSpeed;
 
 let navigateEnd = true;
@@ -45,9 +46,27 @@ document.addEventListener('start-inject', async () => {
         // find the video controller inserted previously if exists
         // remove the inserted controller
     if (insertedNode) insertedNode.remove();
+    outsideEvent = false;
+    document.dispatchEvent(
+        new CustomEvent("cleanup")
+    );
 
     // inject controller for video tag with src attribute
     injectController();
+});
+
+let outsideEvent = true;
+document.addEventListener('cleanup', function() {
+    if (outsideEvent) {
+        console.log("Forced to clean")
+        return;
+    };
+    outsideEvent = true;
+    /* What to cleanup
+    event listeners including keyboard shortcuts
+    the controller
+    */
+    console.log("cleaning up myself");
 });
 
 
