@@ -30,6 +30,9 @@ Find it here:
 | Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.0.8**
+- Add option for controller location on video
+
 **1.0.7.7**
 - Bug fix: releasing the "2x" spacebar changed speed back to the one controlled by YouTube instead of the one set by the controller
 
