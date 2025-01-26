@@ -16,6 +16,7 @@ let hasTimeUpdateListeners;
 let titleElt;
 let timer;
 
+const scriptVer = 1;
 const defaultSpeed = 1.0;
 const minSpeed = 0.25;
 const interval = 0.25;
@@ -34,39 +35,38 @@ document.addEventListener('yt-navigate-start', () => {
     navigateEnd = false;
 });
 document.addEventListener('yt-navigate-finish', () => {
+    console.log(`${scriptVer} navigate finish`)
     navigateEnd = true;
     document.dispatchEvent(
-        new CustomEvent("start-inject")
+        new CustomEvent("start-inject", {
+            detail: { scriptVer: scriptVer }
+        })
     );
 });
-document.addEventListener('start-inject', async () => {
+document.addEventListener('start-inject', async (event) => {
+    if (event.target !== document ) {
+        console.log("not from document")
+        return;
+    }
+    console.log(`${scriptVer} start injecting`)
     video = await waitForElm('video[src]');
     videoContainer = video.parentElement; // html5-video-container
     // remove controller for video tags without src attribute
         // find the video controller inserted previously if exists
         // remove the inserted controller
-    if (insertedNode) insertedNode.remove();
-    outsideEvent = false;
-    document.dispatchEvent(
-        new CustomEvent("cleanup")
-    );
+    if (insertedNode) {
+        insertedNode.remove();
+        console.log(`${scriptVer} removed insertNode`)
+    }
+
+    console.log(event.detail.scriptVer)
+
+    if (event.detail.scriptVer >= scriptVer) {
+        return;
+    }
 
     // inject controller for video tag with src attribute
     injectController();
-});
-
-let outsideEvent = true;
-document.addEventListener('cleanup', function() {
-    if (outsideEvent) {
-        console.log("Forced to clean")
-        return;
-    };
-    outsideEvent = true;
-    /* What to cleanup
-    event listeners including keyboard shortcuts
-    the controller
-    */
-    console.log("cleaning up myself");
 });
 
 
@@ -329,8 +329,11 @@ chrome.runtime.onMessage.addListener(
             sendResponse({msgType: request.msgType, muted: video.muted});
         }
         else if (request.msgType === 'inject') {
+            console.log(`${scriptVer} got inject msg from background`)
             document.dispatchEvent(
-                new CustomEvent("start-inject")
+                new CustomEvent("start-inject"), {
+                    detail: { scriptVer : scriptVer+1 }
+                }
             );
         }
     }
@@ -370,7 +373,6 @@ function updateShowSpeed() {
 
 
 function updateShowTime() {
-    //console.log("Updating showtime")
     let [remainTimestamp, diffTimestamp, sign] = getTimeDisplay();
 
     if (sign === '▲') {
@@ -562,6 +564,8 @@ function constructShadowDOM() {
     `
     shadowRoot.innerHTML = shadowTemplate;
     insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer);
+
+    console.log(`${scriptVer} inserted node`)
 
     speedDisplay = shadowRoot.querySelector('.speed .display');
     timeDisplay = shadowRoot.querySelector('.display.time');
