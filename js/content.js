@@ -265,6 +265,18 @@ function convertSecondToTimestamp(totalSeconds) {
 }
 
 
+function convertTimestampToSecond(timestamp) {
+    let strVec = timestamp.split(':');
+    if (strVec.length === 2) {
+        let [minutes, seconds] = strVec;
+        return parseInt(minutes)*60 + parseInt(seconds);
+    } else {
+        let [hours, minutes, seconds] = strVec;
+        return parseInt(hours)*3600 + parseInt(minutes)*60 + parseInt(seconds);
+    }
+}
+
+
 // calculates remaining time at chosen speed
 function calcDuration(time, speed) {
     return time/speed;
@@ -383,7 +395,21 @@ function getTimeDisplay() {
     }
 
     // 1. remaining video time at 1x speed
-    let remainTime = video.duration - video.currentTime;
+    let duration = video.duration;
+    // if autoplay is disabled, there's no video src, so duration is NaN
+    if (video.duration !== video.duration) {
+        duration = document.getElementsByClassName('ytp-time-duration')[0].textContent;
+        duration = convertTimestampToSecond(duration);
+    }
+
+    // if autoplay is disabled, currentTime will be 0 even if you seek
+    let currentTime = video.currentTime;
+    if (!currentTime) {
+        currentTime = document.getElementsByClassName('ytp-time-current')[0].textContent;
+        currentTime = convertTimestampToSecond(currentTime);
+    }
+
+    let remainTime = duration - currentTime;
     // if remainTime is NaN
     if (remainTime !== remainTime) return [noTime, noTime, ''];
 
@@ -586,11 +612,11 @@ function setupListeners() {
     updateShowSpeed();
 
     if (!hasListeners) {
-        document.addEventListener('loadedmetadata', handleLoadedMetadata, true);
+        video.addEventListener('loadedmetadata', handleLoadedMetadata, true);
 
-        document.addEventListener('ratechange', handleRatechange, true);
+        video.addEventListener('ratechange', handleRatechange, true);
 
-        document.addEventListener('seeked', handleSeeked, true);
+        video.addEventListener('seeked', handleSeeked, true);
 
         hasListeners = true;
     }
