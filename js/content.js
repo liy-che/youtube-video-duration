@@ -42,6 +42,9 @@ document.addEventListener('yt-navigate-finish', () => {
     );
 });
 document.addEventListener('start-inject', async () => {
+    // when autoplay is disabled, src appears momentarily but disappears quickly
+    // so this continues running even though it seems there's no src attribute
+    // TODO loadedmetadata runs after playing so have to get duration from ui
     video = await waitForElm('video[src]');
     videoContainer = video.parentElement; // html5-video-container
     // remove controller for video tags without src attribute
