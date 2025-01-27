@@ -26,7 +26,6 @@ const infTime = '&infin;';
 const noTime = '--:--:--';
 const zeroTime = '0:00';
 
-
 let secondarySpeed = defaultSpeed;
 
 let navigateEnd = true;
@@ -39,15 +38,14 @@ document.addEventListener('yt-navigate-finish', () => {
     navigateEnd = true;
     document.dispatchEvent(
         new CustomEvent("start-inject", {
-            detail: { scriptVer: scriptVer }
+            detail: { 
+                scriptVer: scriptVer,
+                reason: 'navigate'
+            }
         })
     );
 });
 document.addEventListener('start-inject', async (event) => {
-    if (event.target !== document ) {
-        console.log("not from document")
-        return;
-    }
     console.log(`${scriptVer} start injecting`)
     video = await waitForElm('video[src]');
     videoContainer = video.parentElement; // html5-video-container
@@ -56,14 +54,31 @@ document.addEventListener('start-inject', async (event) => {
         // remove the inserted controller
     if (insertedNode) {
         insertedNode.remove();
+        insertedNode = null;
         console.log(`${scriptVer} removed insertNode`)
     }
 
-    console.log(event.detail.scriptVer)
+    /*
+    if update (regardless of version)
+        remove (if any) and don't inject again
+    else if navigate and no insertedNode
+        insert
+    else navigate and has insertedNode
+        remove (if any) and don't insertedNode
+    */
 
-    if (event.detail.scriptVer >= scriptVer) {
+    // note: update with same version should not happen
+    if (event.detail.reason === 'update' && event.detail.scriptVer !== scriptVer) {
+        // or call a cleanup function to clean up controller node, keyboard shortcuts, and all other events
+        document.dispatchEvent(
+            new CustomEvent("removeshortcuts")
+        );
+        removeTimeUpdates();
+        removeListeners();
         return;
     }
+
+    // navigate with all version can happen
 
     // inject controller for video tag with src attribute
     injectController();
@@ -331,9 +346,12 @@ chrome.runtime.onMessage.addListener(
         else if (request.msgType === 'inject') {
             console.log(`${scriptVer} got inject msg from background`)
             document.dispatchEvent(
-                new CustomEvent("start-inject"), {
-                    detail: { scriptVer : scriptVer+1 }
-                }
+                new CustomEvent("start-inject", {
+                    detail: { 
+                        scriptVer : scriptVer,
+                        reason: "update"
+                    }
+                })
             );
         }
     }
@@ -373,6 +391,7 @@ function updateShowSpeed() {
 
 
 function updateShowTime() {
+    console.log(`${scriptVer} update showtime`)
     let [remainTimestamp, diffTimestamp, sign] = getTimeDisplay();
 
     if (sign === '▲') {
@@ -607,6 +626,21 @@ function setupListeners() {
     }
     
     setupTimeUpdates();
+}
+
+function removeListeners() {
+    rewindButton.removeEventListener('click', handleRewind);
+    advanceButton.removeEventListener('click', handleAdvance);
+    resetButton.removeEventListener('click', handleReset);
+    increButton.removeEventListener('click', handleIncre);
+    decreButton.removeEventListener('click', handleDecre);
+
+    if (hasListeners) {
+        document.removeEventListener('loadedmetadata', handleLoadedMetadata, true);
+        document.removeEventListener('ratechange', handleRatechange, true);
+        document.removeEventListener('seeked', handleSeeked, true);
+        hasListeners = false;
+    }
 }
 
 function setupTimeUpdates() {
