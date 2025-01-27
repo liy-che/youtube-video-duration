@@ -545,6 +545,8 @@ function constructShadowDOM() {
 
     switch (videoContainer.parentElement.id) {
         case "movie_player":
+            insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer);
+            break;
         case "shorts-player":
             insertedNode = videoContainer.parentElement.parentElement.insertBefore(newNode, videoContainer.parentElement);
             break;
