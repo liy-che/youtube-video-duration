@@ -542,7 +542,17 @@ function constructShadowDOM() {
         </div>
     `
     shadowRoot.innerHTML = shadowTemplate;
-    insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer);
+
+    switch (videoContainer.parentElement.id) {
+        case "movie_player":
+        case "shorts-player":
+            insertedNode = videoContainer.parentElement.parentElement.insertBefore(newNode, videoContainer.parentElement);
+            break;
+        case "inline-preview-player":
+            let mediaContainer = document.getElementById('media-container');
+            insertedNode = mediaContainer.insertBefore(newNode, mediaContainer.children[0]);
+            break;
+    }
 
     speedDisplay = shadowRoot.querySelector('.speed .display');
     timeDisplay = shadowRoot.querySelector('.display.time');
