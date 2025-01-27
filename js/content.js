@@ -43,7 +43,7 @@ document.addEventListener('yt-navigate-finish', () => {
 });
 document.addEventListener('start-inject', async () => {
     video = await waitForElm('video[src]');
-    videoContainer = video.parentElement; // html5-video-player
+    videoContainer = video.parentElement; // html5-video-container
     // remove controller for video tags without src attribute
         // find the video controller inserted previously if exists
         // remove the inserted controller
@@ -570,7 +570,19 @@ function constructShadowDOM() {
         </div>
     `
     shadowRoot.innerHTML = shadowTemplate;
-    insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer.parentElement.firstChild);
+
+    switch (videoContainer.parentElement.id) {
+        case "movie_player":
+            insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer);
+            break;
+        case "shorts-player":
+            insertedNode = videoContainer.parentElement.parentElement.insertBefore(newNode, videoContainer.parentElement);
+            break;
+        case "inline-preview-player":
+            let mediaContainer = document.getElementById('media-container');
+            insertedNode = mediaContainer.insertBefore(newNode, mediaContainer.children[0]);
+            break;
+    }
 
     speedDisplay = shadowRoot.querySelector('.speed .display');
     timeDisplay = shadowRoot.querySelector('.display.time');
