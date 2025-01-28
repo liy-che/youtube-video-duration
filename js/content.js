@@ -51,6 +51,13 @@ document.addEventListener('start-inject', async () => {
 });
 
 
+if (self !== top) {
+    document.dispatchEvent(
+        new CustomEvent("start-inject")
+    );
+}
+
+
 // wait for element to exist
 function waitForElm(selector) {
     return new Promise(resolve => {
