@@ -97,7 +97,10 @@ document.addEventListener('start-inject', async () => {
     // remove controller for video tags without src attribute
         // find the video controller inserted previously if exists
         // remove the inserted controller
-    if (insertedNode) insertedNode.remove();
+    if (insertedNode) {
+        insertedNode.remove();
+        insertedNode = null;
+    }
 
     // inject controller for video tag with src attribute
     injectController();
