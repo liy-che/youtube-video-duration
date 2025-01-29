@@ -29,6 +29,59 @@ let secondarySpeed = defaultSpeed;
 
 let navigateEnd = true;
 
+// TODO: stop everything when disabled, including in the popup
+// values set default for first-time users
+let settings = {
+    enable: true,
+    enableController: true,
+    enableShortcuts: true,
+    setLocation: 'right'
+};
+
+// initialize user settings
+chrome.storage.sync.get(settings, async function(storage) {
+    settings = storage;
+
+    chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (!controllerNode) controllerNode = await waitForElm(".vdc-controller");
+
+        if (changes.enableController) {
+            settings.enableController = changes.enableController.newValue;
+            showHideController();
+        }
+    
+        if (changes.enableShortcuts) {
+            settings.enableShortcuts = changes.enableShortcuts.newValue;
+            if (settings.enableShortcuts) {
+                document.addEventListener('keydown', handleShortcuts, true);
+            }
+            else {
+                // cannot simply remove event listener if shortcuts were enabled in orphaned content script
+                document.dispatchEvent(
+                    new CustomEvent("removeshortcuts")
+                );
+            }
+        }
+
+        if (changes.setLocation) {
+            settings.setLocation = changes.setLocation.newValue;
+            if (settings.setLocation === 'left') {
+                controllerNode.classList.replace('top-right', 'top-left');
+            } 
+            else {
+                controllerNode.classList.replace('top-left', 'top-right');
+            }
+        }
+    });
+
+    if (self !== top) {
+        document.dispatchEvent(
+            new CustomEvent("start-inject")
+        );
+    }
+});
+
+
 document.addEventListener('yt-navigate-start', () => {
     navigateEnd = false;
 });
@@ -49,13 +102,6 @@ document.addEventListener('start-inject', async () => {
     // inject controller for video tag with src attribute
     injectController();
 });
-
-
-if (self !== top) {
-    document.dispatchEvent(
-        new CustomEvent("start-inject")
-    );
-}
 
 
 // wait for element to exist
@@ -170,15 +216,6 @@ document.addEventListener('keyup', function(event) {
 });
 
 
-// TODO: stop everything when disabled, including in the popup
-// values set default for first-time users
-let settings = {
-    enable: true,
-    enableController: true,
-    enableShortcuts: true,
-    setLocation: 'right'
-};
-
 function controlController() {
     // toggle controller
     if (timer) {
@@ -206,42 +243,6 @@ function showHideController() {
     }
 }
 
-// initialize user settings
-chrome.storage.sync.get(settings, async function(storage) {
-    settings = storage;
-
-    chrome.storage.onChanged.addListener(async (changes, area) => {
-        if (!controllerNode) controllerNode = await waitForElm(".vdc-controller");
-
-        if (changes.enableController) {
-            settings.enableController = changes.enableController.newValue;
-            showHideController();
-        }
-    
-        if (changes.enableShortcuts) {
-            settings.enableShortcuts = changes.enableShortcuts.newValue;
-            if (settings.enableShortcuts) {
-                document.addEventListener('keydown', handleShortcuts, true);
-            }
-            else {
-                // cannot simply remove event listener if shortcuts were enabled in orphaned content script
-                document.dispatchEvent(
-                    new CustomEvent("removeshortcuts")
-                );
-            }
-        }
-
-        if (changes.setLocation) {
-            settings.setLocation = changes.setLocation.newValue;
-            if (settings.setLocation === 'left') {
-                controllerNode.classList.replace('top-right', 'top-left');
-            } 
-            else {
-                controllerNode.classList.replace('top-left', 'top-right');
-            }
-        }
-    });
-});
 
 // disable shortcuts in orphaned content script
 document.addEventListener('removeshortcuts', function() {
