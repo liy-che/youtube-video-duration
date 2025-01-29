@@ -30,6 +30,9 @@ Find it here:
 | Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.0.9**
+- Bug fix: controller could not be clicked due to stacking order on video previews and shorts
+
 **1.0.8**
 - Add option for controller location on video
 

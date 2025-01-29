@@ -1,6 +1,6 @@
 {
     "name": "Video Duration for YouTube™",
-    "version": "1.0.8",
+    "version": "1.1.0",
     "description": "Adjust YouTube video playback speed, save time, and navigate with ease.",
     "manifest_version": 3,
     "author": "liyche",
@@ -11,11 +11,18 @@
         "service_worker": "js/background.js"
     },
     "content_scripts": [{
-        "matches": ["*://*.youtube.com/*"],
+        "matches": [
+            "*://*.youtube.com/*",
+            "*://*.youtube-nocookie.com/*"
+        ],
         "js": ["js/content.js"],
-        "css": ["css/content.css"]
+        "css": ["css/content.css"],
+        "all_frames": true
     }],
-    "host_permissions": ["*://*.youtube.com/*"],
+    "host_permissions": [
+        "*://*.youtube.com/*",
+        "*://*.youtube-nocookie.com/*"
+    ],
     "action": {
         "default_popup": "index.html",
         "default_title": "YouTube Video Duration",

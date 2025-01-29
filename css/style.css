@@ -32,6 +32,10 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
+h1 {
+  font-size: 1em;
+}
+
 small {
   position: absolute;
   bottom: 8px;
@@ -154,12 +158,15 @@ main > label:hover::after {
   transition: 0.25s ease;
   color: #333;
 }
-h3 {
+h1, h3 {
   font-weight: 200;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   display: inherit;
+}
+h1 {
+  font-weight: bold;
 }
 
 /******************************************
