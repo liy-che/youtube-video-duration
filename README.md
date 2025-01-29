@@ -30,6 +30,11 @@ Find it here:
 | Show/hide controller       | V                                       |
 
 ## 🎉 Updates 🎉
+**1.1.0**
+- Aside from YouTube website, extension function now extends to embedded YouTube videos
+- Fixed: no more duplicate functionality on extension install and update, and most importantly soft page reload
+- Temporary tradeoff: website refresh needed on extension install and update
+
 **1.0.9**
 - Bug fix: controller could not be clicked due to stacking order on video previews and shorts
 
