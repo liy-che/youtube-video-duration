@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.msgType === 'handshake') {
     chrome.storage.sync.set({ opened: true });
     for (const cs of chrome.runtime.getManifest().content_scripts) {
-      chrome.tabs.query({url: cs.matches}, (tabs)=> {
+      chrome.tabs.query({}, (tabs)=> {
         for (const tab of tabs) {
           chrome.action.setBadgeText({
             text: "",
