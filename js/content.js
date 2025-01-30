@@ -535,6 +535,10 @@ function constructShadowDOM() {
         </style>
 
         <div id="controller">
+            <div class="seek">
+                <button class="backward">&laquo;</button>
+                <button class="forward">&raquo;</button>
+            </div>
             <button class="reset">&rlarr;</button>
             <div class="speed">
                 <button class="left">&minus;</button>
@@ -544,11 +548,6 @@ function constructShadowDOM() {
 
             <div class="display time">
                 ${noTime}
-            </div>
-
-            <div class="seek">
-                <button class="backward">&laquo;</button>
-                <button class="forward">&raquo;</button>
             </div>
         </div>
     `
