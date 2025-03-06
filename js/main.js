@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         enableController.checked = storage.enableController;
         enableShortcuts.checked = storage.enableShortcuts;
         document.querySelector(`input[name="location"][value="${storage.setLocation}`).checked = true;
+        toggleRadio();
 
         if(!storage.seen) {
             document.querySelector('.alert').style.display = 'block';

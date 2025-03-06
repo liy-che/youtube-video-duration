@@ -326,6 +326,11 @@ input:checked + .slider:before {
   margin-right: 5px;
 }
 
+label:has(input:disabled) {
+  color: #ccc;
+  cursor: default;
+}
+
 /******************************************
 /* ALERT MESSAGE
 /*******************************************/
