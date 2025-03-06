@@ -2,7 +2,7 @@
 const interval = 0.25;
 const seekInterval = 10;
 
-const enable = document.querySelector('#enable');
+const enableExt = document.querySelector('#enable');
 const enableController = document.querySelector('#enableController');
 const enableShortcuts = document.querySelector('#enableShortcuts');
 const setLocation = document.querySelectorAll('input[name="location"]');
@@ -103,7 +103,7 @@ function sendMessage(type, msg={}) {
 // restore options
 document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.sync.get(settings, function(storage) {
-        enable.checked = storage.enable;
+        enableExt.checked = storage.enable;
         enableController.checked = storage.enableController;
         enableShortcuts.checked = storage.enableShortcuts;
         document.querySelector(`input[name="location"][value="${storage.setLocation}`).checked = true;
@@ -123,10 +123,10 @@ chrome.storage.sync.get(["opened"]).then((result) => {
     if (!result.opened) chrome.runtime.sendMessage({msgType: "handshake"});
 });
 
-enable.addEventListener('click', function() {
-    enableController.checked = enableShortcuts.checked = enable.checked;
+enableExt.addEventListener('click', function() {
+    enableController.checked = enableShortcuts.checked = enableExt.checked;
     chrome.storage.sync.set({
-        enable: enable.checked,
+        enable: enableExt.checked,
         enableController: enableController.checked,
         enableShortcuts: enableShortcuts.checked
     });
@@ -134,17 +134,17 @@ enable.addEventListener('click', function() {
 });
 
 enableController.addEventListener('click', function() {
-    enable.checked = enableController.checked || enableShortcuts.checked ? true : false;
+    enableExt.checked = enableController.checked || enableShortcuts.checked ? true : false;
     chrome.storage.sync.set({
-        enable: enable.checked,
+        enable: enableExt.checked,
         enableController: enableController.checked
     });
 });
 
 enableShortcuts.addEventListener('click', function() {
-    enable.checked = enableShortcuts.checked || enableController.checked? true : false;
+    enableExt.checked = enableShortcuts.checked || enableController.checked? true : false;
     chrome.storage.sync.set({
-        enable: enable.checked,
+        enable: enableExt.checked,
         enableShortcuts: enableShortcuts.checked
     });
 });
