@@ -125,6 +125,7 @@ chrome.storage.sync.get(["opened"]).then((result) => {
 
 enableExt.addEventListener('click', function() {
     enableController.checked = enableShortcuts.checked = enableExt.checked;
+    toggleRadio();
     chrome.storage.sync.set({
         enable: enableExt.checked,
         enableController: enableController.checked,
@@ -135,6 +136,7 @@ enableExt.addEventListener('click', function() {
 
 enableController.addEventListener('click', function() {
     enableExt.checked = enableController.checked || enableShortcuts.checked ? true : false;
+    toggleRadio();
     chrome.storage.sync.set({
         enable: enableExt.checked,
         enableController: enableController.checked
@@ -143,11 +145,18 @@ enableController.addEventListener('click', function() {
 
 enableShortcuts.addEventListener('click', function() {
     enableExt.checked = enableShortcuts.checked || enableController.checked? true : false;
+    toggleRadio();
     chrome.storage.sync.set({
         enable: enableExt.checked,
         enableShortcuts: enableShortcuts.checked
     });
 });
+
+function toggleRadio() {
+    setLocation.forEach(radio => {
+        radio.disabled = !enableExt.checked;
+    });
+}
 
 setLocation.forEach(radio => {
     radio.addEventListener('change', function() {
@@ -155,6 +164,7 @@ setLocation.forEach(radio => {
             chrome.storage.sync.set({
                 setLocation: this.value
             });
+            sendMessage('flashLocation');
         }
     });
 });

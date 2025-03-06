@@ -1,6 +1,6 @@
 let video;
 let controllerNode;
-let showButtons;
+let flashButtons;
 let resetButton;
 let increButton;
 let decreButton;
@@ -180,7 +180,7 @@ let handleShortcuts = (event) => {
     else if (pressedCode === 'KeyS') {
         if (video.playbackRate === defaultSpeed) updateShowTime();
         handleReset();
-        showButtons();
+        flashButtons();
     }
     else if (pressedCode === 'KeyL') {
         event.preventDefault();
@@ -325,6 +325,9 @@ chrome.runtime.onMessage.addListener(
                 new CustomEvent("start-inject")
             );
         }
+        else if (request.msgType === 'flashLocation') {
+            flashButtons();
+        }
     }
 );
 
@@ -417,7 +420,7 @@ function getTimeDisplay() {
 }
 
 
-function showController(controller) {
+function flashController(controller) {
 
     function show() {
         if (settings.enableController) return;
@@ -569,7 +572,7 @@ function constructShadowDOM() {
     speedDisplay = shadowRoot.querySelector('.speed .display');
     timeDisplay = shadowRoot.querySelector('.display.time');
 
-    showButtons = showController(newNode);
+    flashButtons = flashController(newNode);
 
     resetButton = shadowRoot.querySelector('.reset');
     increButton = shadowRoot.querySelector('.right');
@@ -644,12 +647,12 @@ let handleLoadedMetadata = () => {
 let handleRatechange = () => {
     updateShowSpeed();
     updateShowTime();
-    showButtons();
+    flashButtons();
 };
 
 let handleSeeked = () => {
     updateShowTime();
-    showButtons();
+    flashButtons();
 };
 
 let handlePause = () => {
