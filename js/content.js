@@ -326,6 +326,7 @@ chrome.runtime.onMessage.addListener(
             );
         }
         else if (request.msgType === 'flashLocation') {
+            updateShowTime();
             flashButtons();
         }
     }
@@ -430,7 +431,7 @@ function flashController(controller) {
         if (timer) clearTimeout(timer);
     
         timer = setTimeout(function () {
-            controller.classList.add("vdc-disable");
+            if (!settings.enableController) controller.classList.add("vdc-disable");
             timer = false;
         }, 2500);
     }
