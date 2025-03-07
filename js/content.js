@@ -327,7 +327,7 @@ chrome.runtime.onMessage.addListener(
         }
         else if (request.msgType === 'flashLocation') {
             updateShowTime();
-            flashButtons();
+            flashButtons(1000);
         }
     }
 );
@@ -423,7 +423,7 @@ function getTimeDisplay() {
 
 function flashController(controller) {
 
-    function show() {
+    function show(duration=2500) {
         if (settings.enableController) return;
 
         controller.classList.remove("vdc-disable");
@@ -433,7 +433,7 @@ function flashController(controller) {
         timer = setTimeout(function () {
             if (!settings.enableController) controller.classList.add("vdc-disable");
             timer = false;
-        }, 2500);
+        }, duration);
     }
 
     return show;
