@@ -20,8 +20,7 @@
         "all_frames": true
     }],
     "host_permissions": [
-        "*://*.youtube.com/*",
-        "*://*.youtube-nocookie.com/*"
+        "<all_urls>"
     ],
     "action": {
         "default_popup": "index.html",
