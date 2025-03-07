@@ -147,6 +147,7 @@ enableController.addEventListener('click', function() {
 enableShortcuts.addEventListener('click', function() {
     enableExt.checked = enableShortcuts.checked || enableController.checked? true : false;
     toggleRadio();
+    if (enableShortcuts.checked) sendMessage('flashLocation');
     chrome.storage.sync.set({
         enable: enableExt.checked,
         enableShortcuts: enableShortcuts.checked
