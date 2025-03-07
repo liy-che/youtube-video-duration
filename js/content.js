@@ -29,7 +29,72 @@ let secondarySpeed = defaultSpeed;
 
 let navigateEnd = true;
 
-// TODO: stop everything when disabled, including in the popup
+/*
+To fully clean up content script after an update or when it’s no longer needed:
+
+Remove all event listeners, intervals, timeouts, and DOM elements.
+Delete or reset the global variables stored on window.
+*/
+// Store references dynamically
+// content scripts run in isolated environments, these are not shared between tabs and updates
+window.__VD4YT_EVENTS__ = [];
+window.__VD4YT_INTERVALS__ = [];
+window.__VD4YT_TIMEOUTS__ = [];
+window.__VD4YT_ELEMENTS__ = [];
+
+// Helper function to add event listeners & track them
+function addEventListenerTracked(target, event, handler, capture=false) {
+    target.addEventListener(event, handler, capture);
+    window.__VD4YT_EVENTS__.push({ target, event, handler, capture });
+}
+
+// Helper function to track intervals
+function setIntervalTracked(callback, delay) {
+    let id = setInterval(callback, delay);
+    window.__VD4YT_INTERVALS__.push(id);
+    return id;
+}
+
+// Helper function to track timeouts
+function setTimeoutTracked(callback, delay) {
+    let id = setTimeout(callback, delay);
+    window.__VD4YT_TIMEOUTS__.push(id);
+    return id;
+}
+
+// Helper function to track injected elements
+function injectElementTracked(element) {
+    window.__VD4YT_ELEMENTS__.push(element);
+}
+
+// Cleanup function (removes everything dynamically)
+function cleanupGhostScript() {
+    console.log("Cleaning up content script...");
+
+    // Remove event listeners
+    window.__VD4YT_EVENTS__.forEach(({ target, event, handler, capture }) => {
+        target.removeEventListener(event, handler, capture);
+    });
+    window.__VD4YT_EVENTS__ = [];
+
+    // Clear intervals
+    window.__VD4YT_INTERVALS__.forEach(clearInterval);
+    window.__VD4YT_INTERVALS__ = [];
+
+    // Clear timeouts
+    window.__VD4YT_TIMEOUTS__.forEach(clearTimeout);
+    window.__VD4YT_TIMEOUTS__ = [];
+
+    // Remove injected elements
+    window.__VD4YT_ELEMENTS__.forEach(el => el.remove());
+    window.__VD4YT_ELEMENTS__ = [];
+
+    // Reset global flag
+    window.__VD4YT_RUNNING__ = false;
+
+    console.log("Content script successfully disabled.");
+}
+
 // values set default for first-time users
 let settings = {
     enable: true,
@@ -53,7 +118,7 @@ chrome.storage.sync.get(settings, async function(storage) {
         if (changes.enableShortcuts) {
             settings.enableShortcuts = changes.enableShortcuts.newValue;
             if (settings.enableShortcuts) {
-                document.addEventListener('keydown', handleShortcuts, true);
+                addEventListenerTracked(document, 'keydown', handleShortcuts, true);
             }
             else {
                 // cannot simply remove event listener if shortcuts were enabled in orphaned content script
@@ -81,17 +146,16 @@ chrome.storage.sync.get(settings, async function(storage) {
     }
 });
 
-
-document.addEventListener('yt-navigate-start', () => {
+addEventListenerTracked(document, 'yt-navigate-start', () => {
     navigateEnd = false;
 });
-document.addEventListener('yt-navigate-finish', () => {
+addEventListenerTracked(document, 'yt-navigate-finish', () => {
     navigateEnd = true;
     document.dispatchEvent(
         new CustomEvent("start-inject")
     );
 });
-document.addEventListener('start-inject', async () => {
+addEventListenerTracked(document, 'start-inject', async () => {
     video = await waitForElm('video[src]');
     videoContainer = video.parentElement; // html5-video-container
     // remove controller for video tags without src attribute
@@ -199,7 +263,7 @@ let handleShortcuts = (event) => {
 let lastSpeed;
 let spacePressed = false;
 let spaceHeld = false;
-document.addEventListener('keydown', function(event) {
+addEventListenerTracked(document, 'keydown', function(event) {
     if (event.code !== 'Space') return;
     if (!spacePressed) {
         lastSpeed = video.playbackRate;
@@ -208,8 +272,7 @@ document.addEventListener('keydown', function(event) {
         spaceHeld = true;
     }
 });
-
-document.addEventListener('keyup', function(event) {
+addEventListenerTracked(document, 'keyup', function(event) {
     if (event.code !== 'Space') return;
     if (spaceHeld) {
         setPlaySpeed(lastSpeed);
@@ -248,7 +311,7 @@ function showHideController() {
 
 
 // disable shortcuts in orphaned content script
-document.addEventListener('removeshortcuts', function() {
+addEventListenerTracked(document, 'removeshortcuts', function() {
     document.removeEventListener('keydown', handleShortcuts, true);
 });
 
@@ -430,7 +493,7 @@ function flashController(controller) {
     
         if (timer) clearTimeout(timer);
     
-        timer = setTimeout(function () {
+        timer = setTimeoutTracked(function () {
             if (!settings.enableController) controller.classList.add("vdc-disable");
             timer = false;
         }, 2500);
@@ -569,6 +632,7 @@ function constructShadowDOM() {
             insertedNode = mediaContainer.insertBefore(newNode, mediaContainer.children[0]);
             break;
     }
+    injectElementTracked(insertedNode);
 
     speedDisplay = shadowRoot.querySelector('.speed .display');
     timeDisplay = shadowRoot.querySelector('.display.time');
@@ -587,24 +651,19 @@ function constructShadowDOM() {
 
 function setupListeners() {
 
-    rewindButton.addEventListener('click', handleRewind);
-    
-    advanceButton.addEventListener('click', handleAdvance);
-
-    resetButton.addEventListener('click', handleReset);
-
-    increButton.addEventListener('click', handleIncre);
-
-    decreButton.addEventListener('click', handleDecre);
+    addEventListenerTracked(rewindButton, 'click', handleRewind);
+    addEventListenerTracked(advanceButton, 'click', handleAdvance);
+    addEventListenerTracked(resetButton, 'click', handleReset);
+    addEventListenerTracked(increButton, 'click', handleIncre);
+    addEventListenerTracked(decreButton, 'click', handleDecre);
 
     updateShowSpeed();
 
     if (!hasListeners) {
-        document.addEventListener('loadedmetadata', handleLoadedMetadata, true);
 
-        document.addEventListener('ratechange', handleRatechange, true);
-
-        document.addEventListener('seeked', handleSeeked, true);
+        addEventListenerTracked(document, 'loadedmetadata', handleLoadedMetadata, true);
+        addEventListenerTracked(document, 'ratechange', handleRatechange, true);
+        addEventListenerTracked(document, 'seeked', handleSeeked, true);
 
         hasListeners = true;
     }
@@ -617,17 +676,15 @@ function setupTimeUpdates() {
 
     clearInterval(showTime);
     updateShowTime();
-    showTime = setInterval(function() {
+    showTime = setIntervalTracked(function() {
         updateShowTime();
     }, 1000);
 
     if (hasTimeUpdateListeners) return;
 
-    document.addEventListener('pause', handlePause, true);
-
-    document.addEventListener('waiting', handleWaiting, true);
-
-    document.addEventListener('playing', handlePlaying, true);
+    addEventListenerTracked(document, 'pause', handlePause, true);
+    addEventListenerTracked(document, 'waiting', handleWaiting, true);
+    addEventListenerTracked(document, 'playing', handlePlaying, true);
 
     hasTimeUpdateListeners = true;
 }
@@ -665,7 +722,7 @@ let handleWaiting = handlePause;
 let handlePlaying = () => {
     clearInterval(showTime);
     updateShowTime();
-    showTime = setInterval(function() {
+    showTime = setIntervalTracked(function() {
         updateShowTime();
     }, 1000);
 };
@@ -680,7 +737,7 @@ function injectController() {
 
     // set up listener for keyboard shortcuts
     if (settings.enableShortcuts) {
-        document.addEventListener('keydown', handleShortcuts, true);
+        addEventListenerTracked(document, 'keydown', handleShortcuts, true);
     }
     else {
         document.dispatchEvent(
