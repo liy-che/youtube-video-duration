@@ -562,7 +562,10 @@ function constructShadowDOM() {
             insertedNode = videoContainer.parentElement.insertBefore(newNode, videoContainer);
             break;
         case "shorts-player":
-            insertedNode = videoContainer.parentElement.parentElement.insertBefore(newNode, videoContainer.parentElement);
+            // inserting right away blocks the video from playing
+            setTimeout(()=> {
+                insertedNode = videoContainer.parentElement.parentElement.insertBefore(newNode, videoContainer.parentElement);
+            }, 500);
             break;
         case "inline-preview-player":
             let mediaContainer = document.getElementById('media-container');
