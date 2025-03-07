@@ -39,13 +39,6 @@
         "48": "/icons/speedCalc48.png",
         "128": "/icons/speedCalc128.png"
     },
-    "commands": {
-        "_execute_action": {
-            "suggested_key": {
-                "default": "Ctrl+Shift+S"
-            }
-        }
-    },
     "web_accessible_resources": [
         {
             "resources": [ "images/*.png" ],
