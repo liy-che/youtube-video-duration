@@ -506,6 +506,10 @@ function constructShadowDOM() {
                 height: var(--controller-height);
                 cursor: default;
                 user-select: none;
+                opacity: 0.9;
+            }
+            #controller:hover {
+                opacity: 1;
             }
             .speed, .seek {
                 display: flex;
