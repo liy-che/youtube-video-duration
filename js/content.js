@@ -15,8 +15,11 @@ let hasListeners;
 let hasTimeUpdateListeners;
 let titleElt;
 let timer;
+let handleSpaceDown;
+let handleSpaceUp;
 
 const defaultSpeed = 1.0;
+let secondarySpeed = defaultSpeed;
 const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
@@ -25,11 +28,13 @@ const infTime = '&infin;';
 const noTime = '--:--:--';
 const zeroTime = '0:00';
 
-let secondarySpeed = defaultSpeed;
-
-let navigateEnd = true;
-
 // TODO: stop everything when disabled, including in the popup
+// enabled -> disabled -> enabled
+// disabled -> enabled -> disabled
+// at start, only initialize the minimum i.e. default disabled, then add on if enabled
+// all intervals, timeouts, inserted elements, and some events must be deleted on disable
+// reinsert elements (if controlled enabled) and all events (if shortcuts enabled) on enable
+
 // values set default for first-time users
 let settings = {
     enable: true,
@@ -38,13 +43,78 @@ let settings = {
     setLocation: 'right'
 };
 
+/***************************** Initialize extension ******************************/
+
+function msgHandler(request, sender, sendResponse) {
+    if (request.msgType === 'decreSpeed') {
+        handleDecre();
+        sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
+    }
+    else if (request.msgType === 'increSpeed') {
+        handleIncre();
+        sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
+    }
+    else if (request.msgType === 'jumpSpeed') {
+        handleReset();
+        sendResponse({msgType: request.msgType, speed: video.playbackRate});
+    }
+    else if (request.msgType === 'rewind') {
+        handleRewind();
+        sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
+    }
+    else if (request.msgType === 'advance') {
+        handleAdvance();
+        sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
+    }
+    else if (request.msgType === 'restartVideo') {
+        restartVideo();
+        sendResponse({msgType: request.msgType, playing: !video.paused});
+    }
+    else if (request.msgType === 'playPauseVideo') {
+        if (video.paused) video.play();
+        else video.pause();
+        sendResponse({msgType: request.msgType, playing: !video.paused});
+    }
+    else if (request.msgType === 'changeVolume') {
+        video.muted = !video.muted;
+        sendResponse({msgType: request.msgType, muted: video.muted});
+    }
+    else if (request.msgType === 'inject') {
+        document.dispatchEvent(
+            new CustomEvent("vdc-initialize")
+        );
+    }
+    else if (request.msgType === 'flashLocation') {
+        updateShowTime();
+        flashButtons(1000);
+    }
+}
+
 // initialize user settings
+// RUNS
 chrome.storage.sync.get(settings, async function(storage) {
     settings = storage;
 
-    chrome.storage.onChanged.addListener(async (changes, area) => {
-        if (!controllerNode) controllerNode = await waitForElm(".vdc-controller");
+    chrome.storage.onChanged.addListener(async function (changes, area) {
+        if (changes.enable) {
+            settings.enable = changes.enable.newValue;
+            if (settings.enable) {
+                document.dispatchEvent(
+                    new CustomEvent("vdc-initialize")
+                );
+                chrome.runtime.onMessage.addListener(msgHandler);
+            } else {
+                document.removeEventListener('keydown', handleSpaceDown);
+                document.removeEventListener('keyup', handleSpaceUp);
+                if (insertedNode) {
+                    insertedNode.remove();
+                    insertedNode = null;
+                }
+            }
+        } 
 
+        if (!controllerNode) controllerNode = await waitForElm(".vdc-controller");
+    
         if (changes.enableController) {
             settings.enableController = changes.enableController.newValue;
             showHideController();
@@ -56,13 +126,10 @@ chrome.storage.sync.get(settings, async function(storage) {
                 document.addEventListener('keydown', handleShortcuts, true);
             }
             else {
-                // cannot simply remove event listener if shortcuts were enabled in orphaned content script
-                document.dispatchEvent(
-                    new CustomEvent("removeshortcuts")
-                );
+                document.removeEventListener('keydown', handleShortcuts, true);
             }
         }
-
+    
         if (changes.setLocation) {
             settings.setLocation = changes.setLocation.newValue;
             if (settings.setLocation === 'left') {
@@ -74,24 +141,32 @@ chrome.storage.sync.get(settings, async function(storage) {
         }
     });
 
+    // RUNS disable
+    if (settings.enable) {
+        chrome.runtime.onMessage.addListener(msgHandler);
+    }
+
     if (self !== top) {
         document.dispatchEvent(
-            new CustomEvent("start-inject")
+            new CustomEvent("vdc-initialize")
         );
     }
 });
 
-
+// disable
+let navigateEnd = true;
 document.addEventListener('yt-navigate-start', () => {
     navigateEnd = false;
 });
 document.addEventListener('yt-navigate-finish', () => {
     navigateEnd = true;
     document.dispatchEvent(
-        new CustomEvent("start-inject")
+        new CustomEvent("vdc-initialize")
     );
 });
-document.addEventListener('start-inject', async () => {
+document.addEventListener('vdc-initialize', async () => {
+    if (!settings.enable) return;
+
     video = await waitForElm('video[src]');
     videoContainer = video.parentElement; // html5-video-container
     // remove controller for video tags without src attribute
@@ -103,7 +178,17 @@ document.addEventListener('start-inject', async () => {
     }
 
     // inject controller for video tag with src attribute
-    injectController();
+    // construct a new node with a shadow DOM and insert node into DOM
+    controllerNode = constructShadowDOM();
+
+    // set up event listeners for controller
+    setupListeners();
+    handleSpaceDown, handleSpaceUp = handleSpaceHold();
+
+    // set up listener for keyboard shortcuts
+    if (settings.enableShortcuts) {
+        document.addEventListener('keydown', handleShortcuts, true);
+    }
 });
 
 
@@ -196,28 +281,36 @@ let handleShortcuts = (event) => {
     return false;
 };
 
-let lastSpeed;
-let spacePressed = false;
-let spaceHeld = false;
-document.addEventListener('keydown', function(event) {
-    if (event.code !== 'Space') return;
-    if (!spacePressed) {
-        lastSpeed = video.playbackRate;
-        spacePressed = true;
-    } else {
-        spaceHeld = true;
-    }
-});
+// RUNS disable, need to initialize, and react on setting update
+function handleSpaceHold() {
+    let lastSpeed;
+    let spacePressed = false;
+    let spaceHeld = false;
 
-document.addEventListener('keyup', function(event) {
-    if (event.code !== 'Space') return;
-    if (spaceHeld) {
-        setPlaySpeed(lastSpeed);
-        spaceHeld = false;
+    function handleSpaceDown(event) {
+        if (event.code !== 'Space') return;
+        if (!spacePressed) {
+            lastSpeed = video.playbackRate;
+            spacePressed = true;
+        } else {
+            spaceHeld = true;
+        }
     }
-    spacePressed = false;
-});
 
+    function handleSpaceUp(event) {
+        if (event.code !== 'Space') return;
+        if (spaceHeld) {
+            setPlaySpeed(lastSpeed);
+            spaceHeld = false;
+        }
+        spacePressed = false;
+    }
+
+    document.addEventListener('keydown', handleSpaceDown);
+    document.addEventListener('keyup', handleSpaceUp);
+
+    return handleSpaceDown, handleSpaceUp;
+}
 
 function controlController() {
     // toggle controller
@@ -247,11 +340,6 @@ function showHideController() {
 }
 
 
-// disable shortcuts in orphaned content script
-document.addEventListener('removeshortcuts', function() {
-    document.removeEventListener('keydown', handleShortcuts, true);
-});
-
 /******************************* calculations *******************************/
 
 
@@ -280,57 +368,6 @@ function convertSecondToTimestamp(totalSeconds) {
 function calcDuration(time, speed) {
     return time/speed;
 }
-
-
-/***************************** Message handlers ******************************/
-
-
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.msgType === 'decreSpeed') {
-            handleDecre();
-            sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
-        }
-        else if (request.msgType === 'increSpeed') {
-            handleIncre();
-            sendResponse({msgType: request.msgType, speed: video.playbackRate, timeDisplay: getTimeDisplay()});
-        }
-        else if (request.msgType === 'jumpSpeed') {
-            handleReset();
-            sendResponse({msgType: request.msgType, speed: video.playbackRate});
-        }
-        else if (request.msgType === 'rewind') {
-            handleRewind();
-            sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
-        }
-        else if (request.msgType === 'advance') {
-            handleAdvance();
-            sendResponse({msgType: request.msgType, timeDisplay: getTimeDisplay()});
-        }
-        else if (request.msgType === 'restartVideo') {
-            restartVideo();
-            sendResponse({msgType: request.msgType, playing: !video.paused});
-        }
-        else if (request.msgType === 'playPauseVideo') {
-            if (video.paused) video.play();
-            else video.pause();
-            sendResponse({msgType: request.msgType, playing: !video.paused});
-        }
-        else if (request.msgType === 'changeVolume') {
-            video.muted = !video.muted;
-            sendResponse({msgType: request.msgType, muted: video.muted});
-        }
-        else if (request.msgType === 'inject') {
-            document.dispatchEvent(
-                new CustomEvent("start-inject")
-            );
-        }
-        else if (request.msgType === 'flashLocation') {
-            updateShowTime();
-            flashButtons(1000);
-        }
-    }
-);
 
 
 /************************* Onscreen video controller **************************/
@@ -424,7 +461,7 @@ function getTimeDisplay() {
 function flashController(controller) {
 
     function show(duration=2500) {
-        if (settings.enableController) return;
+        if (!settings.enable || settings.enableController) return;
 
         controller.classList.remove("vdc-disable");
     
@@ -591,22 +628,16 @@ function constructShadowDOM() {
 function setupListeners() {
 
     rewindButton.addEventListener('click', handleRewind);
-    
     advanceButton.addEventListener('click', handleAdvance);
-
     resetButton.addEventListener('click', handleReset);
-
     increButton.addEventListener('click', handleIncre);
-
     decreButton.addEventListener('click', handleDecre);
 
     updateShowSpeed();
 
     if (!hasListeners) {
         document.addEventListener('loadedmetadata', handleLoadedMetadata, true);
-
         document.addEventListener('ratechange', handleRatechange, true);
-
         document.addEventListener('seeked', handleSeeked, true);
 
         hasListeners = true;
@@ -659,11 +690,9 @@ let handleSeeked = () => {
     flashButtons();
 };
 
-let handlePause = () => {
+let handleWaiting = handlePause = () => {
     clearInterval(showTime);
 };
-
-let handleWaiting = handlePause;
 
 let handlePlaying = () => {
     clearInterval(showTime);
@@ -672,22 +701,3 @@ let handlePlaying = () => {
         updateShowTime();
     }, 1000);
 };
-
-
-function injectController() {
-    // construct a new node with a shadow DOM and insert node into DOM
-    controllerNode = constructShadowDOM();
-
-    // set up event listeners for controller
-    setupListeners();
-
-    // set up listener for keyboard shortcuts
-    if (settings.enableShortcuts) {
-        document.addEventListener('keydown', handleShortcuts, true);
-    }
-    else {
-        document.dispatchEvent(
-            new CustomEvent("removeshortcuts")
-        );
-    }
-}
