@@ -16,6 +16,7 @@ let hasListeners;
 let hasTimeUpdateListeners;
 let titleElt;
 let timer;
+let diffTimer;
 let handleSpaceDown;
 let handleSpaceUp;
 
@@ -146,6 +147,7 @@ chrome.storage.sync.get(settings, async function(storage) {
         if (changes.showRemaining) {
             settings.showRemaining = changes.showRemaining.newValue;
             if (settings.showRemaining) {
+                flashDiff();
                 updateShowTime();
             }
             else {
@@ -463,8 +465,8 @@ function updateShowTime() {
                 sign = `<span id="downArrow">${sign}</span>`
             }
             timeDisplay.innerHTML = `
-                <span id="remain">${remainTimestamp}</span>&nbsp;${sign}<!--
-                --><span id="diff">${diffTimestamp}</span>
+                <span id="remain">${remainTimestamp}</span>&nbsp;
+                <span id="diff">${sign}${diffTimestamp}</span>
             `
         } else {
             timeDisplay.innerHTML = `
@@ -510,17 +512,30 @@ function getTimeDisplay() {
         remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed);
 
         if (speed === 1) return [remainTimestamp, '', '', playProgress];
+        
+        if (showDiff) {
+            // 3. differece between 1 and 2 (displayed in timestamp)
+            let timeDiff = remainTimeAtSpeed - remainTime;
+            diffTimestamp = convertSecondToTimestamp(timeDiff);
 
-        // 3. differece between 1 and 2 (displayed in timestamp)
-        let timeDiff = remainTimeAtSpeed - remainTime;
-        diffTimestamp = convertSecondToTimestamp(timeDiff);
-
-        if (diffTimestamp === zeroTime) sign = '';
-        else if (speed > 1) sign = '▼';
-        else if (speed < 1) sign = '▲';
+            if (diffTimestamp === zeroTime) sign = '';
+            else if (speed > 1) sign = '▼';
+            else if (speed < 1) sign = '▲';
+        }
     }
 
     return [remainTimestamp, diffTimestamp, sign, playProgress];
+}
+
+function flashDiff() {
+    showDiff = true;
+
+    if (diffTimer) clearTimeout(diffTimer);
+
+    diffTimer = setTimeout(function () {
+        showDiff = false;
+        diffTimer = false;
+    }, 2500);
 }
 
 
@@ -754,21 +769,27 @@ let handleLoadedMetadata = () => {
 };
 
 let handleRatechange = () => {
+    flashDiff();
     updateShowSpeed();
     updateShowTime();
     flashButtons();
 };
 
 let handleSeeked = () => {
+    flashDiff();
     updateShowTime();
     flashButtons();
 };
 
 let handleWaiting = handlePause = () => {
+    clearTimeout(diffTimer);
+    showDiff = true;
+    updateShowTime();
     clearInterval(showTime);
 };
 
 let handlePlaying = () => {
+    showDiff = false;
     clearInterval(showTime);
     updateShowTime();
     showTime = setInterval(function() {
