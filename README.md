@@ -10,7 +10,7 @@ Find it here:
 [Chrome Web Store](https://chrome.google.com/webstore/detail/duration-calculator-for-y/djphelnkeombgogeophphofmjkbooofh)
 
 ## ⚡️ Features ⚡️
-:white_check_mark: Adjust video playback speed beyond 2x 
+:white_check_mark: Adjust video playback speed beyond 2x  
 :white_check_mark: Jump to 1x speed, then switch back to the previous speed in one click  
 :white_check_mark: Find out how much time will be saved or added compared to watching at 1x speed  
 :white_check_mark: See your watch progress in percentage  
