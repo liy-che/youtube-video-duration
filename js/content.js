@@ -312,6 +312,18 @@ let handleShortcuts = (event) => {
             showProgress: settings.showProgress
         });
     }
+    else if (pressedCode === 'KeyZ') {
+        settings.setLocation = 'left';
+        chrome.storage.sync.set({
+            setLocation: 'left'
+        })
+    }
+    else if (pressedCode === 'KeyX') {
+        settings.setLocation = 'right';
+        chrome.storage.sync.set({
+            setLocation: 'right'
+        })
+    }
 
     return false;
 };
