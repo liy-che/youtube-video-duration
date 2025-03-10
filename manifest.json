@@ -20,7 +20,7 @@
         "all_frames": true
     }],
     "host_permissions": [
-        "<all_urls>"
+        "*://*/*"
     ],
     "action": {
         "default_popup": "index.html",
