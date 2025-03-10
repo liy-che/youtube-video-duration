@@ -13,6 +13,7 @@ Find it here:
 :white_check_mark: Adjust video playback speed beyond 2x 
 :white_check_mark: Jump to 1x speed, then switch back to the previous speed in one click  
 :white_check_mark: Find out how much time will be saved or added compared to watching at 1x speed  
+:white_check_mark: See your watch progress in percentage  
 :white_check_mark: Know how long it takes to watch the rest of the video at current speed  
 :white_check_mark: Know your YouTube Shorts: know video length, change video speed, skip through video  
 :white_check_mark: Continue using your favorite shortcuts already provided by YouTube  
@@ -28,8 +29,20 @@ Find it here:
 | Play / pause               | K                                       |
 | Mute / unmute              | M                                       |
 | Show/hide controller       | V                                       |
+| Left controller            | Z                                       |
+| Right controller           | X                                       |
+| Show watch progress        | P                                       |
 
 ## 🎉 Updates 🎉
+**2.0.0**
+- Add flashing of controller as response when setting is changed on a hidden controller
+- Remove extension popup opening shortcut
+- Insert controller in all matched frames on install for smoother user experience
+- Perform proper disabling from extension popup for smoother user experience
+- Add options for showing remaining time and watch progress as a percentage
+- Show calculated difference as appropriate
+- Bug fix: static/black frame on Shorts due to insertion timing
+
 **1.1.0**
 - Aside from YouTube website, extension function now extends to embedded YouTube videos
 - Fixed: no more duplicate functionality on extension install and update, and most importantly soft page reload

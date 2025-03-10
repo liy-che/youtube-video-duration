@@ -789,7 +789,7 @@ let handleWaiting = handlePause = () => {
 };
 
 let handlePlaying = () => {
-    showDiff = false;
+    flashDiff();
     clearInterval(showTime);
     updateShowTime();
     showTime = setInterval(function() {
