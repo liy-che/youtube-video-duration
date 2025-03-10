@@ -69,15 +69,18 @@ a:hover::before {
 }
 
 .redText {
-  color: #ed3942;
+  border-left: 3px solid #ed3942;
+  padding-left: 5px;
 }
 
 .blueText {
-  color: #60dcd4;
+  border-left: 3px solid #60dcd4;
+  padding-left: 5px;
 }
 
 .orangeText {
-  color: #f3993e;
+  border-left: 3px solid #f3993e;
+  padding-left: 5px;
 }
 
 /******************************************
@@ -280,9 +283,9 @@ input:checked + .slider:before {
   position: absolute;
   z-index: 1;
   width: 120px;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px;
+  top: -5px;
+  left: 105%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
   font-family: "Roboto", Arial, Helvetica, sans-serif;
   opacity: 0;
   transition: opacity .5s;
