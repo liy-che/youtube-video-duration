@@ -18,6 +18,8 @@ let titleElt;
 let timer;
 let handleSpaceDown;
 let handleSpaceUp;
+let slider;
+let output;
 
 const defaultSpeed = 1.0;
 let secondarySpeed = defaultSpeed;
@@ -612,6 +614,9 @@ function constructShadowDOM() {
             button.right, button.forward {
                 border-radius: 0 5px 5px 0;
             }
+            #myRange {
+                display: none;
+            }
             .display {
                 font-size: var(--text-size);
                 line-height: var(--text-size);
@@ -640,7 +645,8 @@ function constructShadowDOM() {
             #sign {
                 height: 1em;
             }
-            :host(:hover) button {
+            :host(:hover) button,
+            :host(:hover) #myRange {
                 display: inline;
             }
             :host(:hover) .speed .display {
@@ -663,7 +669,11 @@ function constructShadowDOM() {
             <div class="display time"></div>
 
             <div class="display progress"></div>
-        </div>
+            
+            <div class="display range">
+                <input type="range" min="0" max="16" value="1" class="slider" id="myRange" step="1">
+                <span id="rangeValue"></span>
+            </div>
     `
     shadowRoot.innerHTML = shadowTemplate;
 
@@ -686,6 +696,9 @@ function constructShadowDOM() {
     speedDisplay = shadowRoot.querySelector('.speed .display');
     timeDisplay = shadowRoot.querySelector('.display.time');
     progressDisplay = shadowRoot.querySelector('.display.progress');
+    slider = shadowRoot.getElementById("myRange");
+    output = shadowRoot.getElementById("rangeValue");
+    output.innerHTML = slider.value; // Display the default slider value
 
     flashButtons = flashController(newNode);
 
@@ -706,6 +719,10 @@ function setupListeners() {
     resetButton.addEventListener('click', handleReset);
     increButton.addEventListener('click', handleIncre);
     decreButton.addEventListener('click', handleDecre);
+    // Update the current slider value (each time you drag the slider handle)
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+    }
 
     updateShowSpeed();
 
