@@ -6,6 +6,9 @@ const enableExt = document.querySelector('#enable');
 const enableController = document.querySelector('#enableController');
 const enableShortcuts = document.querySelector('#enableShortcuts');
 const setLocation = document.querySelectorAll('input[name="location"]');
+const controllerOptions = document.querySelectorAll('.options label input');
+const showProgress = document.querySelector('#progress');
+const showRemaining = document.querySelector('#remaining');
 
 // User settings, only using keys to get settings from chrome storage
 let settings = {
@@ -13,7 +16,9 @@ let settings = {
     enable: true,
     enableController: true,
     enableShortcuts: true,
-    setLocation: 'right'
+    setLocation: 'right',
+    showRemaining: true,
+    showProgress: false
 };
 
 // Tabs
@@ -85,6 +90,12 @@ document.onkeyup = event => {
     else if (pressedCode === 'KeyV') {
         enableController.click();
     }
+    else if (pressedCode === 'KeyE') {
+        showRemaining.click();
+    }
+    else if (pressedCode === 'KeyP') {
+        showProgress.click();
+    }
 };
 
 
@@ -107,7 +118,9 @@ document.addEventListener('DOMContentLoaded', function() {
         enableController.checked = storage.enableController;
         enableShortcuts.checked = storage.enableShortcuts;
         document.querySelector(`input[name="location"][value="${storage.setLocation}`).checked = true;
-        toggleRadio();
+        showProgress.checked = storage.showProgress;
+        showRemaining.checked = storage.showRemaining;
+        toggleControllerOptions();
 
         if(!storage.seen) {
             document.querySelector('.alert').style.display = 'block';
@@ -126,7 +139,7 @@ chrome.storage.sync.get(["opened"]).then((result) => {
 
 enableExt.addEventListener('click', function() {
     enableController.checked = enableShortcuts.checked = enableExt.checked;
-    toggleRadio();
+    toggleControllerOptions();
     chrome.storage.sync.set({
         enable: enableExt.checked,
         enableController: enableController.checked,
@@ -137,7 +150,7 @@ enableExt.addEventListener('click', function() {
 
 enableController.addEventListener('click', function() {
     enableExt.checked = enableController.checked || enableShortcuts.checked ? true : false;
-    toggleRadio();
+    toggleControllerOptions();
     chrome.storage.sync.set({
         enable: enableExt.checked,
         enableController: enableController.checked
@@ -146,7 +159,7 @@ enableController.addEventListener('click', function() {
 
 enableShortcuts.addEventListener('click', function() {
     enableExt.checked = enableShortcuts.checked || enableController.checked? true : false;
-    toggleRadio();
+    toggleControllerOptions();
     if (enableShortcuts.checked) sendMessage('flashLocation');
     chrome.storage.sync.set({
         enable: enableExt.checked,
@@ -154,9 +167,21 @@ enableShortcuts.addEventListener('click', function() {
     });
 });
 
-function toggleRadio() {
-    setLocation.forEach(radio => {
-        radio.disabled = !enableExt.checked;
+showRemaining.addEventListener('click', function() {
+    chrome.storage.sync.set({
+        showRemaining: showRemaining.checked
+    })
+});
+
+showProgress.addEventListener('click', function() {
+    chrome.storage.sync.set({
+        showProgress: showProgress.checked
+    })
+});
+
+function toggleControllerOptions() {
+    controllerOptions.forEach(option => {
+        option.disabled = !enableExt.checked;
     });
 }
 

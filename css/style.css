@@ -279,9 +279,10 @@ input:checked + .slider:before {
   padding: 5px;
   position: absolute;
   z-index: 1;
-  width: 100px;
-  top: -5px;
-  left: 145%;
+  width: 120px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
   font-family: "Roboto", Arial, Helvetica, sans-serif;
   opacity: 0;
   transition: opacity .5s;
@@ -306,29 +307,35 @@ input:checked + .slider:before {
 }
 
 /* Radio buttons */
-.radio input[type='radio'] {
+.options input {
   display: initial;
   accent-color: #2196F3;
 }
 
-.radio {
+.options {
   display: flex;
   flex-direction: row;
   justify-content: left;
   margin-left: 55px;
+  column-gap: 10px;
+  row-gap: 10px;
 }
 
-.radio label {
+.options label {
   font-weight: normal;
 }
 
-.radio input {
+.options input {
   margin-right: 5px;
 }
 
 label:has(input:disabled) {
   color: #ccc;
   cursor: default;
+}
+
+div .options {
+  padding-top: 10px;
 }
 
 /******************************************

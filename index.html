@@ -45,7 +45,7 @@
                                 </div>
                                 <p>Enable&nbsp;
                                     <i class="fa-regular fa-circle-question tooltip">
-                                        <span class="tooltiptext">Enable this extension</span>
+                                        <span class="tooltiptext">Enable extension</span>
                                     </i>
                                 </p>
                             </label>
@@ -58,24 +58,42 @@
                                 </div>
                                 <p>Controller (v)&nbsp;
                                     <i class="fa-regular fa-circle-question tooltip">
-                                        <span class="tooltiptext">Keeps time and buttons on screen</span>
+                                        <span class="tooltiptext">Show buttons on top corner of video</span>
                                     </i>
                                 </p>
                             </label>
-                            <div class="radio">
-                                <div>
+                            <div>
+                                <div class="options">
                                     <label>
                                         <input type="radio" id="left" name="location" value="left">
                                         Top left
                                     </label>
                                     <label>
                                         <input type="radio" id="right" name="location" value="right">
-                                        Top right
+                                        Top right&nbsp;
+                                        <i class="fa-regular fa-circle-question tooltip">
+                                            <span class="tooltiptext">Where to put the controller</span>
+                                        </i>
                                     </label>
                                 </div>
-                                <i class="fa-regular fa-circle-question tooltip">
-                                    <span class="tooltiptext">Where on the video to put the controller</span>
-                                </i>
+                                <div class="options">
+                                    <label>
+                                        <input type="checkbox" id="remaining" name="remaining" value="show">
+                                        Time to end (e)&nbsp;
+                                        <i class="fa-regular fa-circle-question tooltip">
+                                            <span class="tooltiptext">Show remaining time (e.g. 10:50)</span>
+                                        </i>
+                                    </label>
+                                </div>
+                                <div class="options">
+                                    <label>
+                                        <input type="checkbox" id="progress" name="progress" value="show">
+                                        Progress % (p)&nbsp;
+                                        <i class="fa-regular fa-circle-question tooltip">
+                                            <span class="tooltiptext">Show watch progress (e.g. 30%)</span>
+                                        </i>
+                                    </label>
+                                </div>
                             </div>
                         </li>
                         <li>

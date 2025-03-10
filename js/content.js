@@ -8,6 +8,7 @@ let rewindButton;
 let advanceButton;
 let speedDisplay;
 let timeDisplay;
+let progressDisplay;
 let videoContainer;
 let insertedNode;
 let showTime;
@@ -25,7 +26,7 @@ const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
 const infTime = '&infin;';
-const noTime = '--:--:--';
+const noTime = '-';
 const zeroTime = '0:00';
 
 // TODO: stop everything when disabled, including in the popup
@@ -40,7 +41,9 @@ let settings = {
     enable: true,
     enableController: true,
     enableShortcuts: true,
-    setLocation: 'right'
+    setLocation: 'right',
+    showRemaining: true,
+    showProgress: false
 };
 
 /***************************** Initialize extension ******************************/
@@ -137,6 +140,26 @@ chrome.storage.sync.get(settings, async function(storage) {
             } 
             else {
                 controllerNode.classList.replace('top-left', 'top-right');
+            }
+        }
+
+        if (changes.showRemaining) {
+            settings.showRemaining = changes.showRemaining.newValue;
+            if (settings.showRemaining) {
+                updateShowTime();
+            }
+            else {
+                timeDisplay.innerHTML = '';
+            }
+        }
+
+        if (changes.showProgress) {
+            settings.showProgress = changes.showProgress.newValue;
+            if (settings.showProgress) {
+                updateShowTime();
+            }
+            else {
+                progressDisplay.innerHTML = '';
             }
         }
     });
@@ -277,6 +300,18 @@ let handleShortcuts = (event) => {
     }
     else if (pressedCode === 'KeyR') restartVideo();
     else if (pressedCode === 'KeyV') controlController();
+    else if (pressedCode === 'KeyE') {
+        settings.showRemaining = !settings.showRemaining;
+        chrome.storage.sync.set({
+            showRemaining: settings.showRemaining
+        });
+    }
+    else if (pressedCode === 'KeyP') {
+        settings.showProgress = !settings.showProgress;
+        chrome.storage.sync.set({
+            showProgress: settings.showProgress
+        });
+    }
 
     return false;
 };
@@ -325,8 +360,6 @@ function controlController() {
     chrome.storage.sync.set({
         enableController: settings.enableController
     });
-    // update UI
-    showHideController();
 }
 
 function showHideController() {
@@ -404,22 +437,29 @@ function updateShowSpeed() {
 
 function updateShowTime() {
     //console.log("Updating showtime")
-    let [remainTimestamp, diffTimestamp, sign] = getTimeDisplay();
+    let [remainTimestamp, diffTimestamp, sign, playProgress] = getTimeDisplay();
 
-    if (sign === '▲') {
-        sign = `<span id="upArrow">${sign}</span>`;
-    } else if (sign === '▼') {
-        sign = `<span id="downArrow">${sign}</span>`
+    if (remainTimestamp !== null && remainTimestamp != noTime) {
+        if (diffTimestamp) {
+            if (sign === '▲') {
+                sign = `<span id="upArrow">${sign}</span>`;
+            } else if (sign === '▼') {
+                sign = `<span id="downArrow">${sign}</span>`
+            }
+            timeDisplay.innerHTML = `
+                <span id="remain">${remainTimestamp}</span>&nbsp;${sign}<!--
+                --><span id="diff">${diffTimestamp}</span>
+            `
+        } else {
+            timeDisplay.innerHTML = `
+                <span id="remain">${remainTimestamp}</span>
+            `
+        }    
     }
 
-    if (diffTimestamp) {
-        timeDisplay.innerHTML = `
-            <span id="remain">${remainTimestamp}&nbsp;</span>${sign}<!--
-            --><span id="diff">${diffTimestamp}</span>
-        `
-    } else {
-        timeDisplay.innerHTML = `
-            <span id="remain">${remainTimestamp}</span>
+    if (playProgress !== null && playProgress !== NaN) {
+        progressDisplay.innerHTML = `
+            <span id="percentage">${playProgress}%</span>
         `
     }
 }
@@ -436,25 +476,35 @@ function getTimeDisplay() {
 
     // 1. remaining video time at 1x speed
     let remainTime = video.duration - video.currentTime;
+
+    let playProgress = null;
+    if (settings.showProgress) {
+        playProgress = Math.round(video.currentTime / video.duration * 100);
+    }
+
     // if remainTime is NaN
-    if (remainTime !== remainTime) return [noTime, noTime, ''];
+    if (remainTime !== remainTime) return [noTime, noTime, '', playProgress];
 
-    // 2. remaining video time at chosen speed (displayed in timestamp)
-    let remainTimeAtSpeed = calcDuration(remainTime, speed);
-    let remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed);
+    let remainTimestamp = null;
+    let diffTimestamp = null;
+    let sign = null;
+    if (settings.showRemaining) {
+        // 2. remaining video time at chosen speed (displayed in timestamp)
+        let remainTimeAtSpeed = calcDuration(remainTime, speed);
+        remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed);
 
-    if (speed === 1) return [remainTimestamp, '', ''];
+        if (speed === 1) return [remainTimestamp, '', '', playProgress];
 
-    // 3. differece between 1 and 2 (displayed in timestamp)
-    let timeDiff = remainTimeAtSpeed - remainTime;
-    let diffTimestamp = convertSecondToTimestamp(timeDiff);
+        // 3. differece between 1 and 2 (displayed in timestamp)
+        let timeDiff = remainTimeAtSpeed - remainTime;
+        diffTimestamp = convertSecondToTimestamp(timeDiff);
 
-    let sign;
-    if (diffTimestamp === zeroTime) sign = '';
-    else if (speed > 1) sign = '▼';
-    else if (speed < 1) sign = '▲';
+        if (diffTimestamp === zeroTime) sign = '';
+        else if (speed > 1) sign = '▼';
+        else if (speed < 1) sign = '▲';
+    }
 
-    return [remainTimestamp, diffTimestamp, sign];
+    return [remainTimestamp, diffTimestamp, sign, playProgress];
 }
 
 
@@ -557,6 +607,9 @@ function constructShadowDOM() {
                 justify-content: center;
                 border-radius: 5px;
             }
+            .display:empty {
+                display: none;
+            }
             span {
                 display: flex;
                 justify-content: center;
@@ -591,9 +644,9 @@ function constructShadowDOM() {
                 <button class="right">&plus;</button>
             </div>
 
-            <div class="display time">
-                ${noTime}
-            </div>
+            <div class="display time"></div>
+
+            <div class="display progress"></div>
         </div>
     `
     shadowRoot.innerHTML = shadowTemplate;
@@ -616,6 +669,7 @@ function constructShadowDOM() {
 
     speedDisplay = shadowRoot.querySelector('.speed .display');
     timeDisplay = shadowRoot.querySelector('.display.time');
+    progressDisplay = shadowRoot.querySelector('.display.progress');
 
     flashButtons = flashController(newNode);
 
