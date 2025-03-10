@@ -537,21 +537,21 @@ function constructShadowDOM() {
     let shadowTemplate = `
         <style>
             :host {
-                --controller-height: 25px;
-                --text-size: 20px;
+                --controller-height: 20px;
+                --text-size: 13px;
             }
             * {
                 font-family: sans-serif;
                 box-sizing: border-box;
                 margin: 0;
                 padding: 0;
-            }
+            }           
             #controller {     
                 background: transparent;
                 color: black;     
                 display: flex;
                 flex-direction: var(--controller-direction);
-                gap: 4px;
+                gap: 2px;
                 align-items: stretch;
                 height: var(--controller-height);
                 cursor: default;
@@ -597,8 +597,8 @@ function constructShadowDOM() {
                 border-radius: 0 5px 5px 0;
             }
             .display {
-                font-size: 15px;
-                line-height: 15px;
+                font-size: var(--text-size);
+                line-height: var(--text-size);
                 color: white;
                 background-color: rgba(48, 48, 48, 0.6);
                 padding: 0 5px;
