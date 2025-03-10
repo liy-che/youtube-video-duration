@@ -305,24 +305,28 @@ let handleShortcuts = (event) => {
         chrome.storage.sync.set({
             showRemaining: settings.showRemaining
         });
+        flashButtons();
     }
     else if (pressedCode === 'KeyP') {
         settings.showProgress = !settings.showProgress;
         chrome.storage.sync.set({
             showProgress: settings.showProgress
         });
+        flashButtons();
     }
     else if (pressedCode === 'KeyZ') {
         settings.setLocation = 'left';
         chrome.storage.sync.set({
             setLocation: 'left'
-        })
+        });
+        flashButtons();
     }
     else if (pressedCode === 'KeyX') {
         settings.setLocation = 'right';
         chrome.storage.sync.set({
             setLocation: 'right'
-        })
+        });
+        flashButtons();
     }
 
     return false;

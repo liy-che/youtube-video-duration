@@ -170,13 +170,15 @@ enableShortcuts.addEventListener('click', function() {
 showRemaining.addEventListener('click', function() {
     chrome.storage.sync.set({
         showRemaining: showRemaining.checked
-    })
+    });
+    sendMessage('flashLocation');
 });
 
 showProgress.addEventListener('click', function() {
     chrome.storage.sync.set({
         showProgress: showProgress.checked
-    })
+    });
+    sendMessage('flashLocation');
 });
 
 function toggleControllerOptions() {
