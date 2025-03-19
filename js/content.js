@@ -14,9 +14,10 @@ let insertedNode;
 let showTime;
 let hasListeners;
 let hasTimeUpdateListeners;
-let titleElt;
+let _titleElt;
 let timer;
 let diffTimer;
+let showDiff;
 let handleSpaceDown;
 let handleSpaceUp;
 
@@ -99,7 +100,7 @@ function msgHandler(request, sender, sendResponse) {
 chrome.storage.sync.get(settings, async function(storage) {
     settings = storage;
 
-    chrome.storage.onChanged.addListener(async function (changes, area) {
+    chrome.storage.onChanged.addListener(async function (changes, _area) {
         if (changes.enable) {
             settings.enable = changes.enable.newValue;
             if (settings.enable) {
@@ -475,7 +476,7 @@ function updateShowTime() {
         }    
     }
 
-    if (playProgress !== null && playProgress !== NaN) {
+    if (playProgress !== null && !isNaN(playProgress)) {
         progressDisplay.innerHTML = `
             <span id="percentage">${playProgress}%</span>
         `
@@ -692,10 +693,11 @@ function constructShadowDOM() {
                 insertedNode = videoContainer.parentElement.parentElement.insertBefore(newNode, videoContainer.parentElement);
             }, 500);
             break;
-        case "inline-preview-player":
+        case "inline-preview-player": {
             let mediaContainer = document.getElementById('media-container');
             insertedNode = mediaContainer.insertBefore(newNode, mediaContainer.children[0]);
             break;
+        }
     }
 
     speedDisplay = shadowRoot.querySelector('.speed .display');
@@ -781,12 +783,14 @@ let handleSeeked = () => {
     flashButtons();
 };
 
-let handleWaiting = handlePause = () => {
+let handleWaiting = () => {
     clearTimeout(diffTimer);
     showDiff = true;
     updateShowTime();
     clearInterval(showTime);
 };
+
+let handlePause = handleWaiting;
 
 let handlePlaying = () => {
     flashDiff();

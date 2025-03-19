@@ -1,6 +1,6 @@
 /******************************* program states *******************************/
-const interval = 0.25;
-const seekInterval = 10;
+const _interval = 0.25;
+const _seekInterval = 10;
 
 const enableExt = document.querySelector('#enable');
 const enableController = document.querySelector('#enableController');
@@ -24,7 +24,7 @@ let settings = {
 // Tabs
 const tab1 = document.getElementById('tab1');
 const tab2 = document.getElementById('tab2');
-
+const tab3 = document.getElementById('tab3');
 
 /******************************* event listeners ******************************/
 document.querySelector('.closebtn').addEventListener('click', function(e) {
@@ -100,7 +100,6 @@ document.onkeyup = event => {
 
 
 /********************************* functions **********************************/
-let outputAlert = document.querySelector('#test');
 
 function sendMessage(type, msg={}) {
     msg['msgType'] = type;

@@ -1,0 +1,25 @@
+{
+  "name": "video-duration-youtube",
+  "version": "2.0.0",
+  "description": "Adjust YouTube video playback speed, save time, and navigate with ease.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liy-che/youtube-speed-calculator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/liy-che/youtube-speed-calculator/issues"
+  },
+  "homepage": "https://github.com/liy-che/youtube-speed-calculator#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "eslint": "^9.22.0",
+    "globals": "^16.0.0",
+    "prettier": "3.5.3"
+  }
+}

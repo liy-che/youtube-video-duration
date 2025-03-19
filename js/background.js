@@ -39,12 +39,12 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(request, _sender, _sendResponse) {
   if (request.msgType === 'handshake') {
     chrome.storage.sync.set({ opened: true });
-    for (const cs of chrome.runtime.getManifest().content_scripts) {
+    for (const _cs of chrome.runtime.getManifest().content_scripts) {
       chrome.tabs.query({}, (tabs)=> {
-        for (const tab of tabs) {
+        for (const _tab of tabs) {
           chrome.action.setBadgeText({
             text: "",
           });
