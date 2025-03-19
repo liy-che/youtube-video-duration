@@ -1,25 +1,25 @@
 .vdc-disable {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .vdc-controller {
-    z-index: 99999;
+  z-index: 99999;
 }
 
 .top-left {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    --controller-direction: row;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  --controller-direction: row;
 }
 
 .top-right {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    --controller-direction: row-reverse;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  --controller-direction: row-reverse;
 }
 
 .ytp-fullscreen:not(.ytp-autohide) .vdc-controller {
-    top: 63px;
+  top: 63px;
 }

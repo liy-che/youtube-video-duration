@@ -1,197 +1,263 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-	<head>
-  	<meta charset="utf-8">
-  	<meta name="description" content="Simple Calculator to find time with YouTube video speed">
-  	<meta name="keywords" content="YouTube, video, speed, calculator">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-		
-		<title>YouTube Video Duration</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="description"
+      content="Simple Calculator to find time with YouTube video speed"
+    />
+    <meta name="keywords" content="YouTube, video, speed, calculator" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>YouTube Video Duration</title>
 
-		<!-- external CSS link -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-		<link rel="stylesheet" href="css/normalize.css">
-		<link rel="stylesheet" href="css/style.css">
-	</head>
-	<body class="preload">
-        <main class="container">
-            <input type="radio" id="tab1" name="tab" checked>
-            <label for="tab1"><i class="fa-solid fa-gear"></i></label>
-            <input type="radio" id="tab2" name="tab">
-            <label for="tab2"><i class="fa-regular fa-keyboard"></i></label>
-            <input type="radio" id="tab3" name="tab">
-            <label for="tab3"><i class="fa-solid fa-inbox"></i></label>
-            
-            <div class="line"></div>
-            <div class="alert" style="display: none">
-                <span class="closebtn">&times;</span>
-                <strong>New!</strong> </br>
-                 Customize what you see with <strong>Time to End</strong>, <strong>Progress</strong> and new shortcuts! Reload page to use this new update.
-                <a href="https://chromewebstore.google.com/detail/djphelnkeombgogeophphofmjkbooofh/support?hl=en&authuser=2" target="_blank">Feedback</a>
-            </div>
-            
-            <div class="content-container">
-                <div class="content" id="c1">
-                    <h1>Video Duration for YouTube™</h1>
-                    <h3>Settings</h3>
-                    <ul class="settings">
-                        <li>
-                            <label>
-                                <div class="switch">
-                                    <input type="checkbox" id="enable">
-                                    <span class="slider round"></span>
-                                </div>
-                                <p>Enable&nbsp;
-                                    <i class="fa-regular fa-circle-question tooltip">
-                                        <span class="tooltiptext">Enable extension</span>
-                                    </i>
-                                </p>
-                            </label>
-                        </li>
-                        <li>
-                            <label>
-                                <div class="switch">
-                                    <input type="checkbox" id="enableController">
-                                    <span class="slider round"></span>
-                                </div>
-                                <p>Controller (v)&nbsp;
-                                    <i class="fa-regular fa-circle-question tooltip">
-                                        <span class="tooltiptext">Always show on top corner of video</span>
-                                    </i>
-                                </p>
-                            </label>
-                            <div>
-                                <div class="options">
-                                    <label>
-                                        <input type="radio" id="left" name="location" value="left">
-                                        Left (z)
-                                    </label>
-                                    <label>
-                                        <input type="radio" id="right" name="location" value="right">
-                                        Right (x)&nbsp;
-                                        <i class="fa-regular fa-circle-question tooltip">
-                                            <span class="tooltiptext">Where to put the controller</span>
-                                        </i>
-                                    </label>
-                                </div>
-                                <div class="options">
-                                    <label>
-                                        <input type="checkbox" id="remaining" name="remaining" value="show">
-                                        Time to end (e)&nbsp;
-                                        <i class="fa-regular fa-circle-question tooltip">
-                                            <span class="tooltiptext">Show remaining time, and saved/added time when watching in non-x1 speed (e.g. 10:50 ▲2:10 = saving 2 minutes)</span>
-                                        </i>
-                                    </label>
-                                </div>
-                                <div class="options">
-                                    <label>
-                                        <input type="checkbox" id="progress" name="progress" value="show">
-                                        Progress % (p)&nbsp;
-                                        <i class="fa-regular fa-circle-question tooltip">
-                                            <span class="tooltiptext">Show watch progress (e.g. 30%)</span>
-                                        </i>
-                                    </label>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <label>
-                                <div class="switch">
-                                    <input type="checkbox" id="enableShortcuts">
-                                    <span class="slider round"></span>
-                                </div>
-                                <p>Shortcuts&nbsp;
-                                    <i class="fa-regular fa-circle-question tooltip">
-                                        <span class="tooltiptext">Enable keyboard shortcuts</span>
-                                    </i>
-                                </p>
-                            </label>
-                        </li>
-                    </ul>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- external CSS link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="preload">
+    <main class="container">
+      <input type="radio" id="tab1" name="tab" checked />
+      <label for="tab1"><i class="fa-solid fa-gear"></i></label>
+      <input type="radio" id="tab2" name="tab" />
+      <label for="tab2"><i class="fa-regular fa-keyboard"></i></label>
+      <input type="radio" id="tab3" name="tab" />
+      <label for="tab3"><i class="fa-solid fa-inbox"></i></label>
+
+      <div class="line"></div>
+      <div class="alert" style="display: none">
+        <span class="closebtn">&times;</span>
+        <strong>New!</strong><br />
+        Customize what you see with <strong>Time to End</strong>,
+        <strong>Progress</strong> and new shortcuts! Reload page to use this new
+        update.
+        <a
+          href="https://chromewebstore.google.com/detail/djphelnkeombgogeophphofmjkbooofh/support?hl=en&authuser=2"
+          target="_blank"
+          >Feedback</a
+        >
+      </div>
+
+      <div class="content-container">
+        <div class="content" id="c1">
+          <h1>Video Duration for YouTube™</h1>
+          <h3>Settings</h3>
+          <ul class="settings">
+            <li>
+              <label>
+                <div class="switch">
+                  <input type="checkbox" id="enable" />
+                  <span class="slider round"></span>
                 </div>
-                <div class="content" id="c2">
-                    <h3>Shortcuts</h3>
+                <p>
+                  Enable&nbsp;
+                  <i class="fa-regular fa-circle-question tooltip">
+                    <span class="tooltiptext">Enable extension</span>
+                  </i>
+                </p>
+              </label>
+            </li>
+            <li>
+              <label>
+                <div class="switch">
+                  <input type="checkbox" id="enableController" />
+                  <span class="slider round"></span>
+                </div>
+                <p>
+                  Controller (v)&nbsp;
+                  <i class="fa-regular fa-circle-question tooltip">
+                    <span class="tooltiptext"
+                      >Always show on top corner of video</span
+                    >
+                  </i>
+                </p>
+              </label>
+              <div>
+                <div class="options">
+                  <label>
+                    <input
+                      type="radio"
+                      id="left"
+                      name="location"
+                      value="left"
+                    />
+                    Left (z)
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      id="right"
+                      name="location"
+                      value="right"
+                    />
+                    Right (x)&nbsp;
                     <i class="fa-regular fa-circle-question tooltip">
-                        <span class="tooltiptext widetip">QWERTY keyboard. For others, ignore letters and use the same key positions as shown in image</span>
+                      <span class="tooltiptext"
+                        >Where to put the controller</span
+                      >
                     </i>
-                    <ul class="spreadout">
-                        <img src="images/shortcuts2.png" alt="Image of key positions for shortcuts" style="width:100%; border-radius: 5px;">
-                        <li class="redText">
-                            <div>Increase speed</div>
-                            <div>A</div>
-                        </li>
-                        <li class="redText">
-                            <div>Decrease speed</div>
-                            <div>D</div>
-                        </li>
-                        <li class="redText">
-                            <div>Jump to 1x speed or back</div>
-                            <div>S</div>
-                        </li>
-                        <hr>
-                        <li class="blueText">
-                            <div>Toggle controller</div>
-                            <div>V</div>
-                        </li>
-                        <li class="blueText">
-                            <div>Show left controller</div>
-                            <div>Z</div>
-                        </li>
-                        <li class="blueText">
-                            <div>Show right controller</div>
-                            <div>X</div>
-                        </li>
-                        <li class="blueText">
-                            <div>Toggle time to end</div>
-                            <div>E</div>
-                        </li>
-                        <li class="blueText">
-                            <div>Toggle progress %</div>
-                            <div>P</div>
-                        </li>
-                        <hr>
-                        <li class="orangeText">
-                            <div>Restart video</div>
-                            <div>R</div>
-                        </li>
-                        <li class="orangeText">
-                            <div>Rewind / forward 10s</div>
-                            <div>J / L</div>
-                        </li>
-                        <hr>
-                        <li class="orangeText">
-                            <div>Play / pause</div>
-                            <div>K</div>
-                        </li>
-                        <li class="orangeText">
-                            <div>Mute / unmute</div>
-                            <div>M</div>
-                        </li>
-                    </ul>
+                  </label>
                 </div>
-                <div class="content" id="c3">
-                    <h3>Help</h3>
-                    <ul class="about">
-                        <li>
-                            <h4>Not working? Having issues?</h4>
-                            Refreshing the page usually fixes it.
-                        </li>
-                        <li>
-                            <h4>Still need help or have feedback?</h4>
-                            <a href="https://chromewebstore.google.com/detail/djphelnkeombgogeophphofmjkbooofh/support?hl=en&authuser=2" target="_blank">Let me know!</a>
-                        </li>
-                        <li>
-                            <h4>Like this extension?</h4>
-                            <a href="https://chromewebstore.google.com/detail/video-duration-for-youtub/djphelnkeombgogeophphofmjkbooofh" target="_blank">Rate it, share it</a>
-                            or <a href="https://ko-fi.com/liyche" target="_blank">buy me a coffee</a>
-                        </li>
-                    </ul>
-                    <small>v2.0.0</br>updated Mar 09, 2025</small>
+                <div class="options">
+                  <label>
+                    <input
+                      type="checkbox"
+                      id="remaining"
+                      name="remaining"
+                      value="show"
+                    />
+                    Time to end (e)&nbsp;
+                    <i class="fa-regular fa-circle-question tooltip">
+                      <span class="tooltiptext"
+                        >Show remaining time, and saved/added time when watching
+                        in non-x1 speed (e.g. 10:50 ▲2:10 = saving 2
+                        minutes)</span
+                      >
+                    </i>
+                  </label>
                 </div>
-            </div>
-        </main>
-		<script type="text/javascript" src="js/main.js"></script>
-	</body>
+                <div class="options">
+                  <label>
+                    <input
+                      type="checkbox"
+                      id="progress"
+                      name="progress"
+                      value="show"
+                    />
+                    Progress % (p)&nbsp;
+                    <i class="fa-regular fa-circle-question tooltip">
+                      <span class="tooltiptext"
+                        >Show watch progress (e.g. 30%)</span
+                      >
+                    </i>
+                  </label>
+                </div>
+              </div>
+            </li>
+            <li>
+              <label>
+                <div class="switch">
+                  <input type="checkbox" id="enableShortcuts" />
+                  <span class="slider round"></span>
+                </div>
+                <p>
+                  Shortcuts&nbsp;
+                  <i class="fa-regular fa-circle-question tooltip">
+                    <span class="tooltiptext">Enable keyboard shortcuts</span>
+                  </i>
+                </p>
+              </label>
+            </li>
+          </ul>
+        </div>
+        <div class="content" id="c2">
+          <h3>Shortcuts</h3>
+          <i class="fa-regular fa-circle-question tooltip">
+            <span class="tooltiptext widetip"
+              >QWERTY keyboard. For others, ignore letters and use the same key
+              positions as shown in image</span
+            >
+          </i>
+          <ul class="spreadout">
+            <img
+              src="images/shortcuts2.png"
+              alt="Image of key positions for shortcuts"
+              style="width: 100%; border-radius: 5px"
+            />
+            <li class="redText">
+              <div>Increase speed</div>
+              <div>A</div>
+            </li>
+            <li class="redText">
+              <div>Decrease speed</div>
+              <div>D</div>
+            </li>
+            <li class="redText">
+              <div>Jump to 1x speed or back</div>
+              <div>S</div>
+            </li>
+            <hr />
+            <li class="blueText">
+              <div>Toggle controller</div>
+              <div>V</div>
+            </li>
+            <li class="blueText">
+              <div>Show left controller</div>
+              <div>Z</div>
+            </li>
+            <li class="blueText">
+              <div>Show right controller</div>
+              <div>X</div>
+            </li>
+            <li class="blueText">
+              <div>Toggle time to end</div>
+              <div>E</div>
+            </li>
+            <li class="blueText">
+              <div>Toggle progress %</div>
+              <div>P</div>
+            </li>
+            <hr />
+            <li class="orangeText">
+              <div>Restart video</div>
+              <div>R</div>
+            </li>
+            <li class="orangeText">
+              <div>Rewind / forward 10s</div>
+              <div>J / L</div>
+            </li>
+            <hr />
+            <li class="orangeText">
+              <div>Play / pause</div>
+              <div>K</div>
+            </li>
+            <li class="orangeText">
+              <div>Mute / unmute</div>
+              <div>M</div>
+            </li>
+          </ul>
+        </div>
+        <div class="content" id="c3">
+          <h3>Help</h3>
+          <ul class="about">
+            <li>
+              <h4>Not working? Having issues?</h4>
+              Refreshing the page usually fixes it.
+            </li>
+            <li>
+              <h4>Still need help or have feedback?</h4>
+              <a
+                href="https://chromewebstore.google.com/detail/djphelnkeombgogeophphofmjkbooofh/support?hl=en&authuser=2"
+                target="_blank"
+                >Let me know!</a
+              >
+            </li>
+            <li>
+              <h4>Like this extension?</h4>
+              <a
+                href="https://chromewebstore.google.com/detail/video-duration-for-youtub/djphelnkeombgogeophphofmjkbooofh"
+                target="_blank"
+                >Rate it, share it</a
+              >
+              or
+              <a href="https://ko-fi.com/liyche" target="_blank"
+                >buy me a coffee</a
+              >
+            </li>
+          </ul>
+          <small>v2.0.0<br />updated Mar 09, 2025</small>
+        </div>
+      </div>
+    </main>
+    <script type="text/javascript" src="js/main.js"></script>
+  </body>
 </html>

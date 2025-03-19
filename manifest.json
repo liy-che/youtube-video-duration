@@ -1,48 +1,42 @@
 {
-    "name": "Video Duration for YouTube™",
-    "version": "2.0.0",
-    "description": "Adjust YouTube video playback speed, save time, and navigate with ease.",
-    "manifest_version": 3,
-    "author": "liyche",
-    "permissions": [
-        "scripting", "storage"
-    ],
-    "background": {
-        "service_worker": "js/background.js"
-    },
-    "content_scripts": [{
-        "matches": [
-            "*://*.youtube.com/*",
-            "*://*.youtube-nocookie.com/*"
-        ],
-        "js": ["js/content.js"],
-        "css": ["css/content.css"],
-        "all_frames": true
-    }],
-    "host_permissions": [
-        "*://*.youtube.com/*",
-        "*://*.youtube-nocookie.com/*"
-    ],
-    "action": {
-        "default_popup": "index.html",
-        "default_title": "YouTube Video Duration",
-        "default_icon": {
-            "16": "/icons/speedCalc16.png",
-            "32": "/icons/speedCalc32.png",
-            "48": "/icons/speedCalc48.png",
-            "128": "/icons/speedCalc128.png"
-        }
-    },
-    "icons": {
-        "16": "/icons/speedCalc16.png",
-        "32": "/icons/speedCalc32.png",
-        "48": "/icons/speedCalc48.png",
-        "128": "/icons/speedCalc128.png"
-    },
-    "web_accessible_resources": [
-        {
-            "resources": [ "images/*.png" ],
-            "matches": [ "*://*.youtube.com/*" ]
-        }
-    ]
+  "name": "Video Duration for YouTube™",
+  "version": "2.0.0",
+  "description": "Adjust YouTube video playback speed, save time, and navigate with ease.",
+  "manifest_version": 3,
+  "author": "liyche",
+  "permissions": ["scripting", "storage"],
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*"],
+      "js": ["js/content.js"],
+      "css": ["css/content.css"],
+      "all_frames": true
+    }
+  ],
+  "host_permissions": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*"],
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "YouTube Video Duration",
+    "default_icon": {
+      "16": "/icons/speedCalc16.png",
+      "32": "/icons/speedCalc32.png",
+      "48": "/icons/speedCalc48.png",
+      "128": "/icons/speedCalc128.png"
+    }
+  },
+  "icons": {
+    "16": "/icons/speedCalc16.png",
+    "32": "/icons/speedCalc32.png",
+    "48": "/icons/speedCalc48.png",
+    "128": "/icons/speedCalc128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*.png"],
+      "matches": ["*://*.youtube.com/*"]
+    }
+  ]
 }
