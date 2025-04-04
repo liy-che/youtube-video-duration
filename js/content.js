@@ -20,6 +20,7 @@ let diffTimer;
 let showDiff;
 let handleSpaceDown;
 let handleSpaceUp;
+let isPlaying = false;
 
 const defaultSpeed = 1.0;
 let secondarySpeed = defaultSpeed;
@@ -429,8 +430,10 @@ function updateShowSpeed() {
   speedDisplay.textContent = video.playbackRate.toFixed(2);
 }
 
-function updateShowTime() {
-  //console.log("Updating showtime")
+function updateShowTime(forced = true) {
+  //console.log('Updating showtime');
+  if (!forced && !isPlaying) return;
+
   let [remainTimestamp, diffTimestamp, sign, playProgress] = getTimeDisplay();
 
   if (remainTimestamp !== null && remainTimestamp != noTime) {
@@ -732,6 +735,8 @@ function setupTimeUpdates() {
 
   document.addEventListener('playing', handlePlaying, true);
 
+  document.addEventListener('emptied', handleEmptied, true);
+
   hasTimeUpdateListeners = true;
 }
 
@@ -740,12 +745,13 @@ function removeTimeUpdates() {
   document.removeEventListener('pause', handlePause, true);
   document.removeEventListener('waiting', handleWaiting, true);
   document.removeEventListener('playing', handlePlaying, true);
+  document.removeEventListener('emptied', handleEmptied, true);
   hasTimeUpdateListeners = false;
 }
 
 let handleLoadedMetadata = () => {
   updateShowSpeed();
-  updateShowTime();
+  updateShowTime(false);
 };
 
 let handleRatechange = () => {
@@ -762,6 +768,7 @@ let handleSeeked = () => {
 };
 
 let handleWaiting = () => {
+  isPlaying = false;
   clearTimeout(diffTimer);
   showDiff = true;
   updateShowTime();
@@ -771,10 +778,18 @@ let handleWaiting = () => {
 let handlePause = handleWaiting;
 
 let handlePlaying = () => {
+  isPlaying = true;
   flashDiff();
   clearInterval(showTime);
   updateShowTime();
   showTime = setInterval(function () {
     updateShowTime();
   }, 1000);
+};
+
+let handleEmptied = () => {
+  isPlaying = false;
+  timeDisplay.innerHTML = '';
+  progressDisplay.innerHTML = '';
+  clearInterval(showTime);
 };
