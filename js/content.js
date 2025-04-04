@@ -21,6 +21,7 @@ let showDiff;
 let handleSpaceDown;
 let handleSpaceUp;
 let isPlaying = false;
+let shortsTimeoutId;
 
 const defaultSpeed = 1.0;
 let secondarySpeed = defaultSpeed;
@@ -666,7 +667,8 @@ function constructShadowDOM() {
       break;
     case 'shorts-player':
       // inserting right away blocks the video from playing
-      setTimeout(() => {
+      if (shortsTimeoutId) clearTimeout(shortsTimeoutId);
+      shortsTimeoutId = setTimeout(() => {
         insertedNode = videoContainer.parentElement.parentElement.insertBefore(
           newNode,
           videoContainer.parentElement,
