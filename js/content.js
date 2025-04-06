@@ -162,6 +162,7 @@ chrome.storage.sync.get(settings, async function (storage) {
       if (settings.showDifference) {
         showDiff = true;
         if (diffTimer) clearTimeout(diffTimer);
+        updateShowTime();
       } else {
         showDiff = false;
         diffDisplay.innerHTML = '';
