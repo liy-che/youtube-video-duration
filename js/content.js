@@ -7,7 +7,8 @@ let decreButton;
 let rewindButton;
 let advanceButton;
 let speedDisplay;
-let timeDisplay;
+let remainDisplay;
+let diffDisplay;
 let progressDisplay;
 let videoContainer;
 let insertedNode;
@@ -29,8 +30,6 @@ const minSpeed = 0.25;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
-const infTime = '&infin;';
-const noTime = '-';
 const zeroTime = '0:00';
 
 // TODO: stop everything when disabled, including in the popup
@@ -47,6 +46,7 @@ let settings = {
   enableShortcuts: true,
   setLocation: 'right',
   showRemaining: true,
+  showDifference: false,
   showProgress: false,
 };
 
@@ -104,6 +104,7 @@ function msgHandler(request, sender, sendResponse) {
 // RUNS
 chrome.storage.sync.get(settings, async function (storage) {
   settings = storage;
+  showDiff = settings.showDifference;
 
   chrome.storage.onChanged.addListener(async function (changes, _area) {
     if (changes.enable) {
@@ -152,7 +153,18 @@ chrome.storage.sync.get(settings, async function (storage) {
         flashDiff();
         updateShowTime();
       } else {
-        timeDisplay.innerHTML = '';
+        remainDisplay.textContent = '';
+      }
+    }
+
+    if (changes.showDifference) {
+      settings.showDifference = changes.showDifference.newValue;
+      if (settings.showDifference) {
+        showDiff = true;
+        if (diffTimer) clearTimeout(diffTimer);
+      } else {
+        showDiff = false;
+        diffDisplay.innerHTML = '';
       }
     }
 
@@ -388,10 +400,10 @@ function zeroPad(num, numFigure = 2, char = '0') {
 }
 
 function convertSecondToTimestamp(totalSeconds) {
-  const totalSecondsAbs = Math.abs(totalSeconds);
+  const totalSecondsAbs = Math.floor(Math.abs(totalSeconds));
   const hours = Math.floor(totalSecondsAbs / 3600);
-  const minutes = Math.floor(totalSecondsAbs / 60 - hours * 60);
-  const seconds = Math.floor(totalSecondsAbs % 60);
+  const minutes = Math.floor((totalSecondsAbs % 3600) / 60);
+  const seconds = totalSecondsAbs % 60;
 
   let timeStr = hours !== 0 ? `${hours}:` : '';
   timeStr += hours !== 0 ? `${zeroPad(minutes)}:` : `${minutes}:`;
@@ -433,87 +445,89 @@ function updateShowSpeed() {
 
 function updateShowTime(forced = true) {
   //console.log('Updating showtime');
+
   if (!forced && !isPlaying) return;
 
-  let [remainTimestamp, diffTimestamp, sign, playProgress] = getTimeDisplay();
+  let { remainTimestamp, diffTimestamp, sign, playProgress } = getTimeDisplay();
 
-  if (remainTimestamp !== null && remainTimestamp != noTime) {
-    if (diffTimestamp) {
-      if (sign === '▲') {
-        sign = `<span id="upArrow">${sign}</span>`;
-      } else if (sign === '▼') {
-        sign = `<span id="downArrow">${sign}</span>`;
-      }
-      timeDisplay.innerHTML = `
-                <span id="remain">${remainTimestamp}</span>&nbsp;
-                <span id="diff">${sign}${diffTimestamp}</span>
-            `;
+  if (remainTimestamp === zeroTime) {
+    remainDisplay.textContent = '';
+  } else if (remainTimestamp !== '') {
+    remainDisplay.textContent = remainTimestamp;
+  }
+
+  if (diffTimestamp !== '') {
+    if (sign === '▲') {
+      sign = `<span id="upArrow">${sign}</span>`;
+    } else if (sign === '▼') {
+      sign = `<span id="downArrow">${sign}</span>`;
+    }
+    if (diffTimestamp === zeroTime) {
+      diffDisplay.innerHTML = '';
     } else {
-      timeDisplay.innerHTML = `
-                <span id="remain">${remainTimestamp}</span>
-            `;
+      diffDisplay.innerHTML = `<span id="diff">${sign}${diffTimestamp}</span>`;
     }
   }
 
-  if (playProgress !== null && !isNaN(playProgress)) {
+  if (playProgress !== -1) {
     progressDisplay.innerHTML = `
-            <span id="percentage">${playProgress}%</span>
+            <span id="percentage">${playProgress === 100 ? 'Complete 🎉' : playProgress+'%'}</span>
         `;
   }
 }
 
-// loading, speed==1, difference==0   -------> no sign
+// speed==1, difference==0   -------> no sign ('')
 // speed < 1                          -------> up sign
 // speed > 1                          -------> down sign
 function getTimeDisplay() {
   let speed = video.playbackRate;
-  if (!speed) {
-    return [infTime, infTime, '▲'];
-  }
+
+  // options: showRemaining, showDifference, showProgress
+  // showRemaining: need remainTimestamp, diffTimestamp, and sign
+  // showDifference: need diffTimestamp and sign
+  // showProgress: need playProgress
+  // returning [remainTimestamp, diffTimestamp, sign, playProgress]
+  let remainTimestamp = '';
+  let diffTimestamp = '';
+  let sign = '';
+  let playProgress = -1;
 
   // 1. remaining video time at 1x speed
   let remainTime = video.duration - video.currentTime;
+  if (isNaN(remainTime)) return { remainTimestamp, diffTimestamp, sign, playProgress };
 
-  let playProgress = null;
-  if (settings.showProgress) {
-    playProgress = Math.round((video.currentTime / video.duration) * 100);
-  }
+  // 2. remaining video time at chosen speed
+  let remainTimeAtSpeed = calcDuration(remainTime, speed);
 
-  // if remainTime is NaN
-  if (remainTime !== remainTime) return [noTime, noTime, '', playProgress];
-
-  let remainTimestamp = null;
-  let diffTimestamp = null;
-  let sign = null;
   if (settings.showRemaining) {
-    // 2. remaining video time at chosen speed (displayed in timestamp)
-    let remainTimeAtSpeed = calcDuration(remainTime, speed);
     remainTimestamp = convertSecondToTimestamp(remainTimeAtSpeed);
-
-    if (speed === 1) return [remainTimestamp, '', '', playProgress];
-
-    if (showDiff) {
-      // 3. differece between 1 and 2 (displayed in timestamp)
-      let timeDiff = remainTimeAtSpeed - remainTime;
-      diffTimestamp = convertSecondToTimestamp(timeDiff);
-
-      if (diffTimestamp === zeroTime) sign = '';
-      else if (speed > 1) sign = '▼';
-      else if (speed < 1) sign = '▲';
-    }
   }
 
-  return [remainTimestamp, diffTimestamp, sign, playProgress];
+  if (showDiff || settings.showDifference) {
+    // 3. differece between 1 and 2 (displayed in timestamp)
+    diffTimestamp = convertSecondToTimestamp(remainTimeAtSpeed - remainTime);
+
+    if (diffTimestamp === zeroTime) sign = '';
+    else if (speed > 1) sign = '▼';
+    else if (speed < 1) sign = '▲';
+  }
+
+  if (settings.showProgress) {
+    if (remainTimestamp === zeroTime) playProgress = 100;
+    else playProgress = Math.floor((video.currentTime / video.duration) * 100);
+  }
+
+  return { remainTimestamp, diffTimestamp, sign, playProgress };
 }
 
 function flashDiff() {
-  showDiff = true;
-
   if (diffTimer) clearTimeout(diffTimer);
+  if (settings.showDifference) return;
 
+  showDiff = true;
   diffTimer = setTimeout(function () {
     showDiff = false;
-    diffTimer = false;
+    diffDisplay.innerHTML = '';
   }, 2500);
 }
 
@@ -623,7 +637,7 @@ function constructShadowDOM() {
                 align-items: center;
             }
             #upArrow {
-                color: #cc3300;
+                color: #FF4C4C;
             }
             #downArrow {
                 color: #99cc33;
@@ -651,7 +665,8 @@ function constructShadowDOM() {
                 <button class="right">&plus;</button>
             </div>
 
-            <div class="display time"></div>
+            <span class="display time"id="remain"></span>
+            <span class="display time"id="diff"></span>
 
             <div class="display progress"></div>
         </div>
@@ -686,7 +701,8 @@ function constructShadowDOM() {
   }
 
   speedDisplay = shadowRoot.querySelector('.speed .display');
-  timeDisplay = shadowRoot.querySelector('.display.time');
+  remainDisplay = shadowRoot.querySelector('#remain');
+  diffDisplay = shadowRoot.querySelector('#diff');
   progressDisplay = shadowRoot.querySelector('.display.progress');
 
   flashButtons = flashController(newNode);
@@ -791,7 +807,8 @@ let handlePlaying = () => {
 
 let handleEmptied = () => {
   isPlaying = false;
-  timeDisplay.innerHTML = '';
+  remainDisplay.textContent = '';
+  diffDisplay.innerHTML = '';
   progressDisplay.innerHTML = '';
   clearInterval(showTime);
 };

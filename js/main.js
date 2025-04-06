@@ -9,6 +9,7 @@ const setLocation = document.querySelectorAll('input[name="location"]');
 const controllerOptions = document.querySelectorAll('.options label input');
 const showProgress = document.querySelector('#progress');
 const showRemaining = document.querySelector('#remaining');
+const showDifference = document.querySelector('#difference');
 
 // User settings, only using keys to get settings from chrome storage
 let settings = {
@@ -18,6 +19,7 @@ let settings = {
   enableShortcuts: true,
   setLocation: 'right',
   showRemaining: true,
+  showDifference: false,
   showProgress: false,
 };
 
@@ -112,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showProgress.checked = storage.showProgress;
     showRemaining.checked = storage.showRemaining;
     toggleControllerOptions();
+    showDifference.checked = storage.showDifference;
 
     if (!storage.seen) {
       document.querySelector('.alert').style.display = 'block';
@@ -171,6 +174,12 @@ showProgress.addEventListener('click', function () {
     showProgress: showProgress.checked,
   });
   sendMessage('flashLocation');
+});
+
+showDifference.addEventListener('click', function () {
+  chrome.storage.sync.set({
+    showDifference: showDifference.checked,
+  });
 });
 
 function toggleControllerOptions() {
