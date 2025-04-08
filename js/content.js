@@ -1,5 +1,4 @@
 let video;
-let controllerNode;
 let flashButtons;
 let resetButton;
 let increButton;
@@ -94,9 +93,6 @@ function msgHandler(request, sender, sendResponse) {
     sendResponse({ msgType: request.msgType, muted: video.muted });
   } else if (request.msgType === 'inject') {
     document.dispatchEvent(new CustomEvent('vdc-initialize'));
-  } else if (request.msgType === 'flashLocation') {
-    updateShowTime();
-    flashButtons(1000);
   }
 }
 
@@ -122,7 +118,7 @@ chrome.storage.sync.get(settings, async function (storage) {
       }
     }
 
-    if (!controllerNode) controllerNode = await waitForElm('.vdc-controller');
+    if (!insertedNode) insertedNode = await waitForElm('.vdc-controller');
 
     if (changes.enableController) {
       settings.enableController = changes.enableController.newValue;
@@ -132,6 +128,7 @@ chrome.storage.sync.get(settings, async function (storage) {
     if (changes.enableShortcuts) {
       settings.enableShortcuts = changes.enableShortcuts.newValue;
       if (settings.enableShortcuts) {
+        flashButtons(2000);
         document.addEventListener('keydown', handleShortcuts, true);
       } else {
         document.removeEventListener('keydown', handleShortcuts, true);
@@ -141,20 +138,21 @@ chrome.storage.sync.get(settings, async function (storage) {
     if (changes.setLocation) {
       settings.setLocation = changes.setLocation.newValue;
       if (settings.setLocation === 'left') {
-        controllerNode.classList.replace('top-right', 'top-left');
+        insertedNode.classList.replace('top-right', 'top-left');
       } else {
-        controllerNode.classList.replace('top-left', 'top-right');
+        insertedNode.classList.replace('top-left', 'top-right');
       }
+      flashButtons(2000);
     }
 
     if (changes.showRemaining) {
       settings.showRemaining = changes.showRemaining.newValue;
       if (settings.showRemaining) {
-        flashDiff();
         updateShowTime();
       } else {
         remainDisplay.textContent = '';
       }
+      flashButtons(2000);
     }
 
     if (changes.showDifference) {
@@ -162,10 +160,12 @@ chrome.storage.sync.get(settings, async function (storage) {
       if (settings.showDifference) {
         showDiff = true;
         if (diffTimer) clearTimeout(diffTimer);
+        updateShowTime();
       } else {
         showDiff = false;
         diffDisplay.innerHTML = '';
       }
+      flashButtons(2000);
     }
 
     if (changes.showProgress) {
@@ -175,6 +175,7 @@ chrome.storage.sync.get(settings, async function (storage) {
       } else {
         progressDisplay.innerHTML = '';
       }
+      flashButtons(2000);
     }
   });
 
@@ -212,7 +213,7 @@ document.addEventListener('vdc-initialize', async () => {
 
   // inject controller for video tag with src attribute
   // construct a new node with a shadow DOM and insert node into DOM
-  controllerNode = constructShadowDOM();
+  insertedNode = constructShadowDOM();
 
   // set up event listeners for controller
   setupListeners();
@@ -371,7 +372,7 @@ function controlController() {
   if (timer) {
     clearTimeout(timer);
     timer = false;
-    controllerNode.classList.add('vdc-disable');
+    insertedNode.classList.add('vdc-disable');
     return;
   }
   settings.enableController = !settings.enableController;
@@ -384,10 +385,10 @@ function controlController() {
 function showHideController() {
   if (settings.enableController) {
     setupTimeUpdates();
-    controllerNode.classList.remove('vdc-disable');
+    insertedNode.classList.remove('vdc-disable');
   } else {
     removeTimeUpdates();
-    controllerNode.classList.add('vdc-disable');
+    insertedNode.classList.add('vdc-disable');
   }
 }
 
@@ -444,7 +445,6 @@ function updateShowSpeed() {
 }
 
 function updateShowTime(forced = true) {
-  //console.log('Updating showtime');
 
   if (!forced && !isPlaying) return;
 
@@ -535,12 +535,12 @@ function flashController(controller) {
   function show(duration = 2500) {
     if (!settings.enable || settings.enableController) return;
 
-    controller.classList.remove('vdc-disable');
+    controller.classList.add('vdc-temp');
 
     if (timer) clearTimeout(timer);
 
     timer = setTimeout(function () {
-      if (!settings.enableController) controller.classList.add('vdc-disable');
+      if (!settings.enableController) controller.classList.remove('vdc-temp');
       timer = false;
     }, duration);
   }
