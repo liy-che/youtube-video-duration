@@ -16,7 +16,6 @@ html {
   margin: 0;
   padding: 0;
   width: 300px;
-  max-height: 100%;
   min-height: 200px;
 }
 
@@ -30,6 +29,11 @@ html {
   font-size: 62.5%;
 }
 
+main {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
 h1,
 h2,
 h3,
@@ -39,17 +43,18 @@ h6 {
   margin: 0;
 }
 
-h1 {
+h1,
+h3 {
   font-size: 1em;
 }
 
 small {
-  position: absolute;
-  bottom: 8px;
-  right: 20px;
+  position: relative;
   text-align: right;
   color: #808080;
   font-size: 12px;
+  display: block;
+  margin-top: 10px;
 }
 
 a {
@@ -130,9 +135,12 @@ main > label {
   text-align: center;
   background: #f4f4f4;
   color: #555;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   transition: 0.25s background ease;
   cursor: pointer;
+  bottom: 0;
 }
 main > label::after {
   content: '';
@@ -145,21 +153,30 @@ main > label::after {
   opacity: 0;
   left: 0;
   transition: 0.25s ease;
+  z-index: 10;
 }
 main > label:hover::after {
   opacity: 1;
 }
+input:checked + label::after {
+  opacity: 0 !important;
+}
+
 .line {
-  position: absolute;
+  position: sticky;
   height: 2px;
   background: #1e88e5;
   width: 33.33%;
   top: 34px;
   left: 0;
   transition: 0.25s ease;
+  z-index: 11;
+  bottom: 0;
+  margin-top: -2px;
 }
+
 .content-container {
-  padding: 20px;
+  padding: 10px;
   font-size: 16px;
 }
 .content {
@@ -168,8 +185,7 @@ main > label:hover::after {
   transition: 0.25s ease;
   color: #333;
 }
-h1,
-h3 {
+h1 {
   font-weight: 200;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -180,17 +196,29 @@ h1 {
   font-weight: bold;
 }
 
+h3 {
+  font-weight: 200;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: visible; /* allow the tooltip to escape */
+  display: flex; /* aligns text and icon inline */
+  align-items: center;
+  gap: 0.5rem; /* spacing between heading and icon */
+  margin: 0 0 10px 0;
+}
+
 /******************************************
 /* SHORTCUTS TAB
 /*******************************************/
 
 ul {
   padding: 0;
+  margin: 0;
   list-style-type: none;
 }
 
-ul.about {
-  padding-bottom: 10px;
+ul > li:last-child {
+  margin-bottom: 0;
 }
 
 li {
@@ -202,18 +230,63 @@ li {
   justify-content: space-between;
 }
 
-li div:first-child {
-  font-weight: bold;
+.spreadout {
+  padding: 10px 10px 0 10px;
 }
 
-ul.settings label {
+li div:first-child {
+  font-weight: normal;
+}
+
+.panel {
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+  background-color: #ffffff;
+  border-radius: 0 0 3px 3px;
+}
+
+.panel:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.content .panel {
+  margin-top: 10px;
+}
+
+.content .panel ~ .panel {
+  margin-top: 0;
+}
+
+.panel > * {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.panel > ul {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.panel h4 {
+  display: block;
+  border-radius: 3px 3px 0 0;
+  border-bottom: 1px solid #ccc;
+  font-weight: normal;
+  padding-top: 8px;
+  padding-bottom: 4px;
+}
+
+.settings label {
   cursor: pointer;
   display: flex;
 }
 
-ul.settings label p {
+.settings label p {
   padding-left: 15px;
   flex: 1;
+  font-weight: bold;
+}
+
+.shortcuts h4 {
   font-weight: bold;
 }
 
@@ -275,28 +348,68 @@ input:checked + .slider:before {
 }
 
 /* Tooltip */
+
 .tooltip {
   position: relative;
   display: inline-block;
 }
 
 .tooltip .tooltiptext {
-  line-height: 1.15;
-  font-size: 80%;
-  visibility: hidden;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: rgba(238, 238, 238, 1);
-  border-radius: 6px;
-  padding: 5px;
   position: absolute;
-  z-index: 1;
-  width: 120px;
-  top: -5px;
-  left: 105%;
-  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
-  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  top: 125%; /* space between icon and tooltip */
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #eee;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  line-height: 1.3;
+  font-family: 'Roboto', Arial, sans-serif;
+  white-space: normal;
+  overflow: visible;
+  width: max-content;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
   opacity: 0;
-  transition: opacity 0.5s;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 120px;
+}
+
+.zoom-wrapper {
+  display: flex; /* Ensure content inside the wrapper is stacked vertically */
+  flex-direction: column; /* Stack items vertically */
+  overflow: visible; /* Prevent zoom from overflowing */
+  position: relative; /* Ensures that the zoom effect does not affect the layout of other elements */
+}
+
+.zoom-wrapper label {
+  padding-bottom: 0;
+  transition: padding-bottom 0.3s ease; /* Smooth transition for height change */
+}
+
+.zoom-toggle {
+  display: none; /* Hide the checkbox */
+}
+
+.zoom-img {
+  width: 100%;
+  transition: transform 0.3s ease; /* Smooth zoom effect */
+  transform-origin: 15% center; /* Focus the zoom on the left side */
+  cursor: zoom-in; /* Indicating that the image can be zoomed */
+  display: block; /* Remove any bottom space if it's inline */
+}
+
+/* When checkbox is checked, zoom the image */
+.zoom-toggle:checked + label .zoom-img {
+  transform: scale(1.2) translateY(20px); /* Zoom and move the image down */
+  cursor: zoom-out; /* Indicating that the image can be zoomed out */
+}
+
+/* Dynamically change the height of the wrapper when zoomed */
+.zoom-toggle:checked + label {
+  padding-bottom: 20%;
 }
 
 .tooltip .widetip {
@@ -306,6 +419,14 @@ input:checked + .slider:before {
 .tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
+}
+
+@media (max-width: 500px) {
+  .tooltip .tooltiptext {
+    left: 0;
+    right: auto;
+    transform: none;
+  }
 }
 
 /* Rounded sliders */
@@ -340,6 +461,10 @@ input:checked + .slider:before {
   margin-right: 5px;
 }
 
+li .options {
+  margin-bottom: 0;
+}
+
 label:has(input:disabled) {
   color: #ccc;
   cursor: default;
@@ -347,6 +472,11 @@ label:has(input:disabled) {
 
 div .options {
   padding-top: 10px;
+}
+
+ul > h4 {
+  margin-bottom: 10px;
+  font-weight: normal;
 }
 
 /******************************************

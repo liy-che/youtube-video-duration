@@ -445,7 +445,6 @@ function updateShowSpeed() {
 }
 
 function updateShowTime(forced = true) {
-
   if (!forced && !isPlaying) return;
 
   let { remainTimestamp, diffTimestamp, sign, playProgress } = getTimeDisplay();
@@ -471,7 +470,7 @@ function updateShowTime(forced = true) {
 
   if (playProgress !== -1) {
     progressDisplay.innerHTML = `
-            <span id="percentage">${playProgress === 100 ? 'Complete 🎉' : playProgress+'%'}</span>
+            <span id="percentage">${playProgress === 100 ? 'Complete 🎉' : playProgress + '%'}</span>
         `;
   }
 }
@@ -494,7 +493,8 @@ function getTimeDisplay() {
 
   // 1. remaining video time at 1x speed
   let remainTime = video.duration - video.currentTime;
-  if (isNaN(remainTime)) return { remainTimestamp, diffTimestamp, sign, playProgress };
+  if (isNaN(remainTime))
+    return { remainTimestamp, diffTimestamp, sign, playProgress };
 
   // 2. remaining video time at chosen speed
   let remainTimeAtSpeed = calcDuration(remainTime, speed);
