@@ -45,7 +45,7 @@ h6 {
 
 h1,
 h3 {
-  font-size: 1em;
+  font-size: 1.1em;
 }
 
 small {
@@ -192,9 +192,6 @@ h1 {
   overflow: hidden;
   display: inherit;
 }
-h1 {
-  font-weight: bold;
-}
 
 h3 {
   font-weight: 200;
@@ -241,7 +238,7 @@ li div:first-child {
 .panel {
   box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
   background-color: #ffffff;
-  border-radius: 0 0 3px 3px;
+  border-radius: 3px;
 }
 
 .panel:not(:last-child) {
@@ -268,7 +265,6 @@ li div:first-child {
 
 .panel h4 {
   display: block;
-  border-radius: 3px 3px 0 0;
   border-bottom: 1px solid #ccc;
   font-weight: normal;
   padding-top: 8px;
@@ -366,15 +362,62 @@ input:checked + .slider:before {
   font-family: 'Roboto', Arial, sans-serif;
   white-space: normal;
   overflow: visible;
-  width: max-content;
+  width: 120px; /* Default width */
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease;
   z-index: 1;
+
+  /* Center by default */
   left: 50%;
   transform: translateX(-50%);
-  max-width: 120px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Tooltip size variations */
+.tooltip .tinytip {
+  width: 80px;
+}
+
+.tooltip .midtip {
+  width: 150px;
+}
+
+.tooltip .widetip {
+  width: 180px;
+}
+
+/* Position variations - add these classes manually to tooltips near edges */
+.tooltip .left-align {
+  left: 0;
+  transform: none;
+}
+
+.tooltip .right-align {
+  right: 0;
+  left: auto;
+  transform: none;
+}
+
+/* Top tooltip positioning */
+.tooltip .top-tip {
+  top: auto;
+  bottom: 125%; /* Position above the icon instead of below */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Position variations for top tooltips */
+.tooltip .top-left {
+  bottom: 125%;
+  left: 0;
+  transform: none;
+  top: auto;
 }
 
 .zoom-wrapper {
@@ -410,23 +453,6 @@ input:checked + .slider:before {
 /* Dynamically change the height of the wrapper when zoomed */
 .zoom-toggle:checked + label {
   padding-bottom: 20%;
-}
-
-.tooltip .widetip {
-  width: 120px;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
-}
-
-@media (max-width: 500px) {
-  .tooltip .tooltiptext {
-    left: 0;
-    right: auto;
-    transform: none;
-  }
 }
 
 /* Rounded sliders */
