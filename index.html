@@ -52,36 +52,36 @@
           <h1>Video Duration for YouTube™</h1>
           <div class="panel">
             <h4>General</h4>
-            <ul class="top">
-              <li>
+            <ul>
+              <li class="setting-item">
                 <label>
                   <div class="switch">
                     <input type="checkbox" id="enable" />
                     <span class="slider round"></span>
                   </div>
-                  <p>
-                    Enable&nbsp;
-                    <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext">Enable extension</span>
-                    </i>
-                  </p>
                 </label>
+                <label for="enable">
+                  <p>Enable</p>
+                </label>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip">Enable extension</span>
+                </i>
               </li>
-              <li>
-                <label>
+              <li class="setting-item">
+                <label class="switch-label">
                   <div class="switch">
                     <input type="checkbox" id="enableController" />
                     <span class="slider round"></span>
                   </div>
-                  <p>
-                    Controller (v)&nbsp;
-                    <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext midtip"
-                        >Always show on the top corner of the video</span
-                      >
-                    </i>
-                  </p>
                 </label>
+                <label for="enableController">
+                  <p>Controller</p>
+                </label>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Always show on the top corner of the video</span
+                  >
+                </i>
                 <ul>
                   <li class="options">
                     <label>
@@ -91,22 +91,22 @@
                         name="location"
                         value="left"
                       />
-                      Left (z)
+                      Left
                     </label>
-                    <label>
+                    <label style="margin-left: 10px">
                       <input
                         type="radio"
                         id="right"
                         name="location"
                         value="right"
                       />
-                      Right (x)&nbsp;
-                      <i class="fa-regular fa-circle-question tooltip">
-                        <span class="tooltiptext midtip"
-                          >Which corner to place the controller</span
-                        >
-                      </i>
+                      Right
                     </label>
+                    <i class="fa-regular fa-circle-question tooltip">
+                      <span class="tooltiptext top-tip midtip"
+                        >Which corner to place the controller</span
+                      >
+                    </i>
                   </li>
                   <li class="options">
                     <label>
@@ -116,17 +116,17 @@
                         name="remaining"
                         value="show"
                       />
-                      Time to end (e)&nbsp;
-                      <i class="fa-regular fa-circle-question tooltip">
-                        <span class="tooltiptext midtip"
-                          >Show remaining time and time difference (temperarily)
-                          when watching in non-1x speed
-                          <hr />
-                          Example: "10:00" means you can finish the video on
-                          current speed in 10 minutes)</span
-                        >
-                      </i>
+                      Time to end
                     </label>
+                    <i class="fa-regular fa-circle-question tooltip">
+                      <span class="tooltiptext midtip"
+                        >Show remaining time and time difference (temperarily)
+                        when watching in non-1x speed
+                        <hr />
+                        Example: "10:00" means you can finish the video on
+                        current speed in 10 minutes)</span
+                      >
+                    </i>
                   </li>
                   <li class="options">
                     <label>
@@ -136,18 +136,18 @@
                         name="difference"
                         value="show"
                       />
-                      Time difference&nbsp;
-                      <i class="fa-regular fa-circle-question tooltip">
-                        <span class="tooltiptext widetip top-tip"
-                          >Show potential time saving or addition (if any) to
-                          watch the remaining video in the current non-1x speed
-                          <hr />
-                          Example: "<span style="color: #99cc33">▼</span>2.00"
-                          means you can save 2 minutes watching the remaining
-                          video on current speed</span
-                        >
-                      </i>
+                      Time difference
                     </label>
+                    <i class="fa-regular fa-circle-question tooltip">
+                      <span class="tooltiptext widetip top-tip"
+                        >Show potential time saving or addition (if any) to
+                        watch the remaining video in the current non-1x speed
+                        <hr />
+                        Example: "<span style="color: #99cc33">▼</span>2.00"
+                        means you can save 2 minutes watching the remaining
+                        video on current speed</span
+                      >
+                    </i>
                   </li>
                   <li class="options">
                     <label>
@@ -157,46 +157,45 @@
                         name="progress"
                         value="show"
                       />
-                      Progress % (p)&nbsp;
-                      <i class="fa-regular fa-circle-question tooltip">
-                        <span class="tooltiptext midtip"
-                          >Show watch progress (e.g. 30%)</span
-                        >
-                      </i>
+                      Progress %
                     </label>
+                    <i class="fa-regular fa-circle-question tooltip">
+                      <span class="tooltiptext midtip top-tip"
+                        >Show watch progress (e.g. 30%)</span
+                      >
+                    </i>
                   </li>
                 </ul>
               </li>
-              <li>
-                <label>
+              <li class="setting-item">
+                <label class="switch-label">
                   <div class="switch">
                     <input type="checkbox" id="enableShortcuts" />
                     <span class="slider round"></span>
                   </div>
-                  <p>
-                    Shortcuts&nbsp;
-                    <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext">Enable keyboard shortcuts</span>
-                    </i>
-                  </p>
                 </label>
+                <label for="enableShortcuts">
+                  <p>Shortcuts</p>
+                </label>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Enable keyboard shortcuts</span
+                  >
+                </i>
               </li>
             </ul>
           </div>
           <div class="panel">
             <h4>Speed</h4>
-            <ul class="top">
+            <ul>
               <li>
                 <label>
-                  <div class="switch">
-                    <input type="checkbox" id="persist-speed" />
-                    <span class="slider round"></span>
-                  </div>
                   <p>
-                    Default speed&nbsp;
+                    Default speed
                     <i class="fa-regular fa-circle-question tooltip">
                       <span class="tooltiptext top-tip"></span>
                     </i>
+                    <input type="text" value="1.0" placeholder="1.0" />
                   </p>
                 </label>
               </li>
@@ -245,23 +244,23 @@
             <h4 class="blueText">Controller</h4>
             <ul class="spreadout">
               <li>
-                <div>Toggle controller</div>
+                <div>Show/hide controller</div>
                 <div>V</div>
               </li>
               <li>
-                <div>Show left controller</div>
+                <div>Use left controller</div>
                 <div>Z</div>
               </li>
               <li>
-                <div>Show right controller</div>
+                <div>Use right controller</div>
                 <div>X</div>
               </li>
               <li>
-                <div>Toggle time to end</div>
+                <div>Show/hide time to end</div>
                 <div>E</div>
               </li>
               <li>
-                <div>Toggle progress %</div>
+                <div>Show/hide progress %</div>
                 <div>P</div>
               </li>
             </ul>
