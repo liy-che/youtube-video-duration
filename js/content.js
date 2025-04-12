@@ -30,6 +30,7 @@ const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
 const zeroTime = '0:00';
+let lastSpeed = null;
 
 // TODO: stop everything when disabled, including in the popup
 // enabled -> disabled -> enabled
@@ -47,6 +48,13 @@ let settings = {
   showRemaining: true,
   showDifference: false,
   showProgress: false,
+  rememberSpeed: {
+    set: false,
+    lastSpeed: 1.0,
+  },
+  defaultSpeed: 1.0,
+  speedIncreInterval: 0.25,
+  speedDecreInterval: 0.25,
 };
 
 /***************************** Initialize extension ******************************/
@@ -101,6 +109,7 @@ function msgHandler(request, sender, sendResponse) {
 chrome.storage.sync.get(settings, async function (storage) {
   settings = storage;
   showDiff = settings.showDifference;
+  lastSpeed = settings.rememberSpeed.lastSpeed;
 
   chrome.storage.onChanged.addListener(async function (changes, _area) {
     if (changes.enable) {
@@ -177,6 +186,23 @@ chrome.storage.sync.get(settings, async function (storage) {
       }
       flashButtons(2000);
     }
+
+    // get from storage and set local, then use local after
+    // set to storage and update local, continue using local
+    if (changes.rememberSpeed) {
+      settings.rememberSpeed = changes.rememberSpeed.newValue;
+      if (settings.rememberSpeed.set) {
+        lastSpeed = video.playbackRate;
+        chrome.storage.sync.set({
+          rememberSpeed: {
+            ...settings.rememberSpeed,
+            lastSpeed: lastSpeed,
+          },
+        });
+      } else {
+        lastSpeed = null;
+      }
+    }
   });
 
   // RUNS disable
@@ -202,6 +228,7 @@ document.addEventListener('vdc-initialize', async () => {
   if (!settings.enable) return;
 
   video = await waitForElm('video[src]');
+
   videoContainer = video.parentElement; // html5-video-container
   // remove controller for video tags without src attribute
   // find the video controller inserted previously if exists
@@ -438,9 +465,19 @@ function setPlaySpeed(newSpeed) {
   newSpeed = newSpeed < minSpeed ? minSpeed : newSpeed;
   newSpeed = newSpeed > maxSpeed ? maxSpeed : newSpeed;
   video.playbackRate = newSpeed;
+  if (settings.rememberSpeed.set) {
+    lastSpeed = newSpeed;
+    chrome.storage.sync.set({
+      rememberSpeed: { ...settings.rememberSpeed, lastSpeed: newSpeed },
+    });
+  }
 }
 
 function updateShowSpeed() {
+  if (settings.rememberSpeed.set) {
+    speedDisplay.textContent = lastSpeed.toFixed(2);
+    return;
+  }
   speedDisplay.textContent = video.playbackRate.toFixed(2);
 }
 
@@ -661,7 +698,7 @@ function constructShadowDOM() {
             <button class="reset">&rlarr;</button>
             <div class="speed">
                 <button class="left">&minus;</button>
-                <span class="display">${video.playbackRate}</span>
+                <span class="display"></span>
                 <button class="right">&plus;</button>
             </div>
 
@@ -768,6 +805,7 @@ function removeTimeUpdates() {
 }
 
 let handleLoadedMetadata = () => {
+  if (settings.rememberSpeed.set) setPlaySpeed(lastSpeed);
   updateShowSpeed();
   updateShowTime(false);
 };
@@ -807,6 +845,7 @@ let handlePlaying = () => {
 
 let handleEmptied = () => {
   isPlaying = false;
+  speedDisplay.textContent = '';
   remainDisplay.textContent = '';
   diffDisplay.innerHTML = '';
   progressDisplay.innerHTML = '';

@@ -256,8 +256,8 @@ li div:first-child {
 }
 
 .panel > * {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 .panel > ul {
@@ -271,6 +271,7 @@ li div:first-child {
   font-weight: normal;
   padding-top: 8px;
   padding-bottom: 4px;
+  padding-left: 9px;
 }
 
 .setting-item {
@@ -291,10 +292,12 @@ li div:first-child {
   align-items: center;
 }
 
-.setting-item label p {
-  flex: 1;
+.setting-name {
   font-weight: bold;
-  padding-left: 15px;
+}
+
+.setting-item label + label span {
+  margin-left: 15px;
 }
 
 .shortcuts h4 {
@@ -482,10 +485,16 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-/* Radio buttons */
-.options input {
-  display: initial;
+.options input,
+input[type='checkbox'][name] {
+  display: inherit;
   accent-color: #2196f3;
+}
+
+input[type='checkbox'][name],
+input[type='radio'][name] {
+  width: 16px;
+  height: 16px;
 }
 
 .options {
@@ -555,8 +564,13 @@ ul > h4 {
 
 /* Text box */
 input[type='text'] {
-  width: 40px;
+  width: 44px;
+  height: 24px;
   padding: 3px;
-  text-align: center;
   font-size: 16px;
+  text-align: center;
+}
+
+.textbox-label {
+  margin-left: auto;
 }

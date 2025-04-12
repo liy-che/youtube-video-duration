@@ -10,6 +10,7 @@ const controllerOptions = document.querySelectorAll('.options label input');
 const showProgress = document.querySelector('#progress');
 const showRemaining = document.querySelector('#remaining');
 const showDifference = document.querySelector('#difference');
+const rememberSpeed = document.querySelector('#remember-speed');
 
 // User settings, only using keys to get settings from chrome storage
 let settings = {
@@ -21,6 +22,13 @@ let settings = {
   showRemaining: true,
   showDifference: false,
   showProgress: false,
+  rememberSpeed: {
+    set: false,
+    lastSpeed: 1.0,
+  },
+  defaultSpeed: 1.0,
+  speedIncreInterval: 0.25,
+  speedDecreInterval: 0.25,
 };
 
 // Tabs
@@ -115,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showRemaining.checked = storage.showRemaining;
     toggleControllerOptions();
     showDifference.checked = storage.showDifference;
+    rememberSpeed.checked = storage.rememberSpeed.set;
 
     if (!storage.seen) {
       document.querySelector('.alert').style.display = 'block';
@@ -155,7 +164,6 @@ enableShortcuts.addEventListener('click', function () {
   enableExt.checked =
     enableShortcuts.checked || enableController.checked ? true : false;
   toggleControllerOptions();
-  if (enableShortcuts.checked) sendMessage('flashLocation');
   chrome.storage.sync.set({
     enable: enableExt.checked,
     enableShortcuts: enableShortcuts.checked,
@@ -166,19 +174,26 @@ showRemaining.addEventListener('click', function () {
   chrome.storage.sync.set({
     showRemaining: showRemaining.checked,
   });
-  sendMessage('flashLocation');
 });
 
 showProgress.addEventListener('click', function () {
   chrome.storage.sync.set({
     showProgress: showProgress.checked,
   });
-  sendMessage('flashLocation');
 });
 
 showDifference.addEventListener('click', function () {
   chrome.storage.sync.set({
     showDifference: showDifference.checked,
+  });
+});
+
+rememberSpeed.addEventListener('click', function () {
+  chrome.storage.sync.set({
+    rememberSpeed: {
+      set: rememberSpeed.checked,
+      lastSpeed: settings.rememberSpeed.lastSpeed,
+    },
   });
 });
 
@@ -194,7 +209,6 @@ setLocation.forEach((radio) => {
       chrome.storage.sync.set({
         setLocation: this.value,
       });
-      sendMessage('flashLocation');
     }
   });
 });

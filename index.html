@@ -61,7 +61,7 @@
                   </div>
                 </label>
                 <label for="enable">
-                  <p>Enable</p>
+                  <span class="setting-name">Enable</span>
                 </label>
                 <i class="fa-regular fa-circle-question tooltip">
                   <span class="tooltiptext top-tip">Enable extension</span>
@@ -75,7 +75,7 @@
                   </div>
                 </label>
                 <label for="enableController">
-                  <p>Controller</p>
+                  <span class="setting-name">Controller</span>
                 </label>
                 <i class="fa-regular fa-circle-question tooltip">
                   <span class="tooltiptext top-tip"
@@ -175,7 +175,7 @@
                   </div>
                 </label>
                 <label for="enableShortcuts">
-                  <p>Shortcuts</p>
+                  <span class="setting-name">Shortcuts</span>
                 </label>
                 <i class="fa-regular fa-circle-question tooltip">
                   <span class="tooltiptext top-tip"
@@ -188,15 +188,70 @@
           <div class="panel">
             <h4>Speed</h4>
             <ul>
-              <li>
-                <label>
-                  <p>
-                    Default speed
-                    <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext top-tip"></span>
-                    </i>
-                    <input type="text" value="1.0" placeholder="1.0" />
-                  </p>
+              <li class="setting-item">
+                <span class="setting-name">Remember speed</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Use the last set speed. Overrides default speed</span
+                  >
+                </i>
+                <label class="textbox-label">
+                  <input
+                    type="checkbox"
+                    name="remember-speed"
+                    id="remember-speed"
+                  />
+                </label>
+              </li>
+              <li class="setting-item">
+                <span class="setting-name">Default speed</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Start videos with this speed</span
+                  >
+                </i>
+                <label class="textbox-label">
+                  <input
+                    type="text"
+                    id="default-speed"
+                    name="default-speed"
+                    value="1.0"
+                    placeholder="1.0"
+                  />
+                </label>
+              </li>
+              <li class="setting-item">
+                <span class="setting-name">Increase interval</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Amount of speed to increase at each interval</span
+                  >
+                </i>
+                <label class="textbox-label">
+                  <input
+                    type="text"
+                    id="speed-incre-interval"
+                    name="speed-incre-interval"
+                    value="0.25"
+                    placeholder="0.25"
+                  />
+                </label>
+              </li>
+              <li class="setting-item">
+                <span class="setting-name">Decrease interval</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Amount of speed to decrease at each interval</span
+                  >
+                </i>
+                <label class="textbox-label">
+                  <input
+                    type="text"
+                    id="speed-decre-interval"
+                    name="speed-decre-interval"
+                    value="0.25"
+                    placeholder="0.25"
+                  />
                 </label>
               </li>
             </ul>
