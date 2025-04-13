@@ -11,6 +11,66 @@ const showProgress = document.querySelector('#progress');
 const showRemaining = document.querySelector('#remaining');
 const showDifference = document.querySelector('#difference');
 const rememberSpeed = document.querySelector('#remember-speed');
+const defaultSpeedInput = document.querySelector('#default-speed');
+
+/*
+ - only allow numbers (integer or valid decimal with up to 3 decimal places)
+- value must be between 0 and 16, inclusive
+ */
+defaultSpeedInput.addEventListener('input', () => {
+  const raw = defaultSpeedInput.value;
+
+  // Allow only digits and at most one dot
+  const cleaned = raw.replace(/[^\d.]/g, '');
+
+  // If multiple dots, keep only the first
+  const parts = cleaned.split('.');
+  let numeric = parts[0];
+  if (parts.length > 1) {
+    numeric += '.' + parts[1].slice(0, 3); // limit to 3 decimal places
+  }
+
+  // Update input only if it's changed
+  if (numeric !== raw) {
+    defaultSpeedInput.value = numeric;
+  }
+
+  // Check validity and range
+  defaultSpeedInput.classList.toggle('invalid', Number(numeric) > 16);
+});
+
+/*
+- auto format to a standard format eg: .15 to 0.15, 1 to 1.0, 0.250 to 0.25
+  must have at least one to at most three decimal places, remove the redundant 
+  ending 0s in decimal places. No rounding.
+ */
+function formatSpeed(input) {
+  if (input === '') return input;
+
+  const num = parseFloat(input);
+
+  // Check validity and range
+  if (isNaN(num) || num < 0 || num > 16) return null;
+
+  let str = num.toString(); // Removes trailing zeros already
+
+  // Ensure at least one decimal
+  if (!str.includes('.')) {
+    str += '.0';
+  }
+
+  return str;
+}
+
+defaultSpeedInput.addEventListener('blur', () => {
+  const formatted = formatSpeed(defaultSpeedInput.value);
+  if (formatted !== null) {
+    defaultSpeedInput.value = formatted;
+    defaultSpeedInput.classList.toggle('invalid', false);
+  } else {
+    defaultSpeedInput.classList.toggle('invalid', true);
+  }
+});
 
 // User settings, only using keys to get settings from chrome storage
 let settings = {
@@ -63,7 +123,16 @@ function isRightKey(key) {
 }
 
 // listen for key press
-document.onkeydown = (event) => {
+document.addEventListener('keydown', (event) => {
+  // Ignore keydown event if typing in an input box
+  if (
+    event.target.nodeName === 'INPUT' ||
+    event.target.nodeName === 'TEXTAREA' ||
+    event.target.isContentEditable
+  ) {
+    return false;
+  }
+
   const pressedCode = event.code;
   if (isLeftKey(pressedCode)) {
     sendMessage('decreSpeed');
@@ -82,9 +151,18 @@ document.onkeydown = (event) => {
   } else if (pressedCode === 'KeyM') {
     sendMessage('changeVolume');
   } else if (pressedCode === 'Space') window.close();
-};
+});
 
-document.onkeyup = (event) => {
+document.addEventListener('keyup', (event) => {
+  // Ignore keydown event if typing in an input box
+  if (
+    event.target.nodeName === 'INPUT' ||
+    event.target.nodeName === 'TEXTAREA' ||
+    event.target.isContentEditable
+  ) {
+    return false;
+  }
+
   const pressedCode = event.code;
   if (isUpKey(pressedCode)) {
     if (tab1.checked) tab2.checked = true;
@@ -96,8 +174,12 @@ document.onkeyup = (event) => {
     showRemaining.click();
   } else if (pressedCode === 'KeyP') {
     showProgress.click();
+  } else if (pressedCode === 'KeyZ') {
+    document.querySelector('input[name="location"][value="left"]').click();
+  } else if (pressedCode === 'KeyX') {
+    document.querySelector('input[name="location"][value="right"]').click();
   }
-};
+});
 
 /********************************* functions **********************************/
 
