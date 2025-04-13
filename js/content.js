@@ -474,10 +474,6 @@ function setPlaySpeed(newSpeed) {
 }
 
 function updateShowSpeed() {
-  if (settings.rememberSpeed.set) {
-    speedDisplay.textContent = lastSpeed.toFixed(2);
-    return;
-  }
   speedDisplay.textContent = video.playbackRate.toFixed(2);
 }
 
@@ -805,8 +801,10 @@ function removeTimeUpdates() {
 }
 
 let handleLoadedMetadata = () => {
-  if (settings.rememberSpeed.set) setPlaySpeed(lastSpeed);
-  updateShowSpeed();
+  if (settings.rememberSpeed.set) {
+    speedDisplay.textContent = lastSpeed.toFixed(2);
+    setPlaySpeed(lastSpeed);
+  }
   updateShowTime(false);
 };
 
