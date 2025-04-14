@@ -1,5 +1,4 @@
 let video;
-let controllerNode;
 let flashButtons;
 let resetButton;
 let increButton;
@@ -24,13 +23,14 @@ let handleSpaceUp;
 let isPlaying = false;
 let shortsTimeoutId;
 
-const defaultSpeed = 1.0;
-let secondarySpeed = defaultSpeed;
-const minSpeed = 0.25;
+const resetSpeed = 1.0;
+let secondarySpeed = resetSpeed;
+const minSpeed = 0.0625;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
 const zeroTime = '0:00';
+let lastSpeed = null;
 
 // TODO: stop everything when disabled, including in the popup
 // enabled -> disabled -> enabled
@@ -48,6 +48,13 @@ let settings = {
   showRemaining: true,
   showDifference: false,
   showProgress: false,
+  rememberSpeed: {
+    set: false,
+    lastSpeed: 1.0,
+  },
+  defaultSpeed: 1.0,
+  speedIncreInterval: 0.25,
+  speedDecreInterval: 0.25,
 };
 
 /***************************** Initialize extension ******************************/
@@ -94,9 +101,6 @@ function msgHandler(request, sender, sendResponse) {
     sendResponse({ msgType: request.msgType, muted: video.muted });
   } else if (request.msgType === 'inject') {
     document.dispatchEvent(new CustomEvent('vdc-initialize'));
-  } else if (request.msgType === 'flashLocation') {
-    updateShowTime();
-    flashButtons(1000);
   }
 }
 
@@ -105,6 +109,7 @@ function msgHandler(request, sender, sendResponse) {
 chrome.storage.sync.get(settings, async function (storage) {
   settings = storage;
   showDiff = settings.showDifference;
+  lastSpeed = settings.rememberSpeed.lastSpeed;
 
   chrome.storage.onChanged.addListener(async function (changes, _area) {
     if (changes.enable) {
@@ -122,7 +127,7 @@ chrome.storage.sync.get(settings, async function (storage) {
       }
     }
 
-    if (!controllerNode) controllerNode = await waitForElm('.vdc-controller');
+    if (!insertedNode) insertedNode = await waitForElm('.vdc-controller');
 
     if (changes.enableController) {
       settings.enableController = changes.enableController.newValue;
@@ -132,6 +137,7 @@ chrome.storage.sync.get(settings, async function (storage) {
     if (changes.enableShortcuts) {
       settings.enableShortcuts = changes.enableShortcuts.newValue;
       if (settings.enableShortcuts) {
+        flashButtons(2000);
         document.addEventListener('keydown', handleShortcuts, true);
       } else {
         document.removeEventListener('keydown', handleShortcuts, true);
@@ -141,20 +147,21 @@ chrome.storage.sync.get(settings, async function (storage) {
     if (changes.setLocation) {
       settings.setLocation = changes.setLocation.newValue;
       if (settings.setLocation === 'left') {
-        controllerNode.classList.replace('top-right', 'top-left');
+        insertedNode.classList.replace('top-right', 'top-left');
       } else {
-        controllerNode.classList.replace('top-left', 'top-right');
+        insertedNode.classList.replace('top-left', 'top-right');
       }
+      flashButtons(2000);
     }
 
     if (changes.showRemaining) {
       settings.showRemaining = changes.showRemaining.newValue;
       if (settings.showRemaining) {
-        flashDiff();
         updateShowTime();
       } else {
         remainDisplay.textContent = '';
       }
+      flashButtons(2000);
     }
 
     if (changes.showDifference) {
@@ -167,6 +174,7 @@ chrome.storage.sync.get(settings, async function (storage) {
         showDiff = false;
         diffDisplay.innerHTML = '';
       }
+      flashButtons(2000);
     }
 
     if (changes.showProgress) {
@@ -176,6 +184,29 @@ chrome.storage.sync.get(settings, async function (storage) {
       } else {
         progressDisplay.innerHTML = '';
       }
+      flashButtons(2000);
+    }
+
+    // get from storage and set local, then use local after
+    // set to storage and update local, continue using local
+    if (changes.rememberSpeed) {
+      settings.rememberSpeed = changes.rememberSpeed.newValue;
+      if (settings.rememberSpeed.set) {
+        lastSpeed =
+          video.playbackRate === 1 ? settings.defaultSpeed : video.playbackRate;
+        chrome.storage.sync.set({
+          rememberSpeed: {
+            ...settings.rememberSpeed,
+            lastSpeed: lastSpeed,
+          },
+        });
+      } else {
+        lastSpeed = null;
+      }
+    }
+
+    if (changes.defaultSpeed) {
+      settings.defaultSpeed = changes.defaultSpeed.newValue;
     }
   });
 
@@ -202,6 +233,7 @@ document.addEventListener('vdc-initialize', async () => {
   if (!settings.enable) return;
 
   video = await waitForElm('video[src]');
+
   videoContainer = video.parentElement; // html5-video-container
   // remove controller for video tags without src attribute
   // find the video controller inserted previously if exists
@@ -213,7 +245,7 @@ document.addEventListener('vdc-initialize', async () => {
 
   // inject controller for video tag with src attribute
   // construct a new node with a shadow DOM and insert node into DOM
-  controllerNode = constructShadowDOM();
+  insertedNode = constructShadowDOM();
 
   // set up event listeners for controller
   setupListeners();
@@ -255,9 +287,9 @@ let handleAdvance = () => {
 };
 
 let handleReset = () => {
-  if (video.playbackRate !== defaultSpeed) {
+  if (video.playbackRate !== resetSpeed) {
     secondarySpeed = video.playbackRate;
-    setPlaySpeed(defaultSpeed);
+    setPlaySpeed(resetSpeed);
   } else setPlaySpeed(secondarySpeed);
 };
 
@@ -296,7 +328,7 @@ let handleShortcuts = (event) => {
   if (pressedCode === 'KeyD') handleIncre();
   else if (pressedCode === 'KeyA') handleDecre();
   else if (pressedCode === 'KeyS') {
-    if (video.playbackRate === defaultSpeed) updateShowTime();
+    if (video.playbackRate === resetSpeed) updateShowTime();
     handleReset();
     flashButtons();
   } else if (pressedCode === 'KeyL') {
@@ -372,7 +404,7 @@ function controlController() {
   if (timer) {
     clearTimeout(timer);
     timer = false;
-    controllerNode.classList.add('vdc-disable');
+    insertedNode.classList.add('vdc-disable');
     return;
   }
   settings.enableController = !settings.enableController;
@@ -385,10 +417,10 @@ function controlController() {
 function showHideController() {
   if (settings.enableController) {
     setupTimeUpdates();
-    controllerNode.classList.remove('vdc-disable');
+    insertedNode.classList.remove('vdc-disable');
   } else {
     removeTimeUpdates();
-    controllerNode.classList.add('vdc-disable');
+    insertedNode.classList.add('vdc-disable');
   }
 }
 
@@ -438,6 +470,12 @@ function setPlaySpeed(newSpeed) {
   newSpeed = newSpeed < minSpeed ? minSpeed : newSpeed;
   newSpeed = newSpeed > maxSpeed ? maxSpeed : newSpeed;
   video.playbackRate = newSpeed;
+  if (settings.rememberSpeed.set) {
+    lastSpeed = newSpeed;
+    chrome.storage.sync.set({
+      rememberSpeed: { ...settings.rememberSpeed, lastSpeed: newSpeed },
+    });
+  }
 }
 
 function updateShowSpeed() {
@@ -445,8 +483,6 @@ function updateShowSpeed() {
 }
 
 function updateShowTime(forced = true) {
-  //console.log('Updating showtime');
-
   if (!forced && !isPlaying) return;
 
   let { remainTimestamp, diffTimestamp, sign, playProgress } = getTimeDisplay();
@@ -472,7 +508,7 @@ function updateShowTime(forced = true) {
 
   if (playProgress !== -1) {
     progressDisplay.innerHTML = `
-            <span id="percentage">${playProgress === 100 ? 'Complete 🎉' : playProgress+'%'}</span>
+            <span id="percentage">${playProgress === 100 ? 'Complete 🎉' : playProgress + '%'}</span>
         `;
   }
 }
@@ -495,7 +531,8 @@ function getTimeDisplay() {
 
   // 1. remaining video time at 1x speed
   let remainTime = video.duration - video.currentTime;
-  if (isNaN(remainTime)) return { remainTimestamp, diffTimestamp, sign, playProgress };
+  if (isNaN(remainTime))
+    return { remainTimestamp, diffTimestamp, sign, playProgress };
 
   // 2. remaining video time at chosen speed
   let remainTimeAtSpeed = calcDuration(remainTime, speed);
@@ -536,12 +573,12 @@ function flashController(controller) {
   function show(duration = 2500) {
     if (!settings.enable || settings.enableController) return;
 
-    controller.classList.remove('vdc-disable');
+    controller.classList.add('vdc-temp');
 
     if (timer) clearTimeout(timer);
 
     timer = setTimeout(function () {
-      if (!settings.enableController) controller.classList.add('vdc-disable');
+      if (!settings.enableController) controller.classList.remove('vdc-temp');
       timer = false;
     }, duration);
   }
@@ -662,7 +699,7 @@ function constructShadowDOM() {
             <button class="reset">&rlarr;</button>
             <div class="speed">
                 <button class="left">&minus;</button>
-                <span class="display">${video.playbackRate}</span>
+                <span class="display"></span>
                 <button class="right">&plus;</button>
             </div>
 
@@ -689,6 +726,13 @@ function constructShadowDOM() {
           newNode,
           videoContainer.parentElement,
         );
+        if (settings.rememberSpeed.set) {
+          speedDisplay.textContent = lastSpeed.toFixed(2);
+          setPlaySpeed(lastSpeed);
+        } else {
+          setPlaySpeed(settings.defaultSpeed);
+          updateShowSpeed();
+        }
       }, 500);
       break;
     case 'inline-preview-player': {
@@ -769,7 +813,13 @@ function removeTimeUpdates() {
 }
 
 let handleLoadedMetadata = () => {
-  updateShowSpeed();
+  if (settings.rememberSpeed.set) {
+    speedDisplay.textContent = lastSpeed.toFixed(2);
+    setPlaySpeed(lastSpeed);
+  } else {
+    setPlaySpeed(settings.defaultSpeed);
+    updateShowSpeed();
+  }
   updateShowTime(false);
 };
 
@@ -808,6 +858,7 @@ let handlePlaying = () => {
 
 let handleEmptied = () => {
   isPlaying = false;
+  speedDisplay.textContent = '';
   remainDisplay.textContent = '';
   diffDisplay.innerHTML = '';
   progressDisplay.innerHTML = '';

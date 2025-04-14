@@ -10,6 +10,83 @@ const controllerOptions = document.querySelectorAll('.options label input');
 const showProgress = document.querySelector('#progress');
 const showRemaining = document.querySelector('#remaining');
 const showDifference = document.querySelector('#difference');
+const rememberSpeed = document.querySelector('#remember-speed');
+const defaultSpeedInput = document.querySelector('#default-speed');
+const saveButton = document.querySelector('.save-button');
+const confirmText = document.querySelector('.confirm-text');
+
+/*
+ - only allow numbers (integer or valid decimal with up to 3 decimal places)
+- value must be between 0 and 16, inclusive
+ */
+defaultSpeedInput.addEventListener('input', () => {
+  const raw = defaultSpeedInput.value !== '' ? defaultSpeedInput.value : '1.0';
+
+  // Allow only digits and at most one dot
+  const cleaned = raw.replace(/[^\d.]/g, '');
+
+  // If multiple dots, keep only the first
+  const parts = cleaned.split('.');
+  let numeric = parts[0];
+  if (parts.length > 1) {
+    numeric += '.' + parts[1].slice(0, 3); // limit to 3 decimal places
+  }
+
+  // Update input only if it's changed
+  if (numeric !== raw) {
+    defaultSpeedInput.value = numeric;
+  }
+
+  // Check validity and range
+  let isInvalid = Number(numeric) < 0.063 || Number(numeric) > 16;
+  defaultSpeedInput.classList.toggle('invalid', isInvalid);
+
+  if (!isInvalid && settings.defaultSpeed !== Number(numeric)) {
+    saveButton.classList.toggle('show', true);
+    confirmText.classList.toggle('show', false);
+  } else {
+    saveButton.classList.toggle('show', false);
+  }
+});
+
+/*
+- auto format to a standard format eg: .15 to 0.15, 1 to 1.0, 0.250 to 0.25
+  must have at least one to at most three decimal places, remove the redundant 
+  ending 0s in decimal places. No rounding.
+ */
+function formatSpeed(input) {
+  if (input === '') return input;
+
+  const num = parseFloat(input);
+
+  // Check validity and range
+  if (isNaN(num) || num < 0 || num > 16) return null;
+
+  let str = num.toString(); // Removes trailing zeros already
+
+  // Ensure at least one decimal
+  if (!str.includes('.')) {
+    str += '.0';
+  }
+
+  return str;
+}
+
+saveButton.addEventListener('click', () => {
+  saveButton.classList.toggle('show', false);
+  confirmText.classList.toggle('show', true);
+  setTimeout(() => {
+    confirmText.classList.toggle('show', false);
+  }, 1500);
+  settings.defaultSpeed =
+    defaultSpeedInput.value !== '' ? Number(defaultSpeedInput.value) : 1;
+  chrome.storage.sync.set({ defaultSpeed: settings.defaultSpeed });
+});
+
+defaultSpeedInput.addEventListener('blur', () => {
+  const formatted = formatSpeed(defaultSpeedInput.value);
+  if (formatted !== null) defaultSpeedInput.value = formatted;
+});
 
 // User settings, only using keys to get settings from chrome storage
 let settings = {
@@ -21,6 +98,13 @@ let settings = {
   showRemaining: true,
   showDifference: false,
   showProgress: false,
+  rememberSpeed: {
+    set: false,
+    lastSpeed: 1.0,
+  },
+  defaultSpeed: 1.0,
+  speedIncreInterval: 0.25,
+  speedDecreInterval: 0.25,
 };
 
 // Tabs
@@ -55,7 +139,16 @@ function isRightKey(key) {
 }
 
 // listen for key press
-document.onkeydown = (event) => {
+document.addEventListener('keydown', (event) => {
+  // Ignore keydown event if typing in an input box
+  if (
+    event.target.nodeName === 'INPUT' ||
+    event.target.nodeName === 'TEXTAREA' ||
+    event.target.isContentEditable
+  ) {
+    return false;
+  }
+
   const pressedCode = event.code;
   if (isLeftKey(pressedCode)) {
     sendMessage('decreSpeed');
@@ -74,9 +167,18 @@ document.onkeydown = (event) => {
   } else if (pressedCode === 'KeyM') {
     sendMessage('changeVolume');
   } else if (pressedCode === 'Space') window.close();
-};
+});
 
-document.onkeyup = (event) => {
+document.addEventListener('keyup', (event) => {
+  // Ignore keydown event if typing in an input box
+  if (
+    event.target.nodeName === 'INPUT' ||
+    event.target.nodeName === 'TEXTAREA' ||
+    event.target.isContentEditable
+  ) {
+    return false;
+  }
+
   const pressedCode = event.code;
   if (isUpKey(pressedCode)) {
     if (tab1.checked) tab2.checked = true;
@@ -88,8 +190,12 @@ document.onkeyup = (event) => {
     showRemaining.click();
   } else if (pressedCode === 'KeyP') {
     showProgress.click();
+  } else if (pressedCode === 'KeyZ') {
+    document.querySelector('input[name="location"][value="left"]').click();
+  } else if (pressedCode === 'KeyX') {
+    document.querySelector('input[name="location"][value="right"]').click();
   }
-};
+});
 
 /********************************* functions **********************************/
 
@@ -105,6 +211,7 @@ function sendMessage(type, msg = {}) {
 // restore options
 document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.sync.get(settings, function (storage) {
+    settings = storage;
     enableExt.checked = storage.enable;
     enableController.checked = storage.enableController;
     enableShortcuts.checked = storage.enableShortcuts;
@@ -115,6 +222,8 @@ document.addEventListener('DOMContentLoaded', function () {
     showRemaining.checked = storage.showRemaining;
     toggleControllerOptions();
     showDifference.checked = storage.showDifference;
+    rememberSpeed.checked = storage.rememberSpeed.set;
+    defaultSpeedInput.value = formatSpeed(storage.defaultSpeed);
 
     if (!storage.seen) {
       document.querySelector('.alert').style.display = 'block';
@@ -155,7 +264,6 @@ enableShortcuts.addEventListener('click', function () {
   enableExt.checked =
     enableShortcuts.checked || enableController.checked ? true : false;
   toggleControllerOptions();
-  if (enableShortcuts.checked) sendMessage('flashLocation');
   chrome.storage.sync.set({
     enable: enableExt.checked,
     enableShortcuts: enableShortcuts.checked,
@@ -166,19 +274,26 @@ showRemaining.addEventListener('click', function () {
   chrome.storage.sync.set({
     showRemaining: showRemaining.checked,
   });
-  sendMessage('flashLocation');
 });
 
 showProgress.addEventListener('click', function () {
   chrome.storage.sync.set({
     showProgress: showProgress.checked,
   });
-  sendMessage('flashLocation');
 });
 
 showDifference.addEventListener('click', function () {
   chrome.storage.sync.set({
     showDifference: showDifference.checked,
+  });
+});
+
+rememberSpeed.addEventListener('click', function () {
+  chrome.storage.sync.set({
+    rememberSpeed: {
+      set: rememberSpeed.checked,
+      lastSpeed: settings.rememberSpeed.lastSpeed,
+    },
   });
 });
 
@@ -194,7 +309,6 @@ setLocation.forEach((radio) => {
       chrome.storage.sync.set({
         setLocation: this.value,
       });
-      sendMessage('flashLocation');
     }
   });
 });

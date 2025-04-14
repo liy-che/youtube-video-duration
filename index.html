@@ -48,199 +48,317 @@
       </div>
 
       <div class="content-container">
-        <div class="content" id="c1">
+        <div class="content settings" id="c1">
           <h1>Video Duration for YouTube™</h1>
-          <h3>Settings</h3>
-          <ul class="settings">
-            <li>
-              <label>
-                <div class="switch">
-                  <input type="checkbox" id="enable" />
-                  <span class="slider round"></span>
-                </div>
-                <p>
-                  Enable&nbsp;
-                  <i class="fa-regular fa-circle-question tooltip">
-                    <span class="tooltiptext">Enable extension</span>
-                  </i>
-                </p>
-              </label>
-            </li>
-            <li>
-              <label>
-                <div class="switch">
-                  <input type="checkbox" id="enableController" />
-                  <span class="slider round"></span>
-                </div>
-                <p>
-                  Controller (v)&nbsp;
-                  <i class="fa-regular fa-circle-question tooltip">
-                    <span class="tooltiptext"
-                      >Always show on top corner of video</span
-                    >
-                  </i>
-                </p>
-              </label>
-              <div>
-                <div class="options">
-                  <label>
-                    <input
-                      type="radio"
-                      id="left"
-                      name="location"
-                      value="left"
-                    />
-                    Left (z)
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      id="right"
-                      name="location"
-                      value="right"
-                    />
-                    Right (x)&nbsp;
+          <div class="panel">
+            <div class="panel-header">
+              <h4>General</h4>
+            </div>
+            <ul>
+              <li class="setting-item">
+                <label>
+                  <div class="switch">
+                    <input type="checkbox" id="enable" />
+                    <span class="slider round"></span>
+                  </div>
+                </label>
+                <label for="enable">
+                  <span class="setting-name">Enable</span>
+                </label>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip">Enable extension</span>
+                </i>
+              </li>
+              <li class="setting-item">
+                <label class="switch-label">
+                  <div class="switch">
+                    <input type="checkbox" id="enableController" />
+                    <span class="slider round"></span>
+                  </div>
+                </label>
+                <label for="enableController">
+                  <span class="setting-name">Controller</span>
+                </label>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Always show on the top corner of the video</span
+                  >
+                </i>
+                <ul>
+                  <li class="options">
+                    <label>
+                      <input
+                        type="radio"
+                        id="left"
+                        name="location"
+                        value="left"
+                      />
+                      Left
+                    </label>
+                    <label style="margin-left: 10px">
+                      <input
+                        type="radio"
+                        id="right"
+                        name="location"
+                        value="right"
+                      />
+                      Right
+                    </label>
                     <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext"
-                        >Where to put the controller</span
+                      <span class="tooltiptext top-tip midtip"
+                        >Which corner to place the controller</span
                       >
                     </i>
-                  </label>
-                </div>
-                <div class="options">
-                  <label>
-                    <input
-                      type="checkbox"
-                      id="remaining"
-                      name="remaining"
-                      value="show"
-                    />
-                    Time to end (e)&nbsp;
+                  </li>
+                  <li class="options">
+                    <label>
+                      <input
+                        type="checkbox"
+                        id="remaining"
+                        name="remaining"
+                        value="show"
+                      />
+                      Time to end
+                    </label>
                     <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext"
-                        >Show remaining time, and saved/added time when watching
-                        in non-x1 speed (e.g. 10:50 ▲2:10 = saving 2
-                        minutes)</span
+                      <span class="tooltiptext midtip"
+                        >Show remaining time and time difference (temperarily)
+                        when watching in non-1x speed
+                        <hr />
+                        Example: "10:00" means you can finish the video on
+                        current speed in 10 minutes)</span
                       >
                     </i>
-                  </label>
-                </div>
-                <div class="options">
-                  <label>
-                    <input
-                      type="checkbox"
-                      id="difference"
-                      name="difference"
-                      value="show"
-                    />
-                    Time difference&nbsp;
+                  </li>
+                  <li class="options">
+                    <label>
+                      <input
+                        type="checkbox"
+                        id="difference"
+                        name="difference"
+                        value="show"
+                      />
+                      Time difference
+                    </label>
                     <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext"
-                        >Always show time difference (if any) compared to 1x speed</span
+                      <span class="tooltiptext widetip top-tip"
+                        >Show potential time saving or addition (if any) to
+                        watch the remaining video in the current non-1x speed
+                        <hr />
+                        Example: "<span style="color: #99cc33">▼</span>2.00"
+                        means you can save 2 minutes watching the remaining
+                        video on current speed</span
                       >
                     </i>
-                  </label>
-                </div>
-                <div class="options">
-                  <label>
-                    <input
-                      type="checkbox"
-                      id="progress"
-                      name="progress"
-                      value="show"
-                    />
-                    Progress % (p)&nbsp;
+                  </li>
+                  <li class="options">
+                    <label>
+                      <input
+                        type="checkbox"
+                        id="progress"
+                        name="progress"
+                        value="show"
+                      />
+                      Progress %
+                    </label>
                     <i class="fa-regular fa-circle-question tooltip">
-                      <span class="tooltiptext"
+                      <span class="tooltiptext midtip top-tip"
                         >Show watch progress (e.g. 30%)</span
                       >
                     </i>
-                  </label>
-                </div>
+                  </li>
+                </ul>
+              </li>
+              <li class="setting-item">
+                <label class="switch-label">
+                  <div class="switch">
+                    <input type="checkbox" id="enableShortcuts" />
+                    <span class="slider round"></span>
+                  </div>
+                </label>
+                <label for="enableShortcuts">
+                  <span class="setting-name">Shortcuts</span>
+                </label>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Enable keyboard shortcuts</span
+                  >
+                </i>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <h4>Speed</h4>
+              <div>
+                <button class="save-button">Save</button>
+                <span class="confirm-text">Saved</span>
               </div>
-            </li>
-            <li>
-              <label>
-                <div class="switch">
-                  <input type="checkbox" id="enableShortcuts" />
-                  <span class="slider round"></span>
-                </div>
-                <p>
-                  Shortcuts&nbsp;
-                  <i class="fa-regular fa-circle-question tooltip">
-                    <span class="tooltiptext">Enable keyboard shortcuts</span>
-                  </i>
-                </p>
-              </label>
-            </li>
-          </ul>
+            </div>
+            <ul>
+              <li class="setting-item">
+                <span class="setting-name">Remember speed</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Use the last set speed. Overrides default speed</span
+                  >
+                </i>
+                <label class="textbox-label">
+                  <input
+                    type="checkbox"
+                    name="remember-speed"
+                    id="remember-speed"
+                  />
+                </label>
+              </li>
+              <li class="setting-item">
+                <span class="setting-name">Default speed</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip midtip"
+                    >Start videos with this speed. Overridden by remembered
+                    speed</span
+                  >
+                </i>
+                <label class="textbox-label tooltip">
+                  <input
+                    type="text"
+                    id="default-speed"
+                    name="default-speed"
+                    value="1.0"
+                    placeholder="1.0"
+                  />
+                  <span class="tooltiptext-error midtip left-tip"
+                    >Range: 0.063 - 16</span
+                  >
+                </label>
+              </li>
+              <li class="setting-item">
+                <span class="setting-name">Increase interval</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Amount of speed to increase at each interval</span
+                  >
+                </i>
+                <label class="textbox-label">
+                  <input
+                    type="text"
+                    id="speed-incre-interval"
+                    name="speed-incre-interval"
+                    value="0.25"
+                    placeholder="0.25"
+                  />
+                </label>
+              </li>
+              <li class="setting-item">
+                <span class="setting-name">Decrease interval</span>
+                <i class="fa-regular fa-circle-question tooltip">
+                  <span class="tooltiptext top-tip"
+                    >Amount of speed to decrease at each interval</span
+                  >
+                </i>
+                <label class="textbox-label">
+                  <input
+                    type="text"
+                    id="speed-decre-interval"
+                    name="speed-decre-interval"
+                    value="0.25"
+                    placeholder="0.25"
+                  />
+                </label>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="content" id="c2">
-          <h3>Shortcuts</h3>
-          <i class="fa-regular fa-circle-question tooltip">
-            <span class="tooltiptext widetip"
-              >QWERTY keyboard. For others, ignore letters and use the same key
-              positions as shown in image</span
-            >
-          </i>
-          <ul class="spreadout">
-            <img
-              src="images/shortcuts2.png"
-              alt="Image of key positions for shortcuts"
-              style="width: 100%; border-radius: 5px"
-            />
-            <li class="redText">
-              <div>Increase speed</div>
-              <div>A</div>
-            </li>
-            <li class="redText">
-              <div>Decrease speed</div>
-              <div>D</div>
-            </li>
-            <li class="redText">
-              <div>Jump to 1x speed or back</div>
-              <div>S</div>
-            </li>
-            <hr />
-            <li class="blueText">
-              <div>Toggle controller</div>
-              <div>V</div>
-            </li>
-            <li class="blueText">
-              <div>Show left controller</div>
-              <div>Z</div>
-            </li>
-            <li class="blueText">
-              <div>Show right controller</div>
-              <div>X</div>
-            </li>
-            <li class="blueText">
-              <div>Toggle time to end</div>
-              <div>E</div>
-            </li>
-            <li class="blueText">
-              <div>Toggle progress %</div>
-              <div>P</div>
-            </li>
-            <hr />
-            <li class="orangeText">
-              <div>Restart video</div>
-              <div>R</div>
-            </li>
-            <li class="orangeText">
-              <div>Rewind / forward 10s</div>
-              <div>J / L</div>
-            </li>
-            <hr />
-            <li class="orangeText">
-              <div>Play / pause</div>
-              <div>K</div>
-            </li>
-            <li class="orangeText">
-              <div>Mute / unmute</div>
-              <div>M</div>
-            </li>
-          </ul>
+        <div class="content shortcuts" id="c2">
+          <h3>
+            Shortcuts
+            <i class="fa-regular fa-circle-question tooltip">
+              <span class="tooltiptext widetip left-align"
+                >QWERTY keyboard. For other layouts, ignore letters and use the
+                same key positions</span
+              >
+            </i>
+          </h3>
+          <div class="zoom-wrapper">
+            <input type="checkbox" class="zoom-toggle" id="zoom-toggle" />
+            <label for="zoom-toggle">
+              <img
+                class="zoom-img"
+                src="images/shortcuts2.png"
+                alt="Image of key positions for shortcuts"
+                style="width: 100%; border-radius: 5px"
+              />
+            </label>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <h4 class="redText">Speed Control</h4>
+            </div>
+            <ul class="spreadout">
+              <li>
+                <div>Increase speed</div>
+                <div>A</div>
+              </li>
+              <li>
+                <div>Decrease speed</div>
+                <div>D</div>
+              </li>
+              <li>
+                <div>Jump to 1x speed and back</div>
+                <div>S</div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <h4 class="blueText">Controller</h4>
+            </div>
+            <ul class="spreadout">
+              <li>
+                <div>Show/hide controller</div>
+                <div>V</div>
+              </li>
+              <li>
+                <div>Use left controller</div>
+                <div>Z</div>
+              </li>
+              <li>
+                <div>Use right controller</div>
+                <div>X</div>
+              </li>
+              <li>
+                <div>Show/hide time to end</div>
+                <div>E</div>
+              </li>
+              <li>
+                <div>Show/hide progress %</div>
+                <div>P</div>
+              </li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <h4 class="orangeText">YouTube</h4>
+            </div>
+            <ul class="spreadout">
+              <li>
+                <div>Restart video</div>
+                <div>R</div>
+              </li>
+              <li>
+                <div>Rewind / forward 10s</div>
+                <div>J / L</div>
+              </li>
+              <li>
+                <div>Play / pause</div>
+                <div>K / Space</div>
+              </li>
+              <li>
+                <div>Mute / unmute</div>
+                <div>M</div>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="content" id="c3">
           <h3>Help</h3>

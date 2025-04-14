@@ -16,7 +16,6 @@ html {
   margin: 0;
   padding: 0;
   width: 300px;
-  max-height: 100%;
   min-height: 200px;
 }
 
@@ -30,6 +29,12 @@ html {
   font-size: 62.5%;
 }
 
+main {
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 h1,
 h2,
 h3,
@@ -39,17 +44,22 @@ h6 {
   margin: 0;
 }
 
-h1 {
-  font-size: 1em;
+h1,
+h3 {
+  font-size: 1.1em;
+}
+
+button {
+  line-height: normal;
 }
 
 small {
-  position: absolute;
-  bottom: 8px;
-  right: 20px;
+  position: relative;
   text-align: right;
   color: #808080;
   font-size: 12px;
+  display: block;
+  margin-top: 10px;
 }
 
 a {
@@ -97,7 +107,9 @@ a:hover::before {
 .container {
   font-size: 0;
 }
-input {
+
+input[type='radio'],
+input[type='checkbox'] {
   display: none;
 }
 input:checked + label {
@@ -130,9 +142,12 @@ main > label {
   text-align: center;
   background: #f4f4f4;
   color: #555;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   transition: 0.25s background ease;
   cursor: pointer;
+  bottom: 0;
 }
 main > label::after {
   content: '';
@@ -145,10 +160,15 @@ main > label::after {
   opacity: 0;
   left: 0;
   transition: 0.25s ease;
+  z-index: 10;
 }
 main > label:hover::after {
   opacity: 1;
 }
+input:checked + label::after {
+  opacity: 0 !important;
+}
+
 .line {
   position: absolute;
   height: 2px;
@@ -157,9 +177,12 @@ main > label:hover::after {
   top: 34px;
   left: 0;
   transition: 0.25s ease;
+  z-index: 11;
+  bottom: 0;
 }
+
 .content-container {
-  padding: 20px;
+  padding: 10px;
   font-size: 16px;
 }
 .content {
@@ -168,16 +191,23 @@ main > label:hover::after {
   transition: 0.25s ease;
   color: #333;
 }
-h1,
-h3 {
+h1 {
   font-weight: 200;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   display: inherit;
 }
-h1 {
-  font-weight: bold;
+
+h3 {
+  font-weight: 200;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: visible; /* allow the tooltip to escape */
+  display: flex; /* aligns text and icon inline */
+  align-items: center;
+  gap: 0.5rem; /* spacing between heading and icon */
+  margin: 0 0 10px 0;
 }
 
 /******************************************
@@ -186,11 +216,12 @@ h1 {
 
 ul {
   padding: 0;
+  margin: 0;
   list-style-type: none;
 }
 
-ul.about {
-  padding-bottom: 10px;
+ul > li:last-child {
+  margin-bottom: 0;
 }
 
 li {
@@ -202,23 +233,114 @@ li {
   justify-content: space-between;
 }
 
+.spreadout {
+  padding: 10px 10px 0 10px;
+}
+
 li div:first-child {
+  font-weight: normal;
+}
+
+.panel {
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+  background-color: #ffffff;
+  border-radius: 3px;
+}
+
+.panel:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.content .panel {
+  margin-top: 10px;
+}
+
+.content .panel ~ .panel {
+  margin-top: 0;
+}
+
+.panel > * {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.panel > ul {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.panel-header {
+  border-bottom: 1px solid #ccc;
+  font-weight: normal;
+  padding-top: 8px;
+  padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-header h4 {
+  display: inline-block;
+  font-weight: normal;
+  font-size: 18px;
+}
+
+.save-button {
+  padding: none;
+  font-size: 12px;
+  display: none;
+  height: 100%;
+}
+
+.save-button.show {
+  display: inline-block;
+}
+
+.confirm-text {
+  float: right;
+  font-size: 12px;
+  display: none;
+  color: gray;
+}
+
+.confirm-text.show {
+  display: inline;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.switch-label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.setting-item label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.setting-name {
   font-weight: bold;
 }
 
-ul.settings label {
-  cursor: pointer;
-  display: flex;
+.setting-item label + label span {
+  margin-left: 15px;
 }
 
-ul.settings label p {
-  padding-left: 15px;
-  flex: 1;
+.shortcuts h4 {
   font-weight: bold;
 }
 
 p {
   margin: 0 auto;
+  display: flex;
+  align-items: center;
 }
 
 /******************************************
@@ -275,37 +397,136 @@ input:checked + .slider:before {
 }
 
 /* Tooltip */
+
 .tooltip {
   position: relative;
   display: inline-block;
+  margin-left: 8px;
 }
 
-.tooltip .tooltiptext {
-  line-height: 1.15;
-  font-size: 80%;
-  visibility: hidden;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: rgba(238, 238, 238, 1);
-  border-radius: 6px;
-  padding: 5px;
+.tooltip .tooltiptext,
+.tooltip .tooltiptext-error {
   position: absolute;
-  z-index: 1;
-  width: 120px;
-  top: -5px;
-  left: 105%;
-  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
-  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  top: 105%; /* space between icon and tooltip */
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #eee;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 1.3rem;
+  line-height: 1.3;
+  font-family: 'Roboto', Arial, sans-serif;
+  white-space: normal;
+  width: 120px; /* Default width */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
   opacity: 0;
-  transition: opacity 0.5s;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+
+  /* Center by default */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tooltip:hover .tooltiptext,
+.tooltip .tooltiptext:hover {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltiptext-error {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+input.invalid:focus + .tooltiptext-error {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Tooltip size variations */
+.tooltip .tinytip {
+  width: 80px;
+}
+
+.tooltip .midtip {
+  width: 150px;
 }
 
 .tooltip .widetip {
-  width: 120px;
+  width: 180px;
 }
 
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
+/* Position variations - add these classes manually to tooltips near edges */
+.tooltip .left-align {
+  left: 0;
+  transform: none;
+}
+
+.tooltip .right-align {
+  right: 0;
+  left: auto;
+  transform: none;
+}
+
+/* Top tooltip positioning */
+.tooltip .top-tip {
+  top: auto;
+  bottom: 105%; /* Position above the icon instead of below */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Position variations for top tooltips */
+.tooltip .top-left {
+  bottom: 105%;
+  left: 0;
+  transform: none;
+  top: auto;
+}
+
+.tooltip .left-tip {
+  top: 50%;
+  right: 105%; /* Push it left of the input */
+  left: auto;
+  transform: translateY(-50%);
+}
+
+.zoom-wrapper {
+  display: flex; /* Ensure content inside the wrapper is stacked vertically */
+  flex-direction: column; /* Stack items vertically */
+  overflow: visible; /* Prevent zoom from overflowing */
+  position: relative; /* Ensures that the zoom effect does not affect the layout of other elements */
+}
+
+.zoom-wrapper label {
+  padding-bottom: 0;
+  transition: padding-bottom 0.3s ease; /* Smooth transition for height change */
+}
+
+.zoom-toggle {
+  display: none; /* Hide the checkbox */
+}
+
+.zoom-img {
+  width: 100%;
+  transition: transform 0.3s ease; /* Smooth zoom effect */
+  transform-origin: 15% center; /* Focus the zoom on the left side */
+  cursor: zoom-in; /* Indicating that the image can be zoomed */
+  display: block; /* Remove any bottom space if it's inline */
+}
+
+/* When checkbox is checked, zoom the image */
+.zoom-toggle:checked + label .zoom-img {
+  transform: scale(1.2) translateY(20px); /* Zoom and move the image down */
+  cursor: zoom-out; /* Indicating that the image can be zoomed out */
+}
+
+/* Dynamically change the height of the wrapper when zoomed */
+.zoom-toggle:checked + label {
+  padding-bottom: 20%;
 }
 
 /* Rounded sliders */
@@ -317,10 +538,16 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-/* Radio buttons */
-.options input {
-  display: initial;
+.options input,
+input[type='checkbox'][name] {
+  display: inherit;
   accent-color: #2196f3;
+}
+
+input[type='checkbox'][name],
+input[type='radio'][name] {
+  width: 16px;
+  height: 16px;
 }
 
 .options {
@@ -328,7 +555,6 @@ input:checked + .slider:before {
   flex-direction: row;
   justify-content: left;
   margin-left: 55px;
-  column-gap: 10px;
   row-gap: 10px;
 }
 
@@ -340,6 +566,10 @@ input:checked + .slider:before {
   margin-right: 5px;
 }
 
+li .options {
+  margin-bottom: 0;
+}
+
 label:has(input:disabled) {
   color: #ccc;
   cursor: default;
@@ -347,6 +577,11 @@ label:has(input:disabled) {
 
 div .options {
   padding-top: 10px;
+}
+
+ul > h4 {
+  margin-bottom: 10px;
+  font-weight: normal;
 }
 
 /******************************************
@@ -378,4 +613,26 @@ div .options {
 /* When moving the mouse over the close button */
 .closebtn:hover {
   color: black;
+}
+
+/* Text box */
+input[type='text'] {
+  width: 54px;
+  height: 24px;
+  padding: 3px;
+  font-size: 16px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+input[type='text'].invalid {
+  background-color: #ffe6e6;
+}
+
+input[type='text']:focus.invalid {
+  border: 1px solid #e74c3c;
+}
+
+.textbox-label {
+  margin-left: auto;
 }
