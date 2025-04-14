@@ -49,6 +49,10 @@ h3 {
   font-size: 1.1em;
 }
 
+button {
+  line-height: normal;
+}
+
 small {
   position: relative;
   text-align: right;
@@ -265,13 +269,42 @@ li div:first-child {
   padding-bottom: 8px;
 }
 
-.panel h4 {
-  display: block;
+.panel-header {
   border-bottom: 1px solid #ccc;
   font-weight: normal;
   padding-top: 8px;
   padding-bottom: 4px;
-  padding-left: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-header h4 {
+  display: inline-block;
+  font-weight: normal;
+  font-size: 18px;
+}
+
+.save-button {
+  padding: none;
+  font-size: 12px;
+  display: none;
+  height: 100%;
+}
+
+.save-button.show {
+  display: inline-block;
+}
+
+.confirm-text {
+  float: right;
+  font-size: 12px;
+  display: none;
+  color: gray;
+}
+
+.confirm-text.show {
+  display: inline;
 }
 
 .setting-item {

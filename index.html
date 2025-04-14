@@ -51,7 +51,9 @@
         <div class="content settings" id="c1">
           <h1>Video Duration for YouTube™</h1>
           <div class="panel">
-            <h4>General</h4>
+            <div class="panel-header">
+              <h4>General</h4>
+            </div>
             <ul>
               <li class="setting-item">
                 <label>
@@ -186,7 +188,13 @@
             </ul>
           </div>
           <div class="panel">
-            <h4>Speed</h4>
+            <div class="panel-header">
+              <h4>Speed</h4>
+              <div>
+                <button class="save-button">Save</button>
+                <span class="confirm-text">Saved</span>
+              </div>
+            </div>
             <ul>
               <li class="setting-item">
                 <span class="setting-name">Remember speed</span>
@@ -206,8 +214,9 @@
               <li class="setting-item">
                 <span class="setting-name">Default speed</span>
                 <i class="fa-regular fa-circle-question tooltip">
-                  <span class="tooltiptext top-tip"
-                    >Start videos with this speed</span
+                  <span class="tooltiptext top-tip midtip"
+                    >Start videos with this speed. Overridden by remembered
+                    speed</span
                   >
                 </i>
                 <label class="textbox-label tooltip">
@@ -218,8 +227,8 @@
                     value="1.0"
                     placeholder="1.0"
                   />
-                  <span class="tooltiptext-error tinytip left-tip"
-                    >Enter 0-16</span
+                  <span class="tooltiptext-error midtip left-tip"
+                    >Range: 0.063 - 16</span
                   >
                 </label>
               </li>
@@ -282,7 +291,9 @@
             </label>
           </div>
           <div class="panel">
-            <h4 class="redText">Speed Control</h4>
+            <div class="panel-header">
+              <h4 class="redText">Speed Control</h4>
+            </div>
             <ul class="spreadout">
               <li>
                 <div>Increase speed</div>
@@ -299,7 +310,9 @@
             </ul>
           </div>
           <div class="panel">
-            <h4 class="blueText">Controller</h4>
+            <div class="panel-header">
+              <h4 class="blueText">Controller</h4>
+            </div>
             <ul class="spreadout">
               <li>
                 <div>Show/hide controller</div>
@@ -324,7 +337,9 @@
             </ul>
           </div>
           <div class="panel">
-            <h4 class="orangeText">YouTube</h4>
+            <div class="panel-header">
+              <h4 class="orangeText">YouTube</h4>
+            </div>
             <ul class="spreadout">
               <li>
                 <div>Restart video</div>

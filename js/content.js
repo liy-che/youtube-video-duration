@@ -23,9 +23,9 @@ let handleSpaceUp;
 let isPlaying = false;
 let shortsTimeoutId;
 
-const defaultSpeed = 1.0;
-let secondarySpeed = defaultSpeed;
-const minSpeed = 0.25;
+const resetSpeed = 1.0;
+let secondarySpeed = resetSpeed;
+const minSpeed = 0.0625;
 const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
@@ -192,7 +192,8 @@ chrome.storage.sync.get(settings, async function (storage) {
     if (changes.rememberSpeed) {
       settings.rememberSpeed = changes.rememberSpeed.newValue;
       if (settings.rememberSpeed.set) {
-        lastSpeed = video.playbackRate;
+        lastSpeed =
+          video.playbackRate === 1 ? settings.defaultSpeed : video.playbackRate;
         chrome.storage.sync.set({
           rememberSpeed: {
             ...settings.rememberSpeed,
@@ -202,6 +203,10 @@ chrome.storage.sync.get(settings, async function (storage) {
       } else {
         lastSpeed = null;
       }
+    }
+
+    if (changes.defaultSpeed) {
+      settings.defaultSpeed = changes.defaultSpeed.newValue;
     }
   });
 
@@ -282,9 +287,9 @@ let handleAdvance = () => {
 };
 
 let handleReset = () => {
-  if (video.playbackRate !== defaultSpeed) {
+  if (video.playbackRate !== resetSpeed) {
     secondarySpeed = video.playbackRate;
-    setPlaySpeed(defaultSpeed);
+    setPlaySpeed(resetSpeed);
   } else setPlaySpeed(secondarySpeed);
 };
 
@@ -323,7 +328,7 @@ let handleShortcuts = (event) => {
   if (pressedCode === 'KeyD') handleIncre();
   else if (pressedCode === 'KeyA') handleDecre();
   else if (pressedCode === 'KeyS') {
-    if (video.playbackRate === defaultSpeed) updateShowTime();
+    if (video.playbackRate === resetSpeed) updateShowTime();
     handleReset();
     flashButtons();
   } else if (pressedCode === 'KeyL') {
@@ -721,6 +726,13 @@ function constructShadowDOM() {
           newNode,
           videoContainer.parentElement,
         );
+        if (settings.rememberSpeed.set) {
+          speedDisplay.textContent = lastSpeed.toFixed(2);
+          setPlaySpeed(lastSpeed);
+        } else {
+          setPlaySpeed(settings.defaultSpeed);
+          updateShowSpeed();
+        }
       }, 500);
       break;
     case 'inline-preview-player': {
@@ -804,6 +816,9 @@ let handleLoadedMetadata = () => {
   if (settings.rememberSpeed.set) {
     speedDisplay.textContent = lastSpeed.toFixed(2);
     setPlaySpeed(lastSpeed);
+  } else {
+    setPlaySpeed(settings.defaultSpeed);
+    updateShowSpeed();
   }
   updateShowTime(false);
 };
