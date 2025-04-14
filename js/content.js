@@ -26,7 +26,6 @@ let shortsTimeoutId;
 const resetSpeed = 1.0;
 let secondarySpeed = resetSpeed;
 const minSpeed = 0.0625;
-const interval = 0.25;
 const maxSpeed = 16;
 const seekInterval = 10;
 const zeroTime = '0:00';
@@ -53,8 +52,8 @@ let settings = {
     lastSpeed: 1.0,
   },
   defaultSpeed: 1.0,
-  speedIncreInterval: 0.25,
-  speedDecreInterval: 0.25,
+  increInterval: 0.25,
+  decreInterval: 0.25,
 };
 
 /***************************** Initialize extension ******************************/
@@ -208,6 +207,14 @@ chrome.storage.sync.get(settings, async function (storage) {
     if (changes.defaultSpeed) {
       settings.defaultSpeed = changes.defaultSpeed.newValue;
     }
+
+    if (changes.increInterval) {
+      settings.increInterval = changes.increInterval.newValue;
+    }
+
+    if (changes.decreInterval) {
+      settings.decreInterval = changes.decreInterval.newValue;
+    }
   });
 
   // RUNS disable
@@ -294,11 +301,11 @@ let handleReset = () => {
 };
 
 let handleIncre = () => {
-  setPlaySpeed(video.playbackRate + interval);
+  setPlaySpeed(video.playbackRate + settings.increInterval);
 };
 
 let handleDecre = () => {
-  setPlaySpeed(video.playbackRate - interval);
+  setPlaySpeed(video.playbackRate - settings.decreInterval);
 };
 
 let handleShortcuts = (event) => {

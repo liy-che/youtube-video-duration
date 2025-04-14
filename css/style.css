@@ -288,19 +288,20 @@ li div:first-child {
 .save-button {
   padding: none;
   font-size: 12px;
-  display: none;
+  display: inline-block;
   height: 100%;
 }
 
-.save-button.show {
-  display: inline-block;
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .confirm-text {
-  float: right;
   font-size: 12px;
   display: none;
   color: gray;
+  margin: 0 5px;
 }
 
 .confirm-text.show {

@@ -191,8 +191,8 @@
             <div class="panel-header">
               <h4>Speed</h4>
               <div>
-                <button class="save-button">Save</button>
                 <span class="confirm-text">Saved</span>
+                <button class="save-button">Save</button>
               </div>
             </div>
             <ul>
@@ -239,7 +239,7 @@
                     >Amount of speed to increase at each interval</span
                   >
                 </i>
-                <label class="textbox-label">
+                <label class="textbox-label tooltip">
                   <input
                     type="text"
                     id="speed-incre-interval"
@@ -247,6 +247,9 @@
                     value="0.25"
                     placeholder="0.25"
                   />
+                  <span class="tooltiptext-error midtip left-tip"
+                    >Range: 0.063 - 16</span
+                  >
                 </label>
               </li>
               <li class="setting-item">
@@ -256,7 +259,7 @@
                     >Amount of speed to decrease at each interval</span
                   >
                 </i>
-                <label class="textbox-label">
+                <label class="textbox-label tooltip">
                   <input
                     type="text"
                     id="speed-decre-interval"
@@ -264,6 +267,9 @@
                     value="0.25"
                     placeholder="0.25"
                   />
+                  <span class="tooltiptext-error midtip left-tip"
+                    >Range: 0.063 - 16</span
+                  >
                 </label>
               </li>
             </ul>
