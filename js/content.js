@@ -718,40 +718,6 @@ function constructShadowDOM() {
     `;
   shadowRoot.innerHTML = shadowTemplate;
 
-  switch (videoContainer.parentElement.id) {
-    case 'movie_player':
-      insertedNode = videoContainer.parentElement.insertBefore(
-        newNode,
-        videoContainer,
-      );
-      break;
-    case 'shorts-player':
-      // inserting right away blocks the video from playing
-      if (shortsTimeoutId) clearTimeout(shortsTimeoutId);
-      shortsTimeoutId = setTimeout(() => {
-        insertedNode = videoContainer.parentElement.parentElement.insertBefore(
-          newNode,
-          videoContainer.parentElement,
-        );
-        if (settings.rememberSpeed.set) {
-          speedDisplay.textContent = lastSpeed.toFixed(2);
-          setPlaySpeed(lastSpeed);
-        } else {
-          setPlaySpeed(settings.defaultSpeed);
-          updateShowSpeed();
-        }
-      }, 500);
-      break;
-    case 'inline-preview-player': {
-      let mediaContainer = document.getElementById('media-container');
-      insertedNode = mediaContainer.insertBefore(
-        newNode,
-        mediaContainer.children[0],
-      );
-      break;
-    }
-  }
-
   speedDisplay = shadowRoot.querySelector('.speed .display');
   remainDisplay = shadowRoot.querySelector('#remain');
   diffDisplay = shadowRoot.querySelector('#diff');
@@ -764,6 +730,36 @@ function constructShadowDOM() {
   decreButton = shadowRoot.querySelector('.left');
   rewindButton = shadowRoot.querySelector('.backward');
   advanceButton = shadowRoot.querySelector('.forward');
+
+  switch (videoContainer.parentElement.id) {
+    case 'movie_player':
+      insertedNode = videoContainer.parentElement.insertBefore(
+        newNode,
+        videoContainer,
+      );
+      initSpeed();
+      break;
+    case 'shorts-player':
+      // inserting right away blocks the video from playing
+      if (shortsTimeoutId) clearTimeout(shortsTimeoutId);
+      shortsTimeoutId = setTimeout(() => {
+        insertedNode = videoContainer.parentElement.parentElement.insertBefore(
+          newNode,
+          videoContainer.parentElement,
+        );
+        initSpeed();
+      }, 500);
+      break;
+    case 'inline-preview-player': {
+      let mediaContainer = document.getElementById('media-container');
+      insertedNode = mediaContainer.insertBefore(
+        newNode,
+        mediaContainer.children[0],
+      );
+      initSpeed();
+      break;
+    }
+  }
 
   return newNode;
 }
@@ -819,7 +815,7 @@ function removeTimeUpdates() {
   hasTimeUpdateListeners = false;
 }
 
-let handleLoadedMetadata = () => {
+function initSpeed() {
   if (settings.rememberSpeed.set) {
     speedDisplay.textContent = lastSpeed.toFixed(2);
     setPlaySpeed(lastSpeed);
@@ -827,6 +823,10 @@ let handleLoadedMetadata = () => {
     setPlaySpeed(settings.defaultSpeed);
     updateShowSpeed();
   }
+}
+
+let handleLoadedMetadata = () => {
+  initSpeed();
   updateShowTime(false);
 };
 
