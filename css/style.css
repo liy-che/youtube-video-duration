@@ -15,7 +15,7 @@ body,
 html {
   margin: 0;
   padding: 0;
-  width: 300px;
+  width: 280px;
   min-height: 200px;
 }
 
@@ -183,7 +183,7 @@ input:checked + label::after {
 
 .content-container {
   padding: 10px;
-  font-size: 16px;
+  font-size: 14px;
 }
 .content {
   width: 100%;
@@ -282,7 +282,7 @@ li div:first-child {
 .panel-header h4 {
   display: inline-block;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .save-button {
@@ -336,6 +336,7 @@ li div:first-child {
 
 .shortcuts h4 {
   font-weight: bold;
+  font-size: 14px;
 }
 
 p {
@@ -621,7 +622,7 @@ input[type='text'] {
   width: 54px;
   height: 24px;
   padding: 3px;
-  font-size: 16px;
+  font-size: 14px;
   text-align: center;
   border: 1px solid #ccc;
 }
