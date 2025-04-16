@@ -15,9 +15,14 @@ Find it here:
 
 ## ⚡️ Features ⚡️
 
-:white_check_mark: Adjust video playback speed beyond 2x  
+### Video Speed
+:white_check_mark: Adjust video playback speed to up to 16x  
 :white_check_mark: Jump to 1x speed, then switch back to the previous speed in
 one click  
+:white_check_mark: Set the default speed at which every video starts with  
+:white_check_mark: Change speed in smaller or bigger increments  
+
+### Video Duration
 :white_check_mark: Find out how much time will be saved or added compared to
 watching at 1x speed  
 :white_check_mark: See your watch progress in percentage  
@@ -25,9 +30,11 @@ watching at 1x speed
 current speed  
 :white_check_mark: Know your YouTube Shorts: know video length, change video
 speed, skip through video  
+
+### Flexibility
 :white_check_mark: Continue using your favorite shortcuts already provided by
 YouTube  
-:white_check_mark: Tailor the extension to your liking with settings
+:white_check_mark: Tailor appearance and functionalities to your liking with settings in the extension popup
 
 ## 💥 Keyboard shortcuts 💥
 
@@ -45,6 +52,15 @@ YouTube
 | Show watch progress      | P        |
 
 ## 🎉 Updates 🎉
+
+**2.1.0**
+
+- Add option to always show time difference
+- Add option to use last saved speed
+- Add ability to set the default speed for future videos
+- Add ability to change speed increment and decrement intervals
+- Bug fix: double controller injecting in Shorts
+- Bug fix: stale updates when switching video
 
 **2.0.0**
 
